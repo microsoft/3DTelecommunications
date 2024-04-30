@@ -57,13 +57,6 @@ It is written in C++ and uses the ZeroMQ library for communication.
 In certain configurations where the camera system may be on a separate subnet from the control panel, the Kinect Nano Communicator Service can act as a router to route messages from the Azure Kinect Launcher Daemon and K4A To Fusion components of each camera unit up to the control panel on a separate subnet.
 
 
-As the maintainer of this project, please make a few updates:
-
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
-
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
