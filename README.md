@@ -1,6 +1,8 @@
 # 3D Telemedicine
 
 > This is the open source repository for the 3D Telemedicine system created by Microsoft Research Special Projects Group: https://www.microsoft.com/en-us/research/project/3d-telemedicine/
+[![Watch the video](https://img.youtube.com/vi/ml4Dv5CWC7s/maxresdefault.jpg)](https://youtu.be/ml4Dv5CWC7s)
+
 
 ## 3rd Party Components
 This system relies on the following open-source 3rd party components:
