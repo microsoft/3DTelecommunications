@@ -3,8 +3,27 @@
 > This is the open source repository for the 3D Telemedicine system created by Microsoft Research Special Projects Group: https://www.microsoft.com/en-us/research/project/3d-telemedicine/
 [![Watch the video](https://img.youtube.com/vi/ml4Dv5CWC7s/maxresdefault.jpg)](https://youtu.be/ml4Dv5CWC7s)
 
+## System Requirements
+The typical system layout for 3D Telemedicine is to have one machine running Fusion, and a separate machine running Render and Viewer.  The pods all run their own copy of the K4AToFusion code and should be networked into the same network as Fusion.  Control panel can be run on the Fusion PC, the Render PC, or a separate PC or tablet.
 
-## 3rd Party Components
+### Minimum Requirements (Fusion)
+Windows 11
+CUDA 12.0
+NVidia GPU 2080Ti or larger
+10 Gigabit ethernet adapter
+OpenCV 4.5.4
+We use OpenCV with CUDA libraries.  This means you cannot just use the binaries available directly on the website, although there are typically additional sites that provide OpenCV with CUDA built in.
+Currently our project requires the opencv_contrib folder also be checked out of GIT and compiled as part of OpenCV.  We hope to remove this dependency in the future.
+
+
+### Minimum Requirements (Render)
+Windows 11
+CUDA 12.0
+NVidia GPU 2080Ti or larger
+1 Gigabit ethernet adapter
+
+
+## 3rd Party Components (Windows)
 This system relies on the following open-source 3rd party components:
 | Component | Version | Link |
 | --------- | ------- | ---- |
@@ -24,6 +43,16 @@ This system relies on the following open-source 3rd party components:
 | VXL | 2.0.2 | https://github.com/vxl/vxl.git |
 | xerces | 3.1.1 | https://github.com/apache/xerces-c/ |
 | zlib | 1.2.5 | https://www.zlib.net/ |
+The default configuration expects these dependencies to be placed in a Dependencies\ folder inside the root of the repo.  You can change this location by modifying the definition of Peabody_Dependency_Dir in PeabodyConfigurationMacros.props, or modifying only a specific component's location in its Peabody.x64.[componentName].props file.
+
+## 3rd Party Components (Linux)
+| Component | Version | Link |
+| --------- | ------- | ---- |
+| libk4a | 1.4.1 | https://learn.microsoft.com/en-us/azure/kinect-dk/sensor-sdk-download |
+| ZeroMQ | 4.3.4 | https://github.com/zeromq/libzmq/ |
+| CppZMQ | | https://github.com/zeromq/cppzmq |
+| OpenCV | 4.5.4 (CUDA) | https://github.com/opencv/opencv |
+
 
 ## System Components 
 This repo includes source code to compile the following systems:
@@ -57,6 +86,71 @@ It is written in C++ and uses the ZeroMQ library for communication.
 It is written in C++ and uses the ZeroMQ library for communication.
 ### Kinect Nano Communicator Service
 In certain configurations where the camera system may be on a separate subnet from the control panel, the Kinect Nano Communicator Service can act as a router to route messages from the Azure Kinect Launcher Daemon and K4A To Fusion components of each camera unit up to the control panel on a separate subnet.
+
+## Setup [Windows components]
+Check out the repository to a location of your choice, we'll refer to it as [3dtmroot]
+
+Create the folder for the dependencies, [3dtmroot]\Dependencies
+
+Download the dependencies and install them into the Dependencies folder
+
+### Build (Fusion)
+Fusion is built using the DeformableFusion solution in the DeformableFusion folder of the repository.  It should be built in Release, x64 configuration.  Debug currently does not compile. The DeformableFusion solution contains a number of helper libraries that will be built first, and the Fusion executable is built as part of the LiveFusionDemo-MultiView project, which is selected as the startup project.
+
+
+## Setup [Linux components]
+The linux components (Azure Kinect Launcher Daemon, K4A To Fusion, K4ARecorder) are built for the ARM64 architecture of the Nvidia Jetson Nano.  Our build system uses the Ubuntu 18.04 image from the Nvidia Jetson website that includes CUDA.
+
+Check out the repository to a location of your choice, we'll refer to it as [3dtmroot]
+
+Clone the Azure Kinect SDK: https://github.com/microsoft/Azure-Kinect-Sensor-SDK.git
+
+Install the additional required build packages:
+- Azure Kinect libraries - https://learn.microsoft.com/en-us/azure/kinect-dk/sensor-sdk-download#linux-installation-instructions
+- Ncurses
+- SoundIO (required for Azure Kinect)
+- Boost - System
+- Boost - IO Streams
+- ZMQ
+- ProcPS
+- LZ4
+- JSONCpp
+- ZeroMQ 4.3.4
+- cppzmq
+- OpenCV 4.5.4
+  
+```bash
+sudo apt update && sudo apt install -y libk4atools libk4a1.4  libk4a1.4-dev libncurses-dev libsoundio-dev libboost-system-dev libboost-iostreams-dev libzmq3-dev libprocps-dev liblz4-dev libjsoncpp-dev
+```
+The system requires zeromq 4.3.4 with drafts enabled, which is not available in the Jetson Ubuntu 18.04 image.  So to do this:
+```bash
+ZMQ_VERSION=4.3.4
+PREFIX=/usr/local
+wget https://github.com/zeromq/libzmq/releases/download/v${ZMQ_VERSION}/zeromq-${ZMQ_VERSION}.tar.gz -O libzmq.tar.gz
+tar -xzf libzmq.tar.gz
+cd zeromq-${ZMQ_VERSION} 
+./configure --prefix=${PREFIX} --enable-drafts
+make -j && make install
+```
+You can install cppzmq from here: https://github.com/zeromq/cppzmq
+
+You'll also need OpenCV 4.5.5.  Here's a great tutorial to get it built on the nano: https://qengineering.eu/install-opencv-4.5-on-jetson-nano.html
+
+Now set up the paths correctly in the cmakelists.txt
+
+### Build (Linux)
+You can build all of the linux projects at the same time by
+```bash
+cd [3dtmroot]
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+```
+
+### Reminder
+You might be tempted to update your build environment to a newer version of Ubuntu or other libraries, but remember that most libraries will be dynamically linked, not bundled in the binary, so they won't run on a Jetson Nano, which only has Ubuntu 18.04 as the latest OS.
 
 
 ## Contributing
