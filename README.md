@@ -6,9 +6,9 @@
 ## System Requirements
 The typical system layout for 3D Telemedicine is to have one machine running Fusion, and a separate machine running Render and Viewer.  The pods all run their own copy of the K4AToFusion code and should be networked into the same network as Fusion.  Control panel can be run on the Fusion PC, the Render PC, or a separate PC or tablet.
 
-### Minimum Requirements (Fusion)
+### Minimum Operating Requirements (Fusion)
 Windows 11
-CUDA 12.0
+CUDA 11.7
 NVidia GPU 2080Ti or larger
 10 Gigabit ethernet adapter
 OpenCV 4.5.4
@@ -16,13 +16,13 @@ We use OpenCV with CUDA libraries.  This means you cannot just use the binaries 
 Currently our project requires the opencv_contrib folder also be checked out of GIT and compiled as part of OpenCV.  We hope to remove this dependency in the future.
 
 
-### Minimum Requirements (Render)
+### Minimum Operating Requirements (Render)
 Windows 11
-CUDA 12.0
+CUDA 11.7
 NVidia GPU 2080Ti or larger
 1 Gigabit ethernet adapter
 
-
+## Building from Source
 ## 3rd Party Components (Windows)
 This system relies on the following open-source 3rd party components:
 | Component | Version | Link |
@@ -43,6 +43,10 @@ This system relies on the following open-source 3rd party components:
 | VXL | 2.0.2 | https://github.com/vxl/vxl.git |
 | xerces | 3.1.1 | https://github.com/apache/xerces-c/ |
 | zlib | 1.2.5 | https://www.zlib.net/ |
+| CUDA | 11.7 | https://developer.nvidia.com/cuda-11-7-1-download-archive? |
+| Visual Studio | 2022 | https://visualstudio.microsoft.com/downloads/ |
+
+
 The default configuration expects these dependencies to be placed in a Dependencies\ folder inside the root of the repo.  You can change this location by modifying the definition of Peabody_Dependency_Dir in PeabodyConfigurationMacros.props, or modifying only a specific component's location in its Peabody.x64.[componentName].props file.
 
 ## 3rd Party Components (Linux)
@@ -52,7 +56,7 @@ The default configuration expects these dependencies to be placed in a Dependenc
 | ZeroMQ | 4.3.4 | https://github.com/zeromq/libzmq/ |
 | CppZMQ | | https://github.com/zeromq/cppzmq |
 | OpenCV | 4.5.4 (CUDA) | https://github.com/opencv/opencv |
-
+| CUDA | 11.x | Bundled in Jetpack OS Image |
 
 ## System Components 
 This repo includes source code to compile the following systems:
