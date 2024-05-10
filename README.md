@@ -57,6 +57,9 @@ The default configuration expects these dependencies to be placed in a Dependenc
 | CppZMQ | | https://github.com/zeromq/cppzmq |
 | OpenCV | 4.5.4 (CUDA) | https://github.com/opencv/opencv |
 | CUDA | 11.x | Bundled in Jetpack OS Image |
+| GetGitRevisionDescription (Cmake module) | | https://github.com/bilke/cmake-modules/blob/master/GetGitRevisionDescription.cmake |
+
+
 
 ## System Components 
 This repo includes source code to compile the following systems:
