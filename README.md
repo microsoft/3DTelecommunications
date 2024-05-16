@@ -65,7 +65,7 @@ This repo includes source code to compile the following systems:
 ### Fusion
 Fusion is the main component that creates a watertight, volumetric mesh in real time from any number of RGB+D streams.  The textured volume and raw (or jpeg compressed) RGB images are transmitted to any number of render clients.  
 It is based off of the Fusion4D algorithm https://www.microsoft.com/en-us/research/publication/fusion4d-real-time-performance-capture-challenging-scenes-2/
-Fusion is a C++ and CUDA project, and is known to work with CUDA 12.  It uses Boost ASIO for transmmitting data.
+Fusion is a C++ and CUDA project, and is known to work with CUDA 11.4+.  It uses Boost ASIO for transmmitting data.
 ### Render
 Render takes a volumetric mesh from the fusion system and textures it with the RGB images provided in the same data stream from fusion, and transmits the textured model over the network to any number of viewer clients.  
 It is a C# Unity project, and is known to work with Unity 2019.4.14f1
@@ -74,7 +74,7 @@ It is also dependent on the C++ Rendering Client DLL for transmitting data.  It 
 Viewer subscribes to a given Render stream and presents the textured 3D model to the user.  It provides views of the 3D model and the 2D cameras.  It also includes drawing tools and capture tools for manipulating the model.
 It is a C# Unity project, and is known to work with Unity 2019.4.14f1.  It uses Boost ASI for transmitting data. 
 ### Control Panel
-The control panel software orchestrates all of the components of the 3D Telemedicine system.  It provides one interface to start a calibration session, start a broadcast (live) session, modify configuration values, transmit configuration to the various components, monitor status and version of all componenets in the system, and check for updated components from an Internet-accessible source.
+The control panel software orchestrates all of the components of the 3D Telemedicine system.  It provides one interface to start a calibration session, start a broadcast (live) session, modify configuration values, transmit configuration to the various components, monitor status and version of all components in the system, and check for updated components from an Internet-accessible source.
 It is a C# Unity project, and is known to work with Unity 2019.4.14f1. It utilizes the zeroMQ networking library for all communication.
 ### Calibration Software
 The calibration software will take a number of synchronized input mkv videos from cameras in the system (Azure Kinect) and output a calibration file that provides world coordinates of all cameras in the system.   It is dependent on the PAI calibration system available at this NuGet repository: 
