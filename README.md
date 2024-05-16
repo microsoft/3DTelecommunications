@@ -44,7 +44,7 @@ This system relies on the following open-source 3rd party components:
 | xerces | 3.1.1 | https://github.com/apache/xerces-c/ |
 | zlib | 1.2.5 | https://www.zlib.net/ |
 | CUDA | 11.7 | https://developer.nvidia.com/cuda-11-7-1-download-archive? |
-| Visual Studio | 2022 | https://visualstudio.microsoft.com/downloads/ |
+| Visual Studio | 2019 | https://visualstudio.microsoft.com/downloads/ |
 
 
 The default configuration expects these dependencies to be placed in a Dependencies\ folder inside the root of the repo.  You can change this location by modifying the definition of Peabody_Dependency_Dir in PeabodyConfigurationMacros.props, or modifying only a specific component's location in its Peabody.x64.[componentName].props file.
