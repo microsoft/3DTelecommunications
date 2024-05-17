@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <NVIDIA_VIDEO_CODEC_DIR>$(PEABODY_DEPENDENCY_DIR)NVidiaVideoCodecAPI9.1.23\</NVIDIA_VIDEO_CODEC_DIR>
+    <NVIDIA_VIDEO_CODEC_INC_DIR>$(NVIDIA_VIDEO_CODEC_DIR)include\</NVIDIA_VIDEO_CODEC_INC_DIR>
+    <NVIDIA_VIDEO_CODEC_LIB_DIR>$(NVIDIA_VIDEO_CODEC_DIR)Lib\$(PlatformTarget)\</NVIDIA_VIDEO_CODEC_LIB_DIR>
+    <NVIDIA_VIDEO_CODEC_SAMPLES_DIR>$(NVIDIA_VIDEO_CODEC_DIR)samples\NVCodec\</NVIDIA_VIDEO_CODEC_SAMPLES_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(NVIDIA_VIDEO_CODEC_INC_DIR);$(NVIDIA_VIDEO_CODEC_SAMPLES_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(NVIDIA_VIDEO_CODEC_LIB_DIR)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>nvcuvid.lib;nvencodeapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>%(Command)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="NVIDIA_VIDEO_CODEC_DIR">
+      <Value>$(NVIDIA_VIDEO_CODEC_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="NVIDIA_VIDEO_CODEC_INC_DIR">
+      <Value>$(NVIDIA_VIDEO_CODEC_INC_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="NVIDIA_VIDEO_CODEC_LIB_DIR">
+      <Value>$(NVIDIA_VIDEO_CODEC_LIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="NVIDIA_VIDEO_CODEC_SAMPLES_DIR">
+      <Value>$(NVIDIA_VIDEO_CODEC_SAMPLES_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

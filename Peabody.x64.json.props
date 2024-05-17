@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <JSON_DLL>$(PEABODY_DEPENDENCY_DIR)jsoncpp-master\lib\$(Platform)\$(Configuration)\$(DefaultPlatformToolset)\</JSON_DLL>
+    <JSON_DIR>$(PEABODY_DEPENDENCY_DIR)jsoncpp-master\</JSON_DIR>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ExecutablePath>$(JSON_DLL);$(ExecutablePath)</ExecutablePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(JSON_DIR)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(JSON_DLL);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>jsoncpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>echo copy "$(JSON_DLL)\jsoncpp.dll" "$(OutDir)"
+copy "$(JSON_DLL)jsoncpp.dll" "$(OutDir)"
+%(Command)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="JSON_DLL">
+      <Value>$(JSON_DLL)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="JSON_DIR">
+      <Value>$(JSON_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <OGLPLUS_ROOT>$(PEABODY_DEPENDENCY_DIR)oglplus\</OGLPLUS_ROOT>
+    <OGLPLUS_INC_DIR>$(OGLPLUS_ROOT)include\</OGLPLUS_INC_DIR>
+    <OGLPLUS_IMPL_DIR>$(OGLPLUS_ROOT)implement\</OGLPLUS_IMPL_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(OGLPLUS_IMPL_DIR);$(OGLPLUS_INC_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(OGLPLUS_LIB_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="OGLPLUS_ROOT">
+      <Value>$(OGLPLUS_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="OGLPLUS_INC_DIR">
+      <Value>$(OGLPLUS_INC_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="OGLPLUS_IMPL_DIR">
+      <Value>$(OGLPLUS_IMPL_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

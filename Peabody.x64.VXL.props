@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <VXL_ROOT>$(PEABODY_DEPENDENCY_DIR)vxl\MSBUILD\</VXL_ROOT>
+    <VXL_INC_DIRS>$(VXL_ROOT)include\vxl\vcl;$(VXL_ROOT)include\vxl\core;$(VXL_ROOT)vcl;$(VXL_ROOT)core;$(VXL_ROOT)contrib;$(VXL_ROOT)contrib\cul;$(VXL_ROOT)contrib\brl;$(VXL_ROOT)contrib\oxl;$(VXL_ROOT)contrib\gel;$(VXL_ROOT)contrib\rpl;$(VXL_ROOT)contrib\brl\bbas;$(VXL_ROOT)contrib\brl\bcl;$(VXL_ROOT)contrib\brl\bbas;$(VXL_ROOT)contrib\brl\bseg;$(VXL_ROOT)contrib\brl\bpro;$(VXL_ROOT)contrib\brl;$(VXL_ROOT)contrib\oxl\mvl;$(VXL_ROOT)contrib\gel\mrc</VXL_INC_DIRS>
+    <VXL_LIB_DIR>$(VXL_ROOT)lib\$(Configuration)\</VXL_LIB_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(VXL_INC_DIRS);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(VXL_LIB_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vnl.lib;vnl_algo.lib;vgl_algo.lib;vgl.lib;vpgl.lib;vpgl_algo.lib;vpgl_file_formats.lib;v3p_netlib.lib;vul.lib;vil.lib;vil_algo.lib;vil1.lib;vil_io.lib;vcl.lib;tiff.lib;geotiff.lib;png.lib;jpeg.lib;openjpeg2.lib;rsdl.lib;rrel.lib;mvl.lib;vbl.lib;ws2_32.lib;bapl.lib;bundler.lib;bpgl_algo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="VXL_ROOT">
+      <Value>$(VXL_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VXL_INC_DIRS">
+      <Value>$(VXL_INC_DIRS)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VXL_LIB_DIR">
+      <Value>$(VXL_LIB_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

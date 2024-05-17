@@ -1,0 +1,199 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &189434
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 451338}
+  - component: {fileID: 11465164}
+  - component: {fileID: 11431442}
+  - component: {fileID: 11487258}
+  - component: {fileID: 114181222127420596}
+  m_Layer: 14
+  m_Name: HoloPort Renderer
+  m_TagString: HoloportRenderer
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &451338
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189434}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 4698735500490992}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &11465164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e37a0af8fdf3a4783e9ae6119ea3d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RigConfiguration: {fileID: 11400000, guid: 3ec82d34874ac894ca65c0e54b28d441, type: 2}
+  MaxIndices: 2100000
+  MaxVertices: 350000
+  PauseDrawing: 0
+  PauseNetworkUpdate: 0
+  ComputeVertexWeightsShader: {fileID: 7200000, guid: 140799c5e5f133643973fdcadbccdc9b,
+    type: 3}
+  GlobalAlpha: 1
+  HoloPortMaterial:
+  - {fileID: 2100000, guid: 4d2ba19f3f41d394c9220e321ab21cf4, type: 2}
+  - {fileID: 2100000, guid: db56bd2ddedb12348bcd6203e97772a2, type: 2}
+  CurrentRenderEffectState: 0
+  EffectChangeRate: 0.2
+  EffectWeightArray: []
+  ApplyLightingToNormalMap: 1
+  SpatialDiffusionIterations: 25
+  NormalThresholdForSeams: 0.5
+  NormalWeightedPercentage: 0.874
+  GeodesicScale: 1.5
+  NormalWeightedBlendingOpacity: 1
+  TemporalTransitionSpeed: 500
+  DiscontinuityThreshold: 0.2
+  _DebugIndexAndVertexCount: 0
+  ViewDependentTemporalTextureFieldStep: 0.1
+  RemoveBackgroundPixels: 0
+  TemporalTextureFields: []
+  TargetTextureFields: []
+  ViewPreference: []
+  Voxelize: 0
+  VoxelSize: 0.01
+  VoxelNoSkipSize: 0.009
+  targetExplosionMode: 0
+  Materialize: 0
+  ExplosionAmount: 0
+  ExplosionTimeSec: 1.05
+  NormalBandCenter: -1
+  isDecreasingNormalBandCenter: 1
+  useNormalBands: 0
+  HighlightColor: {r: 0.32941177, g: 0.6392157, b: 0.4156863, a: 1}
+  HologramTint: {r: 0.2901961, g: 0.9607844, b: 0.627451, a: 1}
+  RimPower: 2.2
+  RimVis: 0.3
+  ModelOpacity: 1
+  cullingBox1: {fileID: 0}
+  cullingBox2: {fileID: 0}
+  useGenUVs: 0
+  renderUVSpace: 1
+  simplifyNextFrame: 0
+  aggresivenexx: 7
+  targetPolyCount: 21000
+--- !u!114 &11431442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51599b2ec35165a45b17fbb8ba8e2e48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DepthBACalibPath: X:\Calibrations\chainsawCalib\calib_Depth
+  GeneralCalibPath: X:\Calibrations\chainsawCalib\calibColorCams.txt
+  EnableAutoCalibration: 0
+  AutoCalibrationInverval: 10
+  renderTextureAtlas: {fileID: 0}
+  inputTextureAtlas: {fileID: 0}
+  processRawImageShader: {fileID: 7200000, guid: f7d91acf92865cb4782a0c9da7684e5b,
+    type: 3}
+--- !u!114 &11487258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91d898f1ea2384e41891d1f9ae697d64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useRenderTexture: 1
+  useMockSetup: 0
+  imageProcessScript: {fileID: 11431442}
+  ModelTransform: {fileID: 451338}
+  projectiveTextureCameras: []
+  atlasDepthMap: {fileID: 0}
+  cameraDepthMaps: []
+  textureMatrix: []
+  invTextureMatrix: []
+--- !u!114 &114181222127420596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b81b00649f883b54aae45881ae755c9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkFilesShareScript: {fileID: 0}
+  tempPlane: {fileID: 0}
+  localHoloportScript: {fileID: 0}
+  debugTestMesh: 1
+  testMeshFilter: {fileID: 0}
+  mTextureDimension: 2048
+  mPerTriangleTextureDimension: 32
+  frameUVBufferSize: 10
+  expectedVertexCount: 0
+  expectedIndexCount: 0
+  useSimplifiedData: 0
+  TextureCam: {fileID: 0}
+  mHoloportResultTexture: {fileID: 0}
+  exiting: 0
+  numberOfSaveFileThreads: 5
+  readbackCallbackCount: 0
+  outputCount: 0
+--- !u!1 &1296021769606956
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4698735500490992}
+  m_Layer: 14
+  m_Name: FocusTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4698735500490992
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296021769606956}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 451338}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

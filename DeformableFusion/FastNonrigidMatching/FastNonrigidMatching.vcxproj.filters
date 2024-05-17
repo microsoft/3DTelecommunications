@@ -1,0 +1,350 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="CUDA">
+      <UniqueIdentifier>{c1732df6-c47a-4895-a3b3-bdccc0cf4034}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PCG">
+      <UniqueIdentifier>{67fe8e82-da8b-4d5e-b4bf-2292856b165b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CUDA\Cuda-Core">
+      <UniqueIdentifier>{47980dd3-3e34-47c8-8eab-2e3654e9a83f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="suitesparse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lmsolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NormalEquationSolverSuiteSparse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockedHessianMatrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LinearSolverCuSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EDMatchingJacobianHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EDMatchingLSQProblem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="volumetric_fusion_io.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry_types_cuda.h">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="fast_pcg.cuh">
+      <Filter>PCG</Filter>
+    </ClInclude>
+    <ClInclude Include="matrix_types_cuda.h">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="lmsolver_gpu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda_utility.h">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda_math_common.cuh" />
+    <ClInclude Include="triangle_table.h">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="CMotionFieldEstimationF2F.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Fusion4DGPUKeyFrames.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="volumetric_fusion_GPU.h">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="volumetric_fusion_impl_GPU.cuh">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="DeformGraphCuda_GPU.h">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="DeformGraphCudaImpl_GPU.cuh">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="EDMatchingHelperCuda_GPU.h">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="EDMatchingHelperCudaImpl_GPU.cuh">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="NormalEquationSolverPCGCuda_GPU.h">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="PCGCuda_GPU.cuh">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="EDMatchingLSQProblemCuda.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <!-- <ClInclude Include="DeformGraphCuda_GPU1.h">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="DeformGraphCudaImpl_GPU1.cuh">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="EDMatchingHelperCuda_GPU1.h">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="EDMatchingHelperCudaImpl_GPU1.cuh">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="NormalEquationSolverPCGCuda_GPU1.h">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="PCGCuda_GPU1.cuh">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="volumetric_fusion_GPU1.h">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="volumetric_fusion_impl_GPU1.cuh">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="EDMatchingLSQProblemCuda_GPU1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude> -->
+    <ClInclude Include="DeformGraphCuda.h">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DeformGraphCudaImpl.cuh">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EDMatchingHelperCuda.h">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EDMatchingHelperCudaImpl.cuh">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EDMatchingLSQProblemCudaCore.h">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="NormalEquationSolverPCGCuda.h">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PCGCuda.cuh">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="volumetric_fusion_impl.cuh">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="volumetric_fusion.h">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="mc_mesh_processing.cuh">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="matrix_types_cuda_io.h">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="suitesparse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lmsolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LinearSolverCuSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EDMatchingJacobianHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EDMatchingLSQProblem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CudaGlobalMemory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="matrix_types_cuda_io.cpp">
+      <Filter>CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="lmsolver_gpu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CMotionFieldEstimationF2F.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Fusion4DGPUKeyFrames.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="volumetric_fusion_GPU.cpp">
+      <Filter>CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="DeformGraphCuda_GPU.cpp">
+      <Filter>CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="EDMatchingHelperCuda_GPU.cpp">
+      <Filter>CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="EDMatchingLSQProblemCuda.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <!-- <ClCompile Include="DeformGraphCuda_GPU1.cpp">
+      <Filter>CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="EDMatchingHelperCuda_GPU1.cpp">
+      <Filter>CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="volumetric_fusion_GPU1.cpp">
+      <Filter>CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="EDMatchingLSQProblemCuda_GPU1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile> -->
+    <ClCompile Include="DeformGraphCuda.cpp">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EDMatchingHelperCuda.cpp">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EDMatchingLSQProblemCudaCore_cpu.cpp">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EDMatchingLSQProblemCudaCore_gpu.cpp">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClCompile>
+    <ClCompile Include="volumetric_fusion.cpp">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="fast_pcg.cu">
+      <Filter>PCG</Filter>
+    </CudaCompile>
+    <CudaCompile Include="cuda_common_kernels.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="lmsolver_gpu_impl.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="volumetric_fusion_impl_GPU.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="DeformGraphCudaImpl_GPU.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImpl_GPU.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="NormalEquationSolverPCGCuda_GPU.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="PCGCuda_GPU.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile>
+    <!-- <CudaCompile Include="DeformGraphCudaImpl_GPU1.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImpl_GPU1.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="NormalEquationSolverPCGCuda_GPU1.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="volumetric_fusion_impl_GPU1.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="PCGCuda_GPU1.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile> -->
+    <CudaCompile Include="DeformGraphCudaImpl.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImpl.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImpl_keypts.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImpl_residual.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImpl_rigid.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImpl_visualhull.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImplInit.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImplInit_v2.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImplRegTerm.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="NormalEquationSolverPCGCuda.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="PCGCuda.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="volumetric_fusion_impl.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="volumetric_fusion_impl_post_processing.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="volumetric_fusion_impl_v1.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="volumetric_fusion_impl_v2.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="volumetric_fusion_marchingcubes.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="volumetric_fusion_marchingcubes_vMesh.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="mc_mesh_processing.cu">
+      <Filter>CUDA\Cuda-Core</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cuda_matrix_fixed.cuh">
+      <Filter>CUDA</Filter>
+    </None>
+    <None Include="cuda_vector_fixed.cuh">
+      <Filter>CUDA</Filter>
+    </None>
+  </ItemGroup>
+</Project>

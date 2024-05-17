@@ -1,0 +1,36 @@
+<b>General</b>
+<indent=2%>
+Tooltips are available across the application.  If there is any button that you would like more information on, keep your mouse over the icon for a few seconds and a helpful tooltip will show to give you more information about what the button does.
+</indent>
+
+<b>Navigation</b>
+<indent=2%>
+<size=2em><sprite name="phone" color=#00ff00></size> - Connects to the holoportation server and begins a new session with the patient.  Once connected the icon will change to the disconnect icon (<size=2em><sprite name="phone" color=#ff0000></size>), which will disconnect the application from the holoportation server, and stop the session.
+
+<size=2em><sprite name="navigation_arrow"></size> - Starts the application in Tutorial mode.  This will load the application with a pre-recorded example patient, allowing you to experiment with the functionality of the application without actually interacting with a real patient.  Press the disconnect icon (<size=2em><sprite name="phone" color=#ff0000></size>), to end tutorial mode.
+
+<size=2em><sprite name="camera"></size> - Captures the state of the session to a set of still images and 3D models.
+
+<size=2em><sprite name="pause"></size> - Pauses the video. After pausing, this button will change to the resume button (<size=2em><sprite name="play"></size>) which resumes the video playback.
+
+<size=2em><sprite name="quadrants"></size> - Shows a popup which allows you select which patient camera you would like to see.  Shortcut: <b>CTRL + O</b>
+
+<size=2em><sprite name="plus"></size> - Toggles "Dual View", which allows you to see multiple sides of the patient at the same time.  Use the navigation button <size=2em><sprite name="quadrants"></size> to pick which patient camera is visible.
+
+<size=2em><sprite name="zoom"></size> - Enables Zoom mode, which allows you to click on a view and zoom in towards the patient. Press CTRL + click to zoom out.
+
+<size=2em><sprite name="orbit"></size> - Enables Rotate mode, which allows you to click and drag on a view to rotate around the patient.
+
+<size=2em><sprite name="hand"></size> - Enables Pan mode, which allows you to click and drag on a view to move the view up, down, left, and right.
+
+<size=2em><sprite name="gear"></size> - Shows the settings panel, which allows you to configure various aspects of the application.
+
+<size=2em><sprite name="question_mark"></size> - Shows this popup
+
+00:00 - The time in minutes and seconds since the session was started.
+
+</indent>
+<b>Views</b>
+<indent=2%>
+Each view has the ability to change to 2D mode or 3D mode independently.  <b>2D mode</b> is a video stream from one of several cameras in the patients room.  Use the <sprite name="quadrants"> button to pick which camera you'd like to see.  <b>3D mode</b> places you in a 3D world around the patient, which allows you to navigate all around the patient.</b>
+</indent>

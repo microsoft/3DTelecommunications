@@ -1,0 +1,10 @@
+#version 420 compatibility
+
+out vec2 tc;
+
+void main(void)
+{
+	vec2[4] tcs = vec2[4] ( vec2(0, 0), vec2(1, 0), vec2(1, 1), vec2(0, 1) );
+	gl_Position = vec4(vec2(-1.f, -1.f) + tcs[gl_VertexID] * 2.f, 0, 1);
+	tc = tcs[gl_VertexID];
+}

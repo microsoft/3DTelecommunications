@@ -1,0 +1,11 @@
+[Unit]
+Description=The daemon that launches applications for a 3DTM session
+#don't need as long as we make sure we don't actually run before this starts After=graphical.target
+[Service]
+Type=simple
+ExecStart=/home/peabody/RunK4A.sh
+ExecStop=/bin/rm /var/lock/AKLauncherDaemon
+KillSignal=SIGINT
+User=peabody
+[Install]
+WantedBy=graphical.target

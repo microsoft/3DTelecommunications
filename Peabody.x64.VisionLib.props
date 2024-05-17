@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <VISIONLIB_DIR>$(PEABODY_DEPENDENCY_DIR)VisionLib\</VISIONLIB_DIR>
+    <VISIONLIB_LIB_DIR>$(VISIONLIB_DIR)$(Platform)\$(Configuration)\</VISIONLIB_LIB_DIR>
+    <VISIONLIB_INC_DIR>$(VISIONLIB_DIR)include\</VISIONLIB_INC_DIR>
+  </PropertyGroup>
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>minpack.lib;BLAS.lib;libF77.lib;LAPACK.lib;VisXCMINPACK.lib;VisDiagnostics.lib;VisMini.lib;VisXCLAPACK.lib;VisMatrix.lib;VisCalibration.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(VISIONLIB_LIB_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(VISIONLIB_INC_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="VISIONLIB_DIR">
+      <Value>$(VISIONLIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VISIONLIB_LIB_DIR">
+      <Value>$(VISIONLIB_LIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VISIONLIB_INC_DIR">
+      <Value>$(VISIONLIB_INC_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <QHULL_ROOT>$(PEABODY_DEPENDENCY_DIR)qhull\</QHULL_ROOT>
+    <QHULL_INC_DIR>$(QHULL_ROOT)src\libqhull\</QHULL_INC_DIR>
+    <QHULL_LIB_DIR>$(QHULL_ROOT)lib64\</QHULL_LIB_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(QHULL_INC_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(QHULL_LIB_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>qhullstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="QHULL_ROOT">
+      <Value>$(QHULL_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="QHULL_INC_DIR">
+      <Value>$(QHULL_INC_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="QHULL_LIB_DIR">
+      <Value>$(QHULL_LIB_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,2 @@
+Welcome to the <b><size=125%>Holoporation</size></b> telemedicine system. 
+You will have several interactive 2D and 3D views of the patient.

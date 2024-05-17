@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D3D9E470-3272-4DFC-95D4-50E6415B838F}</ProjectGuid>
+    <ProjectName>LiveFusionDemo-Multiview</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.4.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PeabodyConfigurationMacros.props" />
+    <Import Project="..\..\Peabody.x64.FreeGLUT.props" />
+    <Import Project="..\..\Peabody.x64.VXL.props" />
+    <Import Project="..\..\Peabody.x64.debug.cuda.props" />
+    <Import Project="..\..\Peabody.x64.zlib.props" />
+    <Import Project="..\..\Peabody.x64.qhull.props" />
+    <Import Project="..\..\Peabody.x64.lz4.props" />
+    <Import Project="..\..\Peabody.x64.JSON.props" />
+    <Import Project="..\..\Peabody.x64.zmq.props" />
+    <Import Project="..\..\Peabody.x64.GLEW.props" />
+    <Import Project="..\..\Peabody.x64.McLib2.props" />
+    <Import Project="..\..\Peabody.x64.OpenGL.props" />
+    <Import Project="..\..\Peabody.x64.oglplus.props" />
+    <Import Project="..\..\Peabody.x64.debug.SuiteSparse_mkl.props" />
+    <Import Project="..\..\Peabody.x64.debug.ceres-solver.props" />
+    <Import Project="..\..\Peabody.x64.debug.opencv.props" />
+    <Import Project="..\..\Peabody.x64.boost_1_72_0.props" />
+    <Import Project="..\..\Peabody.x64.buildVersion.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PeabodyConfigurationMacros.props" />
+    <Import Project="..\..\Peabody.x64.FreeGLUT.props" />
+    <Import Project="..\..\Peabody.x64.VXL.props" />
+    <Import Project="..\..\Peabody.x64.release.cuda.props" />
+    <Import Project="..\..\Peabody.x64.zlib.props" />
+    <Import Project="..\..\Peabody.x64.qhull.props" />
+    <Import Project="..\..\Peabody.x64.lz4.props" />
+    <Import Project="..\..\Peabody.x64.JSON.props" />
+    <Import Project="..\..\Peabody.x64.zmq.props" />
+    <Import Project="..\..\Peabody.x64.GLEW.props" />
+    <Import Project="..\..\Peabody.x64.McLib2.props" />
+    <Import Project="..\..\Peabody.x64.oglplus.props" />
+    <Import Project="..\..\Peabody.x64.OpenGL.props" />
+    <Import Project="..\..\Peabody.x64.release.SuiteSparse_mkl.props" />
+    <Import Project="..\..\Peabody.x64.release.ceres-solver.props" />
+    <Import Project="..\..\Peabody.x64.release.opencv.props" />
+    <Import Project="..\..\Peabody.x64.boost_1_72_0.props" />
+    <Import Project="..\..\Peabody.x64.buildVersion.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\CSurface;$(MSBuildProjectDirectory)\..\Utility;$(MSBuildProjectDirectory)\..\Basics;$(MSBuildProjectDirectory)\..\CameraView;$(MSBuildProjectDirectory)\..\NonrigidMatch;$(MSBuildProjectDirectory)\..\FastNonrigidMatching;$(MSBuildProjectDirectory)\..\CWindowsKinect;$(MSBuildProjectDirectory)\..\include\AutoAlignment;$(MSBuildProjectDirectory)\..\..\Networking;$(MSBuildProjectDirectory)\..\FusionDemo-MultiView;$(PEABODY_DIR);$(CUDA_PATH_V11_4)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;ASIO_STANDALONE;GLOG_NO_ABBREVIATED_SEVERITIES;USE_CERES_SOLVER;OPENCV_VERSION=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <OpenMPSupport>true</OpenMPSupport>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>LibUtility.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(Peabody_Dir)Build_Version</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <CudaCompile>
+      <AdditionalCompilerOptions>
+      </AdditionalCompilerOptions>
+      <AdditionalOptions>--default-stream per-thread %(AdditionalOptions)</AdditionalOptions>
+      <CodeGeneration>compute_52,sm_52;compute_75,sm_75;compute_86,sm_86;</CodeGeneration>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\CSurface;$(MSBuildProjectDirectory)\..\Utility;$(MSBuildProjectDirectory)\..\Basics;$(MSBuildProjectDirectory)\..\CameraView;$(MSBuildProjectDirectory)\..\NonrigidMatch;$(MSBuildProjectDirectory)\..\FastNonrigidMatching;$(MSBuildProjectDirectory)\..\CWindowsKinect;$(MSBuildProjectDirectory)\..\include\AutoAlignment;$(MSBuildProjectDirectory)\..\..\Networking;$(MSBuildProjectDirectory)\..\FusionDemo-MultiView;$(PEABODY_DIR);$(CUDA_PATH_V11_4)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;ASIO_STANDALONE;GLOG_NO_ABBREVIATED_SEVERITIES;USE_CERES_SOLVER;OPENCV_VERSION=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>true</OpenMPSupport>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ShowIncludes>false</ShowIncludes>
+      <BrowseInformation>true</BrowseInformation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>CameraView.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(Peabody_Dir)Build_Version</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+    <CudaCompile>
+      <AdditionalCompilerOptions>
+      </AdditionalCompilerOptions>
+      <CodeGeneration>compute_52,sm_52;compute_75,sm_75;compute_86,sm_86;</CodeGeneration>
+      <AdditionalOptions>--default-stream per-thread %(AdditionalOptions)</AdditionalOptions>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Networking\BufferAggregator.cpp" />
+    <ClCompile Include="..\..\Networking\ControlPanelConnector.cpp" />
+    <ClCompile Include="..\..\Networking\fusion_srv\ConnectionManager.cpp" />
+    <ClCompile Include="..\..\Networking\fusion_srv\TCPConnection.cpp" />
+    <ClCompile Include="..\..\Networking\fusion_srv\TCPListener.cpp" />
+    <ClCompile Include="DataCaptureThread.cpp" />
+    <ClCompile Include="FusionConfig.cpp" />
+    <ClCompile Include="FusionControlPanelConnector.cpp" />
+    <ClCompile Include="GlobalDataStatic.cpp" />
+    <ClCompile Include="GPU2Scheduler.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="LiveFusionDemo.cpp" />
+    <ClCompile Include="network_loader.cpp" />
+    <ClCompile Include="TofinoPacket.cpp" />
+    <ClCompile Include="TofinoMeshServer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Basics\Basics.vcxproj">
+      <Project>{76f10c63-ca82-4047-a868-dc1c6c4a6f50}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\CSurface\CSurface.vcxproj">
+      <Project>{f279dfee-f193-429b-95c0-50d69e5413ad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\FastNonrigidMatching\FastNonrigidMatching.vcxproj">
+      <Project>{c3ee02ab-c76c-4179-8b2c-b37c3805ada2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\NonRigidMatch\NonRigidMatch.vcxproj">
+      <Project>{135a0214-46e7-4fad-b99e-760a98edb4c6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Utility\Utility.vcxproj">
+      <Project>{9c286b03-3dec-4a13-852c-9105a68400ef}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Networking\BufferAggregator.h" />
+    <ClInclude Include="..\..\Networking\ControlPanelConnector.h" />
+    <ClInclude Include="..\..\Networking\fusion_srv\ConnectionManager.h" />
+    <ClInclude Include="..\..\Networking\fusion_srv\I3DCompressor.h" />
+    <ClInclude Include="..\..\Networking\fusion_srv\LinkedList.h" />
+    <ClInclude Include="..\..\Networking\fusion_srv\sr_stdafx.h" />
+    <ClInclude Include="..\..\Networking\fusion_srv\TCPConnection.h" />
+    <ClInclude Include="..\..\Networking\fusion_srv\TCPListener.h" />
+    <ClInclude Include="..\..\Networking\NetworkingDataTypes.h" />
+    <ClInclude Include="..\..\Peabody.h" />
+    <ClInclude Include="DataCaptureThread.h" />
+    <ClInclude Include="FusionControlPanelConnector.h" />
+    <ClInclude Include="GlobalDataStatic.h" />
+    <ClInclude Include="GPU2Scheduler.h" />
+    <ClInclude Include="LiveFusionDemo.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="ShadowMap.h" />
+    <ClInclude Include="TemporalFusionThread.h" />
+    <ClInclude Include="data_format.h" />
+    <ClInclude Include="abstract_loader.h" />
+    <ClInclude Include="network_loader.h" />
+    <ClInclude Include="TofinoPacket.h" />
+    <ClInclude Include="TofinoMeshServer.h" />
+    <ClInclude Include="FusionConfig.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="shaders\deferred_shadows_fs.txt" DestinationFolder="shaders\">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\deferred_shadows_vs.txt">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="LiveFusionDemo-Multiview.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.4.targets" />
+  </ImportGroup>
+</Project>

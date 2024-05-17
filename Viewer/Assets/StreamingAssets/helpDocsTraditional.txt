@@ -1,0 +1,18 @@
+<b>General</b>
+<indent=2%>
+Tooltips are available across the application.  If there is any button that you would like more information on, keep your mouse over the icon for a few seconds and a helpful tooltip will show to give you more information about what the button does.
+</indent>
+
+<b>Navigation</b>
+<indent=2%>
+<size=2em><sprite name="phone" color=#00ff00></size> - Connects to the holoportation server and begins a new session with the patient.  Once connected the icon will change to the disconnect icon (<size=2em><sprite name="phone" color=#ff0000></size>), which will disconnect the application from the holoportation server, and stop the session.
+
+<size=2em><sprite name="navigation_arrow"></size> - Starts the application in Tutorial mode.  This will load the application with a pre-recorded example patient, allowing you to experiment with the functionality of the application without actually interacting with a real patient.  Press the disconnect icon (<size=2em><sprite name="phone" color=#ff0000></size>), to end tutorial mode.
+
+<size=2em><sprite name="gear"></size> - Shows the settings panel, which allows you to configure various aspects of the application.
+
+<size=2em><sprite name="question_mark"></size> - Shows this popup
+
+00:00 - The time in minutes and seconds since the session was started.
+
+</indent>

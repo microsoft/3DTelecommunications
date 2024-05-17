@@ -1,0 +1,251 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.ML.OnnxRuntime.Gpu.1.12.1\build\native\Microsoft.ML.OnnxRuntime.Gpu.props" Condition="Exists('..\packages\Microsoft.ML.OnnxRuntime.Gpu.1.12.1\build\native\Microsoft.ML.OnnxRuntime.Gpu.props')" />
+  <Import Project="..\packages\eigen.3.4.1\build\eigen.props" Condition="Exists('..\packages\eigen.3.4.1\build\eigen.props')" />
+  <Import Project="..\packages\codedMarkerLib.1.0.1\build\codedMarkerLib.props" Condition="Exists('..\packages\codedMarkerLib.1.0.1\build\codedMarkerLib.props')" />
+  <Import Project="..\packages\ceres-solver-2.1.0_vs2019_x64.1.0.0\build\ceres-solver-2.1.0_vs2019_x64.props" Condition="Exists('..\packages\ceres-solver-2.1.0_vs2019_x64.1.0.0\build\ceres-solver-2.1.0_vs2019_x64.props')" />
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{8c5a374a-abf6-4a7c-9162-7b452384941c}</ProjectGuid>
+    <RootNamespace>CalibrationSoftware</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.4.props" />
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PeabodyConfigurationMacros.props" />
+    <Import Project="..\..\Peabody.x64.zmq.props" />
+    <Import Project="..\..\Peabody.x64.buildVersion.props" />
+    <Import Project="..\..\Peabody.x64.McLib2.props" />
+    <Import Project="..\..\Peabody.x64.json.props" />
+    <Import Project="..\..\Peabody.x64.debug.k4a.props" />
+    <Import Project="..\..\Peabody.x64.debug.opencv.props" />
+    <Import Project="..\..\Peabody.x64.debug.cuda.props" />
+    <Import Project="..\..\Peabody.x64.tslib.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PeabodyConfigurationMacros.props" />
+    <Import Project="..\..\Peabody.x64.zmq.props" />
+    <Import Project="..\..\Peabody.x64.buildVersion.props" />
+    <Import Project="..\..\Peabody.x64.McLib2.props" />
+    <Import Project="..\..\Peabody.x64.json.props" />
+    <Import Project="..\..\Peabody.x64.release.k4a.props" />
+    <Import Project="..\..\Peabody.x64.release.opencv.props" />
+    <Import Project="..\..\Peabody.x64.release.cuda.props" />
+    <Import Project="..\..\Peabody.x64.tslib.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\PAICalibration;$(MSBuildProjectDirectory)\..\..\Networking;$(MCLIB2_TRANSPORT_INC_DIR);$(MCLIB2_LIBUTILITY_INC_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>jsoncpp.lib;LibUtility.lib;Transport.lib;PAICalibration.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Networking\ControlPanelConnector.cpp" />
+    <ClCompile Include="CalibrationSoftware.cpp" />
+    <ClCompile Include="CalibrationSoftwareControlPanelConnector.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Networking\ControlPanelConnector.h" />
+    <ClInclude Include="..\..\Networking\NetworkingDataTypes.h" />
+    <ClInclude Include="CalibrationSoftware.h" />
+    <ClInclude Include="CalibrationSoftwareControlPanelConnector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.4.targets" />
+    <Import Project="..\packages\CaptureLib-link-windows-v142-x64-Release.1.0.289\build\native\CaptureLib-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\CaptureLib-link-windows-v142-x64-Release.1.0.289\build\native\CaptureLib-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\CalibrationLib-link-windows-v142-x64-Release.1.0.1378\build\native\CalibrationLib-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\CalibrationLib-link-windows-v142-x64-Release.1.0.1378\build\native\CalibrationLib-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\Calibration-link-windows-v142-x64-Release.1.0.1378\build\native\Calibration-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\Calibration-link-windows-v142-x64-Release.1.0.1378\build\native\Calibration-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\glm.0.9.9.800\build\native\glm.targets" Condition="Exists('..\packages\glm.0.9.9.800\build\native\glm.targets')" />
+    <Import Project="..\packages\ImageConversion-include.1.0.1364\build\native\ImageConversion-include.targets" Condition="Exists('..\packages\ImageConversion-include.1.0.1364\build\native\ImageConversion-include.targets')" />
+    <Import Project="..\packages\ImageConversion-link-windows-v142-x64-Release.1.0.1364\build\native\ImageConversion-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\ImageConversion-link-windows-v142-x64-Release.1.0.1364\build\native\ImageConversion-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\MeshHelpers-link-windows-v142-x64-Release.1.0.1364\build\native\MeshHelpers-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\MeshHelpers-link-windows-v142-x64-Release.1.0.1364\build\native\MeshHelpers-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\ImageConversion-link-windows-v142-x64-Debug.1.0.1364\build\native\ImageConversion-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\ImageConversion-link-windows-v142-x64-Debug.1.0.1364\build\native\ImageConversion-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\MeshHelpers-link-windows-v142-x64-Debug.1.0.1364\build\native\MeshHelpers-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\MeshHelpers-link-windows-v142-x64-Debug.1.0.1364\build\native\MeshHelpers-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\CalibrationLib-link-windows-v142-x64-Debug.1.0.1378\build\native\CalibrationLib-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\CalibrationLib-link-windows-v142-x64-Debug.1.0.1378\build\native\CalibrationLib-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\CaptureLib-include.1.0.289\build\native\CaptureLib-include.targets" Condition="Exists('..\packages\CaptureLib-include.1.0.289\build\native\CaptureLib-include.targets')" />
+    <Import Project="..\packages\Common-include.1.0.1364\build\native\Common-include.targets" Condition="Exists('..\packages\Common-include.1.0.1364\build\native\Common-include.targets')" />
+    <Import Project="..\packages\glfw.3.3.8\build\native\glfw.targets" Condition="Exists('..\packages\glfw.3.3.8\build\native\glfw.targets')" />
+    <Import Project="..\packages\HoloportationHelpers-include.1.0.1389\build\native\HoloportationHelpers-include.targets" Condition="Exists('..\packages\HoloportationHelpers-include.1.0.1389\build\native\HoloportationHelpers-include.targets')" />
+    <Import Project="..\packages\HoloportationHelpers-link-windows-v142-x64-Debug.1.0.1389\build\native\HoloportationHelpers-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\HoloportationHelpers-link-windows-v142-x64-Debug.1.0.1389\build\native\HoloportationHelpers-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\Demosaicing-include.1.0.1389\build\native\Demosaicing-include.targets" Condition="Exists('..\packages\Demosaicing-include.1.0.1389\build\native\Demosaicing-include.targets')" />
+    <Import Project="..\packages\Demosaicing-link-windows-v142-x64-Debug.1.0.1389\build\native\Demosaicing-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\Demosaicing-link-windows-v142-x64-Debug.1.0.1389\build\native\Demosaicing-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\Encoding-include.1.0.1389\build\native\Encoding-include.targets" Condition="Exists('..\packages\Encoding-include.1.0.1389\build\native\Encoding-include.targets')" />
+    <Import Project="..\packages\Encoding-link-windows-v142-x64-Debug.1.0.1389\build\native\Encoding-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\Encoding-link-windows-v142-x64-Debug.1.0.1389\build\native\Encoding-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\3DEncoding-include.2.0.1389\build\native\3DEncoding-include.targets" Condition="Exists('..\packages\3DEncoding-include.2.0.1389\build\native\3DEncoding-include.targets')" />
+    <Import Project="..\packages\3DEncoding-link-windows-v142-x64-Debug.2.0.1389\build\native\3DEncoding-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\3DEncoding-link-windows-v142-x64-Debug.2.0.1389\build\native\3DEncoding-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\FusionLib-include.1.0.1389\build\native\FusionLib-include.targets" Condition="Exists('..\packages\FusionLib-include.1.0.1389\build\native\FusionLib-include.targets')" />
+    <Import Project="..\packages\FusionLib-link-windows-v142-x64-Debug.1.0.1389\build\native\FusionLib-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\FusionLib-link-windows-v142-x64-Debug.1.0.1389\build\native\FusionLib-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\HashMatch-include.1.0.1389\build\native\HashMatch-include.targets" Condition="Exists('..\packages\HashMatch-include.1.0.1389\build\native\HashMatch-include.targets')" />
+    <Import Project="..\packages\HashMatch-link-windows-v142-x64-Debug.1.0.1389\build\native\HashMatch-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\HashMatch-link-windows-v142-x64-Debug.1.0.1389\build\native\HashMatch-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\HoloportationHelpers-link-windows-v142-x64-Release.1.0.1389\build\native\HoloportationHelpers-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\HoloportationHelpers-link-windows-v142-x64-Release.1.0.1389\build\native\HoloportationHelpers-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\Demosaicing-link-windows-v142-x64-Release.1.0.1389\build\native\Demosaicing-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\Demosaicing-link-windows-v142-x64-Release.1.0.1389\build\native\Demosaicing-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\Encoding-link-windows-v142-x64-Release.1.0.1389\build\native\Encoding-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\Encoding-link-windows-v142-x64-Release.1.0.1389\build\native\Encoding-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\3DEncoding-link-windows-v142-x64-Release.2.0.1389\build\native\3DEncoding-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\3DEncoding-link-windows-v142-x64-Release.2.0.1389\build\native\3DEncoding-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\FusionLib-link-windows-v142-x64-Release.1.0.1389\build\native\FusionLib-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\FusionLib-link-windows-v142-x64-Release.1.0.1389\build\native\FusionLib-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\HashMatch-link-windows-v142-x64-Release.1.0.1389\build\native\HashMatch-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\HashMatch-link-windows-v142-x64-Release.1.0.1389\build\native\HashMatch-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\ImageWarp-include.1.0.1389\build\native\ImageWarp-include.targets" Condition="Exists('..\packages\ImageWarp-include.1.0.1389\build\native\ImageWarp-include.targets')" />
+    <Import Project="..\packages\ImageWarp-link-windows-v142-x64-Debug.1.0.1389\build\native\ImageWarp-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\ImageWarp-link-windows-v142-x64-Debug.1.0.1389\build\native\ImageWarp-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\ImageWarp-link-windows-v142-x64-Release.1.0.1389\build\native\ImageWarp-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\ImageWarp-link-windows-v142-x64-Release.1.0.1389\build\native\ImageWarp-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\Microsoft.Azure.Kinect.Sensor.1.4.1\build\native\Microsoft.Azure.Kinect.Sensor.targets" Condition="Exists('..\packages\Microsoft.Azure.Kinect.Sensor.1.4.1\build\native\Microsoft.Azure.Kinect.Sensor.targets')" />
+    <Import Project="..\packages\Microsoft.ML.OnnxRuntime.Gpu.1.12.1\build\native\Microsoft.ML.OnnxRuntime.Gpu.targets" Condition="Exists('..\packages\Microsoft.ML.OnnxRuntime.Gpu.1.12.1\build\native\Microsoft.ML.OnnxRuntime.Gpu.targets')" />
+    <Import Project="..\packages\DnnInference-include.1.0.1389\build\native\DnnInference-include.targets" Condition="Exists('..\packages\DnnInference-include.1.0.1389\build\native\DnnInference-include.targets')" />
+    <Import Project="..\packages\DnnInference-link-windows-v142-x64-Debug.1.0.1389\build\native\DnnInference-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\DnnInference-link-windows-v142-x64-Debug.1.0.1389\build\native\DnnInference-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\DnnInference-link-windows-v142-x64-Release.1.0.1389\build\native\DnnInference-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\DnnInference-link-windows-v142-x64-Release.1.0.1389\build\native\DnnInference-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\HmdPoseTracker-include.1.0.1389\build\native\HmdPoseTracker-include.targets" Condition="Exists('..\packages\HmdPoseTracker-include.1.0.1389\build\native\HmdPoseTracker-include.targets')" />
+    <Import Project="..\packages\HmdPoseTracker-link-windows-v142-x64-Debug.1.0.1389\build\native\HmdPoseTracker-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\HmdPoseTracker-link-windows-v142-x64-Debug.1.0.1389\build\native\HmdPoseTracker-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\HmdPoseTracker-link-windows-v142-x64-Release.1.0.1389\build\native\HmdPoseTracker-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\HmdPoseTracker-link-windows-v142-x64-Release.1.0.1389\build\native\HmdPoseTracker-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\Segmentation-include.1.0.1389\build\native\Segmentation-include.targets" Condition="Exists('..\packages\Segmentation-include.1.0.1389\build\native\Segmentation-include.targets')" />
+    <Import Project="..\packages\Segmentation-link-windows-v142-x64-Debug.1.0.1389\build\native\Segmentation-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\Segmentation-link-windows-v142-x64-Debug.1.0.1389\build\native\Segmentation-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\Segmentation-link-windows-v142-x64-Release.1.0.1389\build\native\Segmentation-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\Segmentation-link-windows-v142-x64-Release.1.0.1389\build\native\Segmentation-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\SlantedStereoLib-include.1.0.1389\build\native\SlantedStereoLib-include.targets" Condition="Exists('..\packages\SlantedStereoLib-include.1.0.1389\build\native\SlantedStereoLib-include.targets')" />
+    <Import Project="..\packages\SlantedStereoLib-link-windows-v142-x64-Debug.1.0.1389\build\native\SlantedStereoLib-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\SlantedStereoLib-link-windows-v142-x64-Debug.1.0.1389\build\native\SlantedStereoLib-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\SlantedStereoLib-link-windows-v142-x64-Release.1.0.1389\build\native\SlantedStereoLib-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\SlantedStereoLib-link-windows-v142-x64-Release.1.0.1389\build\native\SlantedStereoLib-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\StereoDepthEstimation-include.1.0.1389\build\native\StereoDepthEstimation-include.targets" Condition="Exists('..\packages\StereoDepthEstimation-include.1.0.1389\build\native\StereoDepthEstimation-include.targets')" />
+    <Import Project="..\packages\3DReconstruction-include.1.0.1389\build\native\3DReconstruction-include.targets" Condition="Exists('..\packages\3DReconstruction-include.1.0.1389\build\native\3DReconstruction-include.targets')" />
+    <Import Project="..\packages\3DReconstruction-link-windows-v142-x64-Debug.1.0.1389\build\native\3DReconstruction-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\3DReconstruction-link-windows-v142-x64-Debug.1.0.1389\build\native\3DReconstruction-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\3DReconstruction-link-windows-v142-x64-Release.1.0.1389\build\native\3DReconstruction-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\3DReconstruction-link-windows-v142-x64-Release.1.0.1389\build\native\3DReconstruction-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\CalibrationLib-include.1.0.1389\build\native\CalibrationLib-include.targets" Condition="Exists('..\packages\CalibrationLib-include.1.0.1389\build\native\CalibrationLib-include.targets')" />
+    <Import Project="..\packages\CalibrationLib-link-windows-v142-x64-Debug.1.0.1389\build\native\CalibrationLib-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\CalibrationLib-link-windows-v142-x64-Debug.1.0.1389\build\native\CalibrationLib-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\Calibration-include.1.0.1389\build\native\Calibration-include.targets" Condition="Exists('..\packages\Calibration-include.1.0.1389\build\native\Calibration-include.targets')" />
+    <Import Project="..\packages\Calibration-link-windows-v142-x64-Debug.1.0.1389\build\native\Calibration-link-windows-v142-x64-Debug.targets" Condition="Exists('..\packages\Calibration-link-windows-v142-x64-Debug.1.0.1389\build\native\Calibration-link-windows-v142-x64-Debug.targets')" />
+    <Import Project="..\packages\CalibrationLib-link-windows-v142-x64-Release.1.0.1389\build\native\CalibrationLib-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\CalibrationLib-link-windows-v142-x64-Release.1.0.1389\build\native\CalibrationLib-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\Calibration-link-windows-v142-x64-Release.1.0.1389\build\native\Calibration-link-windows-v142-x64-Release.targets" Condition="Exists('..\packages\Calibration-link-windows-v142-x64-Release.1.0.1389\build\native\Calibration-link-windows-v142-x64-Release.targets')" />
+    <Import Project="..\packages\ts-include.1.3.56\build\native\ts-include.targets" Condition="Exists('..\packages\ts-include.1.3.56\build\native\ts-include.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\CaptureLib-link-windows-v142-x64-Release.1.0.289\build\native\CaptureLib-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CaptureLib-link-windows-v142-x64-Release.1.0.289\build\native\CaptureLib-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\ceres-solver-2.1.0_vs2019_x64.1.0.0\build\ceres-solver-2.1.0_vs2019_x64.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ceres-solver-2.1.0_vs2019_x64.1.0.0\build\ceres-solver-2.1.0_vs2019_x64.props'))" />
+    <Error Condition="!Exists('..\packages\codedMarkerLib.1.0.1\build\codedMarkerLib.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\codedMarkerLib.1.0.1\build\codedMarkerLib.props'))" />
+    <Error Condition="!Exists('..\packages\eigen.3.4.1\build\eigen.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\eigen.3.4.1\build\eigen.props'))" />
+    <Error Condition="!Exists('..\packages\CalibrationLib-link-windows-v142-x64-Release.1.0.1389\build\native\CalibrationLib-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CalibrationLib-link-windows-v142-x64-Release.1.0.1389\build\native\CalibrationLib-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\Calibration-link-windows-v142-x64-Release.1.0.1389\build\native\Calibration-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Calibration-link-windows-v142-x64-Release.1.0.1389\build\native\Calibration-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\glm.0.9.9.800\build\native\glm.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glm.0.9.9.800\build\native\glm.targets'))" />
+    <Error Condition="!Exists('..\packages\ImageConversion-include.1.0.1364\build\native\ImageConversion-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ImageConversion-include.1.0.1364\build\native\ImageConversion-include.targets'))" />
+    <Error Condition="!Exists('..\packages\ImageConversion-link-windows-v142-x64-Release.1.0.1364\build\native\ImageConversion-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ImageConversion-link-windows-v142-x64-Release.1.0.1364\build\native\ImageConversion-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\MeshHelpers-link-windows-v142-x64-Release.1.0.1364\build\native\MeshHelpers-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MeshHelpers-link-windows-v142-x64-Release.1.0.1364\build\native\MeshHelpers-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\ImageConversion-link-windows-v142-x64-Debug.1.0.1364\build\native\ImageConversion-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ImageConversion-link-windows-v142-x64-Debug.1.0.1364\build\native\ImageConversion-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\MeshHelpers-link-windows-v142-x64-Debug.1.0.1364\build\native\MeshHelpers-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MeshHelpers-link-windows-v142-x64-Debug.1.0.1364\build\native\MeshHelpers-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\CalibrationLib-link-windows-v142-x64-Debug.1.0.1389\build\native\CalibrationLib-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CalibrationLib-link-windows-v142-x64-Debug.1.0.1389\build\native\CalibrationLib-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\CaptureLib-include.1.0.289\build\native\CaptureLib-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CaptureLib-include.1.0.289\build\native\CaptureLib-include.targets'))" />
+    <Error Condition="!Exists('..\packages\Common-include.1.0.1364\build\native\Common-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Common-include.1.0.1364\build\native\Common-include.targets'))" />
+    <Error Condition="!Exists('..\packages\glfw.3.3.8\build\native\glfw.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glfw.3.3.8\build\native\glfw.targets'))" />
+    <Error Condition="!Exists('..\packages\HoloportationHelpers-include.1.0.1389\build\native\HoloportationHelpers-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\HoloportationHelpers-include.1.0.1389\build\native\HoloportationHelpers-include.targets'))" />
+    <Error Condition="!Exists('..\packages\HoloportationHelpers-link-windows-v142-x64-Debug.1.0.1389\build\native\HoloportationHelpers-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\HoloportationHelpers-link-windows-v142-x64-Debug.1.0.1389\build\native\HoloportationHelpers-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\Demosaicing-include.1.0.1389\build\native\Demosaicing-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Demosaicing-include.1.0.1389\build\native\Demosaicing-include.targets'))" />
+    <Error Condition="!Exists('..\packages\Demosaicing-link-windows-v142-x64-Debug.1.0.1389\build\native\Demosaicing-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Demosaicing-link-windows-v142-x64-Debug.1.0.1389\build\native\Demosaicing-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\Encoding-include.1.0.1389\build\native\Encoding-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Encoding-include.1.0.1389\build\native\Encoding-include.targets'))" />
+    <Error Condition="!Exists('..\packages\Encoding-link-windows-v142-x64-Debug.1.0.1389\build\native\Encoding-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Encoding-link-windows-v142-x64-Debug.1.0.1389\build\native\Encoding-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\3DEncoding-include.2.0.1389\build\native\3DEncoding-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\3DEncoding-include.2.0.1389\build\native\3DEncoding-include.targets'))" />
+    <Error Condition="!Exists('..\packages\3DEncoding-link-windows-v142-x64-Debug.2.0.1389\build\native\3DEncoding-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\3DEncoding-link-windows-v142-x64-Debug.2.0.1389\build\native\3DEncoding-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\FusionLib-include.1.0.1389\build\native\FusionLib-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\FusionLib-include.1.0.1389\build\native\FusionLib-include.targets'))" />
+    <Error Condition="!Exists('..\packages\FusionLib-link-windows-v142-x64-Debug.1.0.1389\build\native\FusionLib-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\FusionLib-link-windows-v142-x64-Debug.1.0.1389\build\native\FusionLib-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\HashMatch-include.1.0.1389\build\native\HashMatch-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\HashMatch-include.1.0.1389\build\native\HashMatch-include.targets'))" />
+    <Error Condition="!Exists('..\packages\HashMatch-link-windows-v142-x64-Debug.1.0.1389\build\native\HashMatch-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\HashMatch-link-windows-v142-x64-Debug.1.0.1389\build\native\HashMatch-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\HoloportationHelpers-link-windows-v142-x64-Release.1.0.1389\build\native\HoloportationHelpers-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\HoloportationHelpers-link-windows-v142-x64-Release.1.0.1389\build\native\HoloportationHelpers-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\Demosaicing-link-windows-v142-x64-Release.1.0.1389\build\native\Demosaicing-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Demosaicing-link-windows-v142-x64-Release.1.0.1389\build\native\Demosaicing-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\Encoding-link-windows-v142-x64-Release.1.0.1389\build\native\Encoding-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Encoding-link-windows-v142-x64-Release.1.0.1389\build\native\Encoding-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\3DEncoding-link-windows-v142-x64-Release.2.0.1389\build\native\3DEncoding-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\3DEncoding-link-windows-v142-x64-Release.2.0.1389\build\native\3DEncoding-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\FusionLib-link-windows-v142-x64-Release.1.0.1389\build\native\FusionLib-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\FusionLib-link-windows-v142-x64-Release.1.0.1389\build\native\FusionLib-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\HashMatch-link-windows-v142-x64-Release.1.0.1389\build\native\HashMatch-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\HashMatch-link-windows-v142-x64-Release.1.0.1389\build\native\HashMatch-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\ImageWarp-include.1.0.1389\build\native\ImageWarp-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ImageWarp-include.1.0.1389\build\native\ImageWarp-include.targets'))" />
+    <Error Condition="!Exists('..\packages\ImageWarp-link-windows-v142-x64-Debug.1.0.1389\build\native\ImageWarp-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ImageWarp-link-windows-v142-x64-Debug.1.0.1389\build\native\ImageWarp-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\ImageWarp-link-windows-v142-x64-Release.1.0.1389\build\native\ImageWarp-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ImageWarp-link-windows-v142-x64-Release.1.0.1389\build\native\ImageWarp-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Azure.Kinect.Sensor.1.4.1\build\native\Microsoft.Azure.Kinect.Sensor.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Azure.Kinect.Sensor.1.4.1\build\native\Microsoft.Azure.Kinect.Sensor.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.ML.OnnxRuntime.Gpu.1.12.1\build\native\Microsoft.ML.OnnxRuntime.Gpu.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ML.OnnxRuntime.Gpu.1.12.1\build\native\Microsoft.ML.OnnxRuntime.Gpu.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.ML.OnnxRuntime.Gpu.1.12.1\build\native\Microsoft.ML.OnnxRuntime.Gpu.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ML.OnnxRuntime.Gpu.1.12.1\build\native\Microsoft.ML.OnnxRuntime.Gpu.targets'))" />
+    <Error Condition="!Exists('..\packages\DnnInference-include.1.0.1389\build\native\DnnInference-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\DnnInference-include.1.0.1389\build\native\DnnInference-include.targets'))" />
+    <Error Condition="!Exists('..\packages\DnnInference-link-windows-v142-x64-Debug.1.0.1389\build\native\DnnInference-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\DnnInference-link-windows-v142-x64-Debug.1.0.1389\build\native\DnnInference-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\DnnInference-link-windows-v142-x64-Release.1.0.1389\build\native\DnnInference-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\DnnInference-link-windows-v142-x64-Release.1.0.1389\build\native\DnnInference-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\HmdPoseTracker-include.1.0.1389\build\native\HmdPoseTracker-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\HmdPoseTracker-include.1.0.1389\build\native\HmdPoseTracker-include.targets'))" />
+    <Error Condition="!Exists('..\packages\HmdPoseTracker-link-windows-v142-x64-Debug.1.0.1389\build\native\HmdPoseTracker-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\HmdPoseTracker-link-windows-v142-x64-Debug.1.0.1389\build\native\HmdPoseTracker-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\HmdPoseTracker-link-windows-v142-x64-Release.1.0.1389\build\native\HmdPoseTracker-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\HmdPoseTracker-link-windows-v142-x64-Release.1.0.1389\build\native\HmdPoseTracker-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\Segmentation-include.1.0.1389\build\native\Segmentation-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Segmentation-include.1.0.1389\build\native\Segmentation-include.targets'))" />
+    <Error Condition="!Exists('..\packages\Segmentation-link-windows-v142-x64-Debug.1.0.1389\build\native\Segmentation-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Segmentation-link-windows-v142-x64-Debug.1.0.1389\build\native\Segmentation-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\Segmentation-link-windows-v142-x64-Release.1.0.1389\build\native\Segmentation-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Segmentation-link-windows-v142-x64-Release.1.0.1389\build\native\Segmentation-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\SlantedStereoLib-include.1.0.1389\build\native\SlantedStereoLib-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SlantedStereoLib-include.1.0.1389\build\native\SlantedStereoLib-include.targets'))" />
+    <Error Condition="!Exists('..\packages\SlantedStereoLib-link-windows-v142-x64-Debug.1.0.1389\build\native\SlantedStereoLib-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SlantedStereoLib-link-windows-v142-x64-Debug.1.0.1389\build\native\SlantedStereoLib-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\SlantedStereoLib-link-windows-v142-x64-Release.1.0.1389\build\native\SlantedStereoLib-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SlantedStereoLib-link-windows-v142-x64-Release.1.0.1389\build\native\SlantedStereoLib-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\StereoDepthEstimation-include.1.0.1389\build\native\StereoDepthEstimation-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\StereoDepthEstimation-include.1.0.1389\build\native\StereoDepthEstimation-include.targets'))" />
+    <Error Condition="!Exists('..\packages\3DReconstruction-include.1.0.1389\build\native\3DReconstruction-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\3DReconstruction-include.1.0.1389\build\native\3DReconstruction-include.targets'))" />
+    <Error Condition="!Exists('..\packages\3DReconstruction-link-windows-v142-x64-Debug.1.0.1389\build\native\3DReconstruction-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\3DReconstruction-link-windows-v142-x64-Debug.1.0.1389\build\native\3DReconstruction-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\3DReconstruction-link-windows-v142-x64-Release.1.0.1389\build\native\3DReconstruction-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\3DReconstruction-link-windows-v142-x64-Release.1.0.1389\build\native\3DReconstruction-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\CalibrationLib-include.1.0.1389\build\native\CalibrationLib-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CalibrationLib-include.1.0.1389\build\native\CalibrationLib-include.targets'))" />
+    <Error Condition="!Exists('..\packages\CalibrationLib-link-windows-v142-x64-Debug.1.0.1389\build\native\CalibrationLib-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CalibrationLib-link-windows-v142-x64-Debug.1.0.1389\build\native\CalibrationLib-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\Calibration-include.1.0.1389\build\native\Calibration-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Calibration-include.1.0.1389\build\native\Calibration-include.targets'))" />
+    <Error Condition="!Exists('..\packages\Calibration-link-windows-v142-x64-Debug.1.0.1389\build\native\Calibration-link-windows-v142-x64-Debug.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Calibration-link-windows-v142-x64-Debug.1.0.1389\build\native\Calibration-link-windows-v142-x64-Debug.targets'))" />
+    <Error Condition="!Exists('..\packages\CalibrationLib-link-windows-v142-x64-Release.1.0.1389\build\native\CalibrationLib-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CalibrationLib-link-windows-v142-x64-Release.1.0.1389\build\native\CalibrationLib-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\Calibration-link-windows-v142-x64-Release.1.0.1389\build\native\Calibration-link-windows-v142-x64-Release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Calibration-link-windows-v142-x64-Release.1.0.1389\build\native\Calibration-link-windows-v142-x64-Release.targets'))" />
+    <Error Condition="!Exists('..\packages\ts-include.1.3.56\build\native\ts-include.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ts-include.1.3.56\build\native\ts-include.targets'))" />
+  </Target>
+</Project>

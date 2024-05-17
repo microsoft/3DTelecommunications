@@ -1,0 +1,59 @@
+#version 420 compatibility
+
+#define MULTISAMPLING 1
+
+#if MULTISAMPLING == 1
+	layout(binding = 0) uniform sampler2DMS tex_screen_depth;
+#else
+	layout(binding = 0) uniform sampler2D tex_screen_depth;
+#endif
+
+
+layout(binding = 1) uniform sampler2DShadow tex_shadow_map;
+uniform mat4 shadow_map_mvp;
+
+uniform ivec2 screen_size;
+
+in vec2 tc;
+
+out vec4 fragColor;
+void main(void)
+{
+	int shadow_map_size = 1024;
+
+	#if MULTISAMPLING == 1
+		float screen_depth = texelFetch(tex_screen_depth, ivec2(tc * textureSize(tex_screen_depth)), gl_SampleID).r;
+	#else
+		float screen_depth = texture(tex_screen_depth, tc).r;
+	#endif
+
+	vec4 h_screen_coord = vec4( 2.f * vec3(tc, screen_depth) - vec3(1, 1, 1), 1);
+
+	vec4 world_coord = gl_ModelViewProjectionMatrixInverse * h_screen_coord;
+	world_coord /= world_coord.w;
+
+	vec4 h_shadow_map_coord = shadow_map_mvp * world_coord;
+	h_shadow_map_coord /= h_shadow_map_coord.w;
+
+	h_shadow_map_coord.z -= 0.001; // bias
+
+	float blur_scale = 2.f;
+
+	int filter_size = 5;
+	float shadow_mask = 0.f;
+	for (int x = -filter_size/2; x <= filter_size/2; ++x)
+		for (int y = -filter_size/2; y <= filter_size/2; ++y)
+		{
+			vec2 uv_offset = vec2(x, y) / float(shadow_map_size) * blur_scale;
+			shadow_mask += texture(tex_shadow_map, 0.5 * (h_shadow_map_coord.xyz) + vec3(0.5) + vec3(uv_offset, 0)).r;
+			//shadow_mask += float(h_shadow_map_coord.z - 0.001 > 2.f * shadow_depth - 1.f);
+		}
+	shadow_mask /= filter_size * filter_size;
+
+	shadow_mask = 1.f - shadow_mask;
+
+	//float shadow_mask = 1.f - texture(tex_shadow_map, 0.5 * (h_shadow_map_coord.xyz) + vec3(0.5)).r;
+
+	fragColor = vec4(0, 0, 0, shadow_mask * 0.5);
+	//fragColor = vec4(shadow_depth, shadow_depth, shadow_depth, 0.5);
+}

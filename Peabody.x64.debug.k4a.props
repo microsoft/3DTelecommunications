@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <K4A_VERSION>1.4.1</K4A_VERSION>
+    <K4A_SDK_ROOT>C:\Program Files\Azure Kinect SDK v$(K4A_VERSION)\sdk\</K4A_SDK_ROOT>
+    <K4A_SDK_INC_DIR>$(K4A_SDK_ROOT)include\</K4A_SDK_INC_DIR>
+    <K4A_SDK_LIB_DIR>$(K4A_SDK_ROOT)windows-desktop\amd64\release\lib\</K4A_SDK_LIB_DIR>
+    <K4A_SDK_BIN_DIR>$(K4A_SDK_ROOT)windows-desktop\amd64\release\bin\</K4A_SDK_BIN_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(AdditionalIncludeDirectories);$(K4A_SDK_INC_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(K4A_SDK_LIB_DIR);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);k4a.lib;k4arecord.lib;</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y "$(K4A_SDK_BIN_DIR)*.dll" $(OutputPath)
+%(Command)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="K4A_VERSION">
+      <Value>$(K4A_VERSION)</Value>
+    </BuildMacro>
+    <BuildMacro Include="K4A_SDK_ROOT">
+      <Value>$(K4A_SDK_ROOT)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="K4A_SDK_INC_DIR">
+      <Value>$(K4A_SDK_INC_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="K4A_SDK_BIN_DIR">
+      <Value>$(K4A_SDK_BIN_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="K4A_SDK_LIB_DIR">
+      <Value>$(K4A_SDK_LIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="K4A_SDK_BIN_DIR">
+      <Value>$(K4A_SDK_BIN_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

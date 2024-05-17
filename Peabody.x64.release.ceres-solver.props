@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <CERES_ROOT_DIR>$(PEABODY_DEPENDENCY_DIR)ceres-solver\</CERES_ROOT_DIR>
+    <CERES_DIR>$(CERES_ROOT_DIR)VSBUILD\</CERES_DIR>
+    <CERES_INC_DIR>$(CERES_DIR)include\</CERES_INC_DIR>
+    <CERES_LIB_DIR>$(CERES_DIR)lib\</CERES_LIB_DIR>
+    <CERES_INTERNAL_DIR>$(CERES_DIR)internal\ceres\</CERES_INTERNAL_DIR>
+    <CERES_EIGEN_DIR>$(CERES_ROOT_DIR)eigen\</CERES_EIGEN_DIR>
+    <CERES_GLOG_DIR>$(CERES_ROOT_DIR)glog\</CERES_GLOG_DIR>
+    <CERES_GLOG_INC_DIR>$(CERES_GLOG_DIR)src\windows\</CERES_GLOG_INC_DIR>
+    <CERES_GLOG_LIB_DIR>$(CERES_GLOG_DIR)$(Platform)\$(Configuration)\</CERES_GLOG_LIB_DIR>
+    <CERES_GFLAGS_DIR>$(CERES_ROOT_DIR)gflags\</CERES_GFLAGS_DIR>
+    <CERES_GFLAGS_LIB_DIR>$(CERES_GFLAGS_DIR)$(Platform)\$(Configuration)\</CERES_GFLAGS_LIB_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(CERES_GLOG_INC_DIR);$(CERES_EIGEN_DIR);$(CERES_INC_DIR);$(CERES_INTERNAL_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>GOOGLE_GLOG_DLL_DECL=;_MBCS;CERES_MSVC_USE_UNDERSCORE_PREFIXED_BESSEL_FUNCTIONS;GLOG_NO_ABBREVIATED_SEVERITIES;USE_CERES_SOLVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>shlwapi.lib;libgflags.lib;miniglog.lib;ceres.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(CERES_GLOG_LIB_DIR);$(CERES_ROOT_DIR)acml\ifort64_mp\lib;$(CERES_LIB_DIR);$(CERES_GFLAGS_LIB_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>%(Command)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="CERES_ROOT_DIR">
+      <Value>$(CERES_ROOT_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CERES_DIR">
+      <Value>$(CERES_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CERES_INC_DIR">
+      <Value>$(CERES_INC_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CERES_LIB_DIR">
+      <Value>$(CERES_LIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CERES_INTERNAL_DIR">
+      <Value>$(CERES_INTERNAL_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CERES_EIGEN_DIR">
+      <Value>$(CERES_EIGEN_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CERES_GLOG_DIR">
+      <Value>$(CERES_GLOG_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CERES_GLOG_INC_DIR">
+      <Value>$(CERES_GLOG_INC_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CERES_GLOG_LIB_DIR">
+      <Value>$(CERES_GLOG_LIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CERES_GFLAGS_DIR">
+      <Value>$(CERES_GFLAGS_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CERES_GFLAGS_LIB_DIR">
+      <Value>$(CERES_GFLAGS_LIB_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,21 @@
+127.0.0.1       localhost
+127.0.1.1       POD-11
+192.168.101.1  POD-1
+192.168.101.2  POD-2
+192.168.101.3  POD-3
+192.168.101.4  POD-4
+192.168.101.5  POD-5
+192.168.101.6  POD-6
+192.168.101.7  POD-7
+192.168.101.8  POD-8
+192.168.101.9  POD-9
+192.168.101.10  POD-10
+192.168.101.11  POD-11
+192.168.101.250 peabodycontrolpanel
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters

@@ -1,0 +1,519 @@
+[Configuration]
+# THIS FILE#
+ConfigurationFile=C:\3DTelemedicine\3DTelemedicine.cfg
+ConfigurationFileLinux=/home/peabody/K4AToFusion/3DTelemedicine.cfg
+
+[Network]
+FusionIPAddress=192.168.102.250
+FusionIPAddress_PODNetwork=192.168.101.250
+RendererIPAddress=192.168.102.249
+# The calibration software usually runs on the same machine as Fusion
+CalibrationSoftwareIPAddress=192.168.102.250
+ControlPanelIPAddress=192.168.102.251
+# This is an IP base.  You should not specify the final octet, it will be appended to the end of this string
+DepthPodIPBase=192.168.101.
+
+[Ports]
+EventPort=14520
+StatusPort=14512
+DaemonPort=14511
+RendererColorStreamPort=7777
+Renderer3DStreamPort=3074
+# Depth pod daemons use DepthPodDaemonPortBase+DepthPodNumber for the port.  Depth Pod numbering is 1-based, NOT 0-based.
+# nothing will broadcast directly on the port number specified here, it will always be [DepthPodDaemonPortBase]+(1..[DepthCameraCount])
+# we use the range starting in 14531 for daemons, and 14571 for applications
+DepthPodDaemonPortBase=14530
+DepthPodApplicationStatusPortBase=14570
+NanoDaemonStatusPort=14501
+NanoApplicationStatusPort=14502
+NanoInterCalibrationSyncPort=14503
+KNCSPublishEventPort=14502  #only reason why we keep this separate is so you could theoretically run control panel on the same machine as fusion and not conflict ports
+DataStreamPort=14900
+
+[OverridePorts]
+# FusionStatusPort=12345
+# FusionDaemonPort=12345
+# Sections are defined by data sections, not program sections
+[DepthGeneration]
+DepthCameraCount=10
+#we convert depth images into color space, so we map them onto 1024 x 1024 images
+DepthImageWidth=1024
+DepthImageHeight=1024
+RawDepthImageWidth=640
+RawDepthImageHeight=576
+IRBytesPerPixel=2
+
+[ColorProcessing]
+ColorImageWidth=3840 #1920
+ColorImageHeight=2160 #1080
+ColorPixelBytes=3
+
+[Calibration]
+# If set to true, two buttons appear for PAI calibration, one for recording the videos and another for doing calibration, 
+# after the videos are recorded. This is useful to run only the video capture step since we may not wish to run
+# calibration afterwards, because it make take a considerable amount of time
+DebugMode=false
+# We store logs in the AppData folder, so this is a relative directory from %APPDATA%
+LogRelativePath="\\..\\LocalLow\\Microsoft Research\\CalibrationLogs"
+CSLogFilename="CalibrationSoftware.log"
+CSErrorFilename="CalibrationSoftware.error"
+Verbosity=0
+### Required parameters
+CalibrationWorkingDirectory=C:\3DTelemedicine\DATA\Calibration
+# Available options: Kinect, StereoIR. Only the former is supported for now.
+RigType=Kinect
+# Maximal timestamp difference allowed among camera inputs for synchronization. For our setting with 10 cameras, 2000 is probably best. Value is in microseconds.
+MaximumTimeSeparationOfSubframes=2000
+# Two available calibration modes: stage1 - computes intrinsics and extrinsics; stage2 - computes only extrinsics
+CalibrationMode=stage2
+# Calibration board model. See available sizes below.
+CalibrationBoard=CalibrationBoard-A2
+# Method for aligning the calibration parameters in world coordinate system. Available options: useImuToAlignYAxisToGravity, useDetectedFloorForWorldAlignment
+YAlignmentMethod=useImuToAlignYAxisToGravity
+### Optional parameters
+## Set DevicesCalibrationJson to load intrinsics stored in the corresponding file
+## and overwrite computed/factory values. This is useful to run stage1 during a careful 
+## calibration, save the corresponding file and load it when using stage2.
+#DevicesCalibrationJson=C:\\3DTelemedicine\\Data\\Calibration\\Intrinsics\\devicesCalibration.json
+## Any parameter accepted by the RunCalibrationApi.exe executable from the PAI calibration tools can
+## be added to ExtraParams, similarly to the example below
+#ExtraParams=--saveFovCoverage
+
+# A0-sized calibration board
+[CalibrationBoard-A0]
+# The objectSize parameter used by the PAI algorithm. See PDF instructions to determine how 
+# this value should be measured for different calibration board sizes. The ObjectSize is in meters
+ObjectSize=0.1401
+
+# A1-sized calibration board
+[CalibrationBoard-A1]
+ObjectSize=0.090
+
+# A2-sized calibration board
+[CalibrationBoard-A2]
+ObjectSize=0.065
+
+# The POD-side calibration software for PAI is K4ARecorder. It records MKVs and saves them to [Calibration][CalibrationWorkingDirectory].
+# The Azure Kinects are set using the parameters of this section 
+[K4ARecorder]
+Verbosity=1
+# Color mode accepted by Azure Kinect: 720p, 720p_YUY2, 720p_NV12, 1080p, 1440p, 1536p, 2160p, 3072p, off
+ColorMode=2160p
+# Depth mode accepted by Azure Kinect: NFOV_2X2BINNED, NFOV_UNBINNED, WFOV_2X2BINNED, WFOV_UNBINNED, PASSIVE_IR, off
+DepthMode=NFOV_UNBINNED
+# Frame rate to record the videos: 5, 15, 30
+FrameRate=5
+# Exposure setting. Value range is 2 to 5s, or -11 to 1. -12 sets auto exposure.
+ExposureValue=-9
+# Gain setting. Value range is 0 to 255. -1 sets auto gain
+Gain=255
+# White balance setting. Value range is 2500 to 12500. -1 sets auto white balance.
+WhiteBalance = -1
+# Saturation setting. Value range is 0 to 63. -1 does not set saturation.
+Saturation = -1
+# Sharpness setting. Value range is 0 to 4. -1 does not set sharpness.
+Sharpness = -1
+# Brighness setting. Value range is 0 to 255. -1 does not set brightness.
+Brightness = -1
+# Contrast setting. Value range is 0 to 10. -1 does not set contrast.
+Contrast = -1
+# destination where MKVs are stored (USB or RamDisk)
+MKVDestination="/mnt/USB"
+#destination where MKVs are transferred to via scp
+TransferDestination="3dtm@peabodycontrolpanel:/3DTelemedicine/DATA/Calibration"
+
+[Fusion]
+BinaryLocation=C:\3DTelemedicine\Fusion\
+# ###### basic setup ###########
+CalibrationDirectory=C:\3DTelemedicine\DATA\FusionCalibration
+OfflineDataDirectory=C:\3DTelemedicine\OfflineData\Fusion
+frame_start=1
+frames_num=200
+# determines how we load offline data (as bin or PNG)
+usePNGAsDepth = true
+usePNGAsColor = true
+# ####### Enable live capture from network ########
+livecapture=true
+# ###### mesh server ###########
+runmeshserver=true
+# ###### mock server ###########
+runmockserver=false
+mockserver_file=C:\3DTelemedicine\OfflineData\Fusion
+mockserver_begin=3811
+mockserver_end=4044
+# ###### Data capture parameters
+# ## If true, the grab synchronized frame operation is done in a separate thread.
+# ## Threaded frame grabbing mitigates out of sync buffers, because it separates
+# ## the frame processing step for Fusion from data capture. If we do those operations
+# ## in the same thread, the latency in Fusion computation or data capture may lead
+# ## the buffers to run out of sync because they are not emptied/filled fast enough.
+# ## Note that Fusion re-uses the last synchronized frame if one was not yet captured 
+# ## by the time that Fusion is ready to compute a new mesh.
+ThreadedGrabFrame=false
+# ## This thread forces the Fusion frame buffers to resync every given number of 
+# ## frames. Values <=0 disable this operation. This parameter helps prevent out of sync buffers 
+# ## from happening, but in practice threaded frame grabbing seems to be more effective.
+ResyncBuffersEveryGivenNumberOfFrames=0
+# ## Action to be performed if Fusion buffers are out of sync. terminate -> Fusion is terminated and
+# ## ControlPanel tries to restart it. try_resync -> Fusion flushes its buffers and tries to resync. 
+# ## try_resync_and_terminate -> Tries to resync Fusion's buffers <MaximumNumberOfResyncAttempts> times
+# ## and requests termination if a new attempt is necessary
+ActionIfBuffersOutOfSync=try_resync_and_terminate
+MaximumNumberOfResyncAttempts=3
+# ###### Fusion volume adjustment parameters. Fusion uses the volume dimensions computed given the camera extrinsics. 
+# ###### The values below are used to add/decrease the volume bounding box. Values are in millimeters.
+xmin_adjustment=0
+xmax_adjustment=0
+ymin_adjustment=0
+ymax_adjustment=0
+zmin_adjustment=0
+zmax_adjustment=0
+# ###### Fusion quality parameters ####
+voxel_resolution=0.5
+ed_nodes_resolution=4.0
+voxel_resolution_low=0.4
+ed_nodes_resolution_low=8.0
+ddf_mu=2.5
+align_mu=5.0
+dual_gpu=false
+UseDepthOffset=false
+DepthOffsetAmount=0
+# ###### Debug ##############
+interceptFusionWriteDisk=false
+interceptFusionWriteDirectory=C:\3DTelemedicine\OfflineData\Fusion
+ProcessRegex=LiveFusionDemo-Multiview
+HighQualityEnabled=true
+#DisabledCameraList={1,3,7}
+Verbosity=0
+
+[Renderer]
+BinaryLocation=C:\3DTelemedicine\Renderer\
+UseBuiltInConfig=false
+CalibrationDirectory=C:\3DTelemedicine\DATA\RendererCalibration
+# No idea why we need this... LocalCalibDirectoryName="DummyData"
+SendToStreamingServer=true
+ServerVideoEncodeBitRate=34
+ProcessRegex=HoloPortRenderer
+DrawColorTextures=true
+UseColorCorrectionLUT=false
+#DisabledCameraList={1,3,7}
+Verbosity=0
+NetworkTargetFPS=30.0
+
+# UVUnwrap and Texturing
+[ModelToTexture]
+TextureDimension=2048
+PerTriangleTextureDimension=16
+ExpectedIndexCount=196608
+ExpectedVertexCount=120000
+TextureDimensionHQ=4096
+PerTriangleTextureDimensionHQ=5
+ExpectedIndexCountHQ=4000000
+ExpectedVertexCountHQ=500000
+
+[Audio]
+UseAudio=true
+AudioSampleRate=48000
+AudioSampleSize=2
+
+[TransformCorrection]
+UseCorrection=true
+CorrectionPositionX=0
+CorrectionPositionY=0
+CorrectionPositionZ=0
+CorrectionRotationX=0
+CorrectionRotationY=0
+CorrectionRotationZ=0
+
+
+# Depth dilation/search settings for Renderer's color projection checks
+[DepthDilationProfile]
+DilateSteps=1
+DefaultDepthSearchRadius=6
+DefaultDepthSearchStep=2
+DefaultDepthDilateStepSize=3
+DepthDilateStepSize_Pod0=5
+DepthSearchStep_Pod0=2
+DepthSearchRadius_Pod0=6
+#determines min angle between surface normal and camera ray that's acceptable 
+DotProductNormalWeightThreshold = 0.0
+#determines min cutoff for discontinuity check in color projection 
+DiscontinuityThreshold = 0.1
+
+[UI]
+StoppedColor=2.0
+CameraPanningSpeed=50
+CameraRotationSpeed=3000
+CameraZoomSpeed=5
+# Display the debug tab in the UI
+EnableDebugTab=true
+
+# Section for the Viewer's Capture functionality
+[Capture/Viewer]
+
+# Capture the LQ model on save
+3DModelLowQuality = true
+
+# Capture the HQ model on save
+3DModelHighQuality = true
+
+# Capture a screenshot on save
+Screenshot = true
+
+# Capture the currently panned/zoomed view on save
+Views = true
+
+# Capture all raw frames on save
+AllRawFrames = true
+
+[3DTMLauncherService]
+#Verbosity level.  0 is default, minimal output. 1 will produce much more output in the event log.  2 and higher are extremely verbose and should only be used for debugging
+Verbosity=1
+DisableHeartbeat = false
+BinaryLocation=C:\3DTelemedicine\3DTMLauncherService
+# We can't overwrite this binary directly because it's the binary used to download updates, so it has to copy data somewhere and then
+# the 3DTM Launcher Service Updater.exe will be called which will grab this value and overwrite the launcher
+UpdatedZipFilename=C:\3DTelemedicine\3DTMLauncherService.new.zip
+# When we've received a new binary and saved it to the filename above, 3DTMLauncherService will call [UpdaterExecutable]
+# so [UpdaterExecutable] should find the new zip, stop the 3DTMLauncherService, overwrite files, restart 3DTMLauncherService
+# and then exit
+UpdaterExecutable=C:\3DTelemedicine\Tools\3DTM Launcher Service Updater.exe
+
+[KinectNanoCommunicatorService]
+#Verbosity level.  0 is default, minimal output. 1 will produce much more output in the event log.  2 and higher are extremely verbose and should only be used for debugging
+Verbosity=1
+DisableHeartbeat = false
+BinaryLocation=C:\3DTelemedicine\KinectNanoCommunicatorService
+
+[Decoder]
+# Defaults to [Network][RendererIPAddress] if not set HoloStreamServerHost=RENDER
+# Defaults to [Ports][Renderer3DStreamPort] if not set HoloStreamServerPort=3074
+ShouldWriteIncomingStreamToDisk=false
+# folder for saving incoming stream to disk, so it can be loaded later for debug
+HoloportStreamWriteFolder=C:\HoloportStreamData
+# if set to true, data will be read from HoloportStreamReadFolder instead of from network stream
+ShouldReadStreamFromDisk=false
+HoloportStreamReadFolder=C:\HoloportStreamData\_2020_10_7_11-42-22
+Color2DStreamReadFolder=C:\HoloportStreamData\
+
+[Debug]
+# Setting this to true will skip straight to Fusion start
+SkipControlPanelDepthStartCheck=false
+# Setting this to true will skip daemon status check for DGs
+SkipControlPanelDaemonStatusCheck=false
+# Should control panel automatically restart Fusion/Render when they time out?
+RestartTimedout_FusionRender = true
+#FusionLogDirectory = "C:\\users\\BCUTLER\\AppData\\LocalLow\\Microsoft Research\\FusionLogs"
+#RenderLogDirectory = "C:\\users\\BCUTLER\\AppData\\LocalLow\\MicrosoftResearch\\HoloPortRenderer"
+LogCollectionFolder = "C:\\users\\BCUTLER\\OneDrive\\Debug\\Logs"
+
+[AzureKinectLauncherDaemon]
+BinaryLocation=/usr/local/bin/
+StagingFolder=/home/peabody/staging/
+DaemonMode = true
+Verbosity = 0
+LogFilename = /var/log/K4AToFusion/AKLauncherDaemon.log
+LockFilename = /var/lock/AKLauncherDaemon
+WorkingDirectory = /home/peabody
+CalibrationDirectory = /home/peabody/K4AToFusion
+ColorFactoryCalibFilename = /home/peabody/K4AToFusion/colorConfig00.json
+DepthFactoryCalibFilename = /home/peabody/K4AToFusion/depthConfig00.json
+ExtrinsicsFactoryCalibFilename = /home/peabody/K4AToFusion/extrinsics00.json
+IMUSampleFilename = /home/peabody/K4AToFusion/imusample.json
+CaptureRegex = "AzureKinectNanoToFusion /home/peabody/K4AToFusion/3DTelemedicine.cfg 0 "
+CalibrationRegex = "AzureKinectNanoToFusion /home/peabody/K4AToFusion/3DTelemedicine.cfg 1 "
+BackgroundCaptureRegex = "AzureKinectNanoToFusion /home/peabody/K4AToFusion/3DTelemedicine.cfg 2 "
+K4ARecorderRegex = "K4ARecorder /home/peabody/K4AToFusion/3DTelemedicine.cfg "
+DisableHeartbeat = false
+
+[PodGlobalConfig]
+Verbosity=0
+# Enables profiling mode.  Lots of debug output, very slow, prints out time spent in each function
+Profile=false
+# Calculates statistics around temporal erosion work.  Set to false unless debugging
+StatisticsMode=false
+BinaryLocation = /usr/local/bin/
+DaemonMode = true  #if set to 1, std::cout will be piped to a file
+LogFilename = /var/log/K4AToFusion/K4AToFusion.log
+# Color Format (see K4A documentation for more details)
+#   0 - K4A_IMAGE_FORMAT_COLOR_MJPG
+#   1 - K4A_IMAGE_FORMAT_COLOR_NV12
+#   2 - K4A_IMAGE_FORMAT_COLOR_YUY2
+#   3 - K4A_IMAGE_FORMAT_COLOR_BGRA32
+ColorFormat = 0
+# Color Resolution
+#   0 - K4A_COLOR_RESOLUTION_OFF  
+#   1 - K4A_COLOR_RESOLUTION_720P
+#   2 - K4A_COLOR_RESOLUTION_1080P
+#   3 - K4A_COLOR_RESOLUTION_1440P
+#   4 - K4A_COLOR_RESOLUTION_1536P
+#   5 - K4A_COLOR_RESOLUTION_2160P
+#   6 - K4A_COLOR_RESOLUTION_3072P
+ColorResolution = 5
+# Depth mode
+#   0 - K4A_DEPTH_MODE_OFF
+#   1 - K4A_DEPTH_MODE_NFOV_2X2BINNED (320x288)
+#   2 - K4A_DEPTH_MODE_NFOV_UNBINNED  (640x576)
+#   3 - K4A_DEPTH_MODE_WFOV_2X2BINNED (512x512)
+#   4 - K4A_DEPTH_MODE_WFOV_UNBINNED  (1024x1024)
+#   5 - K4A_DEPTH_MODE_PASSIVE_IR     (1024x1024)
+DepthMode = 2
+# Camera FPS
+#   0 - K4A_FRAMES_PER_SECOND_5
+#   1 - K4A_FRAMES_PER_SECOND_15
+#   2 - K4A_FRAMES_PER_SECOND_30
+CameraFPS = 1
+# determines whether we want to send IR info along with color for calibration (only in calibration mode)
+calibCaptureActiveIR = false
+# determines whether we want to send Depth info along with color for calibration (only in calibration mode)
+calibCaptureDepth = true
+# determines if we are going to run in factory calib mode (for calibration or streaming)
+UseFactoryCalib = false
+# Sync images only
+# Only produce k4a_capture_t objects if they contain synchronized color and depth images.
+SyncImages = true
+# Skip first N captured frames (important in multi camera setup)
+SkipFirstNFrames = 10
+# IR Range scale (only useful when writing to disk)
+# [min] [max]  where IrVal(v) = (v - min) / (max - min)
+MinIRRange = 0
+MaxIRRange = 250
+# Min Depth in cm, Max Depth in cm (depth beyond which is flagged as bg)
+MinDepth = 100
+MaxDepth = 3000
+# apply mask
+# if true, then a fg/bg mask will be computed per pixel based on BG images, otherwise raw point cloud will be sent (all points w/foreground mask)
+ApplyMask = true
+# num std deviations
+# when generating the mask it will look at how far a new depth value is from the computed background frame. Anything closer than N std deviations away is counted as FG
+NumStdDevFromBG = 3.0
+# Defines how frequently images are saved to disk when doing calib capture (recommended values for Muscle's tool: 80, 10; for MultiviewCalib: 1, 1)
+FrameRecordingFrequency = 1
+FrameToGrabEachBurst = 10
+# Num K Params -- number of distortion parameters to use, 3 or 6
+NumKParams = 6
+# Calibration path -- ONLY USED WHEN STREAMING. BG, calibration, and offline captures are raw to allow for postprocess w/different calibrations
+CalibrationPath=/home/peabody/K4AToFusion/
+# Calibration file format. 0 - Face3D, 1 - CalibStudio, 2 - 3DTM Json format
+CalibFormat=2
+# If true, pods will try to detect the presence of a checkerboard live during calibration
+# Currently disabled because it runs at 1 frame / 4 seconds
+DetectCheckerboardDuringCalibration=false
+# How the calibration file folders are saved out (Multiview Calib expects "cam0, cam1...etc") 
+OutputForMultiViewCalib=true
+# brightness:   0 to 255. The default value is 128.
+K4ASettingsBrightness = 128
+# contrast:     0 to 10. The default is 5. Auto is not supported.
+K4ASettingsContrast = 5
+# whitebalance: The unit is degrees Kelvin. The setting must be set to a value evenly divisible by 10 degrees. Setting to negative will set to auto.
+K4ASettingsWhitebalance=-1
+# gain:         0 to 255
+K4ASettingsGain=0
+#The Azure Kinect supports a limited number of fixed exposure settings. When setting this, expect the exposure to be rounded up to the nearest setting. 
+#Exceptions are 1) The last value in the table is the upper limit, so a value larger than this will be overridden to the largest entry in the table. 
+#2) The exposure time cannot be larger than the equivelent FPS. So expect 100ms exposure time to be reduced to 30ms or 33.33ms when the camera is started. 
+#The most recent copy of the table 'device_exposure_mapping' is in https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/src/color/color_priv.h
+#
+#Exposure time is measured in microseconds.
+K4ASettingsExposure=16000
+# Saturation setting.  Valid values (taken from the Kinect Viewer UI are [0-64].  Default is 32
+K4ASettingsSaturation=32
+# Sharpness setting.  Valid values (taken from the Kinect Viewer UI are [0-4]).  Default is 2
+K4ASettingsSharpness=2
+# Enables or disables backlight compensation.  Default is false (disabled)
+K4ASettingsBacklightCompensation=false
+# Identifies the power line frequency of the Kinect.  This affects exposure timings (supposedly to help with interference from AC lighting?)
+# Valid values are 1 or 2.  1 = 50Hz, 2 = 60Hz.  Default is 2
+K4ASettingsPowerlineFrequency=2
+# k4a_sync_mode values (per K4A sdk documentation):
+#  0 - K4A_WIRED_SYNC_MODE_STANDALONE,  Neither 'Sync In' or 'Sync Out' connections are used.
+#  1 - K4A_WIRED_SYNC_MODE_MASTER,      The 'Sync Out' jack is enabled and synchronization data it driven out the connected wire.
+#  2 - K4A_WIRED_SYNC_MODE_SUBORDINATE  The 'Sync In' jack is used for synchronization and 'Sync Out' is driven for the next device in the chain. 
+#                                       'Sync Out' is a mirror of 'Sync In' for this mode.                                   
+K4ASettingsSyncMode = 2
+# Camera start mode (only useful for multi-camera)
+#   0 - auto with delay (delay useful for master/subordinate scenarios on same machine)
+#   1 - wait for user input before each camera (indicated in console when ready, useful for multi-machine setups)
+#   2 - wait for user input before master (indicated in console when ready, useful for multi-machine setups)
+#   3 - wait for signal from control panel [default]
+CameraStartMode = 3
+#RecordingFolderName = rec #Recording name to help identify capture. Data will be saved in a new folder named <RecordingFolderName>_<datetime>
+#ShowColorFrame = false #show color frame for each camera
+#ForceUndistortDepth = true #we do not undistort depth in calibration mode by default unless this is true
+# Start delay in milliseconds (only used when camera start mode is set to 0)
+StartDelayMS = 0
+# If set > 0, neighboring pixels used for bilinear interpolation that have a depth value difference greater than this threshold will not be interpolated
+# in order to preserve edges and not blend across different-depth objects
+InterpolationEdgeThreshold=3
+# If set > 0, depth fluctuations of a given x/y pixel < threshold will be ignored
+TemporalSmoothingThreshold=3
+# If set > 0, the undistorted depth image will be eroded such than any non-zero depth pixel with > DepthErosionMaxZeros neighbors == 0 will be zeroed out
+DepthErosionMaxZeros=1
+# Radius of the erosion kernel.  1 = 3x3 kernel, 2 = 5x5, 3 = 7x7, etc...
+DepthErosionSearchRadius=1
+# If set > 0, we will keep a history (up to 8 frames MAX) for each pixel whether it was valid depth or not, and use that in the erosion calculation
+TemporalErosionFrames=0
+DisableHeartbeat = false
+SerialPortFilename=/dev/ttyACM0
+
+[Pod1Override]
+CameraStartMode = 4
+K4ASettingsSyncMode = 1
+# K4ASettingsSyncDelay meaning:
+#   If this camera is a subordinate, this sets the capture delay between the color camera capture and the external
+#   input pulse. A setting of zero indicates that the master and subordinate color images should be aligned.
+#   This setting does not effect the 'Sync out' connection.
+#   This value must be positive and range from zero to one capture period.
+#   If this is not a subordinate, then this value is ignored.
+K4ASettingsSyncDelay = 0
+
+[Pod2Override]
+K4ASettingsSyncDelay = 200
+
+[Pod3Override]
+K4ASettingsSyncDelay = 400
+
+[Pod4Override]
+K4ASettingsSyncDelay = 600
+
+[Pod5Override]
+K4ASettingsSyncDelay = 800
+
+[Pod6Override]
+K4ASettingsSyncDelay = 1000
+
+[Pod7Override]
+K4ASettingsSyncDelay = 1200
+
+[Pod8Override]
+K4ASettingsSyncDelay = 1400
+
+[Updates]
+#3DTMLauncherServiceVersionUrl = "https://onedrive.live.com/download?cid=EB688D68E77B7D40&resid=EB688D68E77B7D40%217169&authkey=AOcmtVDaqL4ONaQ"
+#3DTMLauncherServiceSoftwareUrl = "https://onedrive.live.com/download?cid=EB688D68E77B7D40&resid=EB688D68E77B7D40%214504&authkey=ADi3UCl-wItqwjU"
+#AKLauncherDaemonVersionUrl = "https://onedrive.live.com/download?cid=EB688D68E77B7D40&resid=EB688D68E77B7D40%217166&authkey=APAdDJgPF1pqeDI"
+#AKLauncherDaemonSoftwareUrl = "https://onedrive.live.com/download?cid=EB688D68E77B7D40&resid=EB688D68E77B7D40%217156&authkey=AMD9IEFHvmtRZGQ"
+#AzureKinectNanoToFusionVersionUrl = "https://onedrive.live.com/download?cid=EB688D68E77B7D40&resid=EB688D68E77B7D40%217165&authkey=ANxnDXeTZBvGy8U"
+#AzureKinectNanoToFusionSoftwareUrl = "https://onedrive.live.com/download?cid=EB688D68E77B7D40&resid=EB688D68E77B7D40%217153&authkey=AFgdKuesrHg5ido"
+#KinectNanoCommunicatorServiceVersionUrl = ""
+#KinectNanoCommunicatorServiceSoftwareUrl = "https://onedrive.live.com/download?cid=EB688D68E77B7D40&resid=EB688D68E77B7D40%214505&authkey=AF40CLWDcGORIk4"
+#FusionVersionUrl = "https://onedrive.live.com/download?cid=EB688D68E77B7D40&resid=EB688D68E77B7D40%217170&authkey=AG-8NWXabHfrVbw"
+#FusionSoftwareUrl = "https://onedrive.live.com/download?cid=EB688D68E77B7D40&resid=EB688D68E77B7D40%214537&authkey=AGE13wXeCAjx8-E"
+#RenderVersionUrl = "https://onedrive.live.com/download?cid=EB688D68E77B7D40&resid=EB688D68E77B7D40%217167&authkey=AMiybEdS7Pulit4"
+#RenderSoftwareUrl = "https://onedrive.live.com/download?cid=EB688D68E77B7D40&resid=EB688D68E77B7D40%214499&authkey=AEc-LYqH1Mp4of0"
+#ConfigFileUrl = "https://onedrive.live.com/download?cid=EB688D68E77B7D40&resid=EB688D68E77B7D40%219616&authkey=AMGg05csmgOJeLM"
+3DTMLauncherServiceVersionUrl=http://51.132.63.142/Content/TRANSFER/3DTMLauncherService.version
+3DTMLauncherServiceSoftwareUrl=http://51.132.63.142/Content/TRANSFER/3DTMLauncherService.zip
+AKLauncherDaemonVersionUrl=http://51.132.63.142/Content/TRANSFER/AKLauncherDaemon.version
+AKLauncherDaemonSoftwareUrl=http://51.132.63.142/Content/TRANSFER/AKLauncherDaemon.bin
+AzureKinectNanoToFusionVersionUrl=http://51.132.63.142/Content/TRANSFER/AzureKinectNanoToFusion.version
+AzureKinectNanoToFusionSoftwareUrl=http://51.132.63.142/Content/TRANSFER/AzureKinectNanoToFusion.bin
+KinectNanoCommunicatorServiceVersionUrl=http://51.132.63.142/Content/TRANSFER/KinectNanoCommunicatorService.version
+KinectNanoCommunicatorServiceSoftwareUrl=http://51.132.63.142/Content/TRANSFER/KinectNanoCommunicatorService.bin
+FusionVersionUrl=http://51.132.63.142/Content/TRANSFER/Fusion.version
+FusionSoftwareUrl=http://51.132.63.142/Content/TRANSFER/Fusion.zip
+RenderVersionUrl=http://51.132.63.142/Content/TRANSFER/Renderer.version
+RenderSoftwareUrl=http://51.132.63.142/Content/TRANSFER/renderer.zip
+ControlPanelVersionUrl=http://51.132.63.142/Content/TRANSFER/ControlPanel.version
+ControlPanelSoftwareUrl=http://51.132.63.142/Content/TRANSFER/ControlPanel.zip
+ConfigFileUrl=http://51.132.63.142/Content/TRANSFER/3DTelemedicine.cfg

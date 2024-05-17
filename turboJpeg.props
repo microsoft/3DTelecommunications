@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <TURBOJPEG_ROOT>$(PEABODY_DEPENDENCY_DIR)libjpeg-turbo\</TURBOJPEG_ROOT>
+    <TURBOJPEG_LIB_DIR>$(TURBOJPEG_ROOT)VSBUILD\$(Configuration)\</TURBOJPEG_LIB_DIR>
+    <TURBOJPEG_BIN_DIR>$(TURBOJPEG_LIB_DIR)</TURBOJPEG_BIN_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(TURBOJPEG_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(TURBOJPEG_LIB_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>turbojpeg.lib;jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="TURBOJPEG_ROOT">
+      <Value>$(TURBOJPEG_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TURBOJPEG_LIB_DIR">
+      <Value>$(TURBOJPEG_LIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TURBOJPEG_BIN_DIR">
+      <Value>$(TURBOJPEG_BIN_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

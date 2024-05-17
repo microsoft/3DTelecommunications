@@ -1,0 +1,328 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel ProcessRawImages
+#pragma kernel UnsharpMask
+#pragma kernel UndistortImages
+
+#define BIAS_FIRST
+
+// The following define is used to process YUV color images.  #undef this to process raw bayer RGB instead.
+#undef YUV_COLOR
+#undef RGBA_COLOR
+#undef RGB_COLOR
+#define ARGB_COLOR
+#define OBJ_CAPTURE_RIG
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+
+struct CameraParameters
+{
+	float4 g_F;
+	float4 g_P;
+	float4 g_Kappa;
+	float4 g_Tangential;
+	float4 g_Scale;
+	float4 g_Bias;
+	int    g_IsR6kt;
+};
+
+int colorWidth;
+int colorHeight;
+int numPods;
+float maskScale;
+StructuredBuffer<float> mask;
+RWStructuredBuffer<CameraParameters> cameraParameterBuffer;
+
+Texture2DArray<float4> inputArray;
+RWTexture2DArray<float4> processedColor4;
+RWTexture2DArray<float4> sharpenedColor4;
+RWTexture2DArray<float4> output4;
+
+bool UseLUT;
+Texture3D<float4> LutTable;
+SamplerState my_trillinear_clamp_sampler;
+// convert from yuv / or bayered to rgb
+[numthreads(32, 32, 1)]
+void ProcessRawImages(uint3 blockIdx : SV_GroupID,
+	uint3 DTid : SV_DispatchThreadID,
+	uint3 threadIdx : SV_GroupThreadID,
+	uint GI : SV_GroupIndex)
+{
+	uint camIdx = blockIdx.z;
+	uint width, height, depth;
+	inputArray.GetDimensions(width, height, depth);
+
+
+	uint outX = blockIdx.x * 32 + threadIdx.x;
+	uint outY = blockIdx.y * 32 + threadIdx.y;
+	uint outZ = blockIdx.z;
+
+	uint inX = outX;
+	uint inY = outY;
+
+	float3 clr = (float3)0;
+
+	outY = height - 1 - outY;
+	float d11 = inputArray[int3(inX + 0 , inY + 0 , camIdx)].w;
+	
+
+	if (d11 == 0.0f)
+	{
+		clr = float3(d11, d11, d11);
+	}
+	else 
+	{
+
+		#ifdef YUV_COLOR
+		{
+			uint uvX = inX - (inX % 2);
+			uint uvY = inY / 2;
+			int C = 255 * input4[int2(inX, inY)].y - 16;
+			int D = 255 * input4[int2(inX, inY)].x - 128;
+			int E = 255 * input4[int2(inX, inY)].w - 128;
+
+			clr.x = clamp((298 * C + 409 * E + 128) >> 8, 0, 255);
+			clr.y = clamp((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
+			clr.z = clamp((298 * C + 516 * D + 128) >> 8, 0, 255);
+			clr = clr / 255;
+		}
+		#elif defined(RGBA_COLOR) || defined(RGB_COLOR) || defined(ARGB_COLOR)
+		{
+
+			//	if (inX > 0 && inX < width - 1 && inY > 0 && inY < height - 1)
+			{
+				float4 resColor = inputArray[int3(inX, inY, camIdx) ];
+				#ifdef RGB_COLOR
+					clr = float3(resColor.y, resColor.x, resColor.z);
+				#elif defined(RGBA_COLOR)
+					clr = float3(resColor.y, resColor.x, resColor.w);
+				#else //ARGB_COLOR
+					clr = float3(resColor.x, resColor.y, resColor.z);
+				#endif
+
+				//linear gamma color space change
+				clr = float3( pow(abs(clr.x) , 1/2.2f) , pow(abs(clr.y), 1/2.2f), pow(abs(clr.z), 1/2.2f));
+		
+			}
+		}
+		#else
+		{
+			if (inX > 0 && inX < width - 1 && inY > 0 && inY < height - 1)
+			{
+				float d02 = input4[int2(inX - 1, inY + 1)].w;
+				float d10 = input4[int2(inX + 0, inY - 1)].w;
+				float d00 = input4[int2(inX - 1, inY - 1)].w;
+				float d01 = input4[int2(inX - 1, inY + 0)].w;
+				d11 = input4[int2(inX + 0 , inY + 0 )].w;
+				float d12 = input4[int2(inX + 0, inY + 1)].w;
+				float d20 = input4[int2(inX + 1, inY - 1)].w;
+				float d21 = input4[int2(inX + 1, inY + 0)].w;
+				float d22 = input4[int2(inX + 1, inY + 1)].w;
+
+				float u = 0.5, ui = 0.5;
+				float v = 0.5, vi = 0.5;
+				float a = ui * d01 + u * d21;
+				float b = vi * d10 + v * d12;
+				float c = 0.5*(a + b);
+				float d = vi * (ui*d00 + u * d20) + v * (ui*d02 + u * d22);
+
+
+				#if defined(OBJ_CAPTURE_RIG)
+				{
+					if (inY % 2)
+					{
+
+						if (inX % 2)
+						{
+							clr = float3(a, d11, b);
+						}
+						else
+						{
+							clr = float3(d11, c, d);
+						}
+					}
+					else
+					{
+						if (inX % 2)
+						{
+							clr = float3(d, c, d11);
+						}
+						else
+						{
+							clr = float3(b, d11, a);
+						}
+
+					}
+				}
+				#else
+					if (inY % 2)
+					{
+						if (inX % 2)
+						{
+							clr = float3(d, c, d11);
+						}
+						else
+						{
+							clr = float3(b, d11, a);
+						}
+					}
+					else
+					{
+						if (inX % 2)
+						{
+							clr = float3(a, d11, b);
+						}
+						else
+						{
+							clr = float3(d11, c, d);
+						}
+					}
+				#endif
+			}
+		}
+		#endif
+	}
+	//apply scale and bias
+	float3 s = cameraParameterBuffer[camIdx].g_Scale.xyz;
+	float3 b = cameraParameterBuffer[camIdx].g_Bias.xyz;
+
+	#if defined(BIAS_FIRST)
+		//apply bias first
+		clr.x = s.x*(clr.x + b.x); clr.y = s.y*(clr.y + b.y); clr.z = s.z*(clr.z + b.z);
+	#else
+		//apply scale first
+		clr.x = s.x*clr.x + b.x; clr.y = s.y*clr.y + b.y; clr.z = s.z*clr.z + b.z;
+	#endif
+		
+	clr = clamp(clr, 0.0, 1.0);
+	//processedColor4[int3(outX, outY, outZ)] = float4(clr, 1.0);
+	float alpha = 1.f;
+	if (UseLUT)
+	{
+		clr = clamp(clr, 0.015, 1.0); // slight offset to correct for SUPER dark areas being matched to bright colors
+		float lutTableDimX, lutTableDimY, lutTableDimZ;
+		LutTable.GetDimensions(lutTableDimX, lutTableDimY, lutTableDimZ);
+
+		float clrLookupOffset = camIdx / (float)numPods;
+		clr.z = clr.z / (float)numPods +clrLookupOffset;
+		float4 resultColor = LutTable.SampleLevel(my_trillinear_clamp_sampler, float3(clr.x,clr.y,clr.z), 0);
+		resultColor.a = alpha;
+
+		processedColor4[int3(outX , outY, camIdx)] = resultColor;
+	}
+	else
+	{
+		processedColor4[int3(outX, outY, camIdx)] = float4(clr, alpha);
+	}
+}
+
+
+[numthreads(32, 32, 1)]
+void UnsharpMask(uint3 blockIdx : SV_GroupID,
+	uint3 DTid : SV_DispatchThreadID,
+	uint3 threadIdx : SV_GroupThreadID,
+	uint GI : SV_GroupIndex)
+{
+	uint camIdx = blockIdx.z;
+	uint width, height, depth;
+	processedColor4.GetDimensions(width, height, depth);
+
+	uint outX = blockIdx.x * 32 + threadIdx.x;
+	uint outY = blockIdx.y * 32 + threadIdx.y;
+	uint outZ = blockIdx.z;
+		
+	float4 outClr = (float4)0;	
+	for (int dy = -1; dy < 2; ++dy)
+	{
+		for (int dx = -1; dx < 2; ++dx)
+		{
+			float4 processedColor = processedColor4[int3(outX + dx , outY + dy, camIdx)];
+			int kIdx = (dy + 1) * 3 + (dx + 1);			
+			outClr += maskScale * mask[kIdx] * processedColor;			
+		}
+	}
+
+	sharpenedColor4[int3(outX , outY, camIdx)] = clamp(outClr, 0.0, 1.0);	
+}
+
+
+[numthreads(32, 32, 1)]
+void UndistortImages(uint3 blockIdx : SV_GroupID,
+	uint3 DTid : SV_DispatchThreadID,
+	uint3 threadIdx : SV_GroupThreadID,
+	uint GI : SV_GroupIndex)
+{
+	//0.0931235 0.000398252 -0.000245919 0
+	//-0.164345 0.094179 0.000496948 0.000383531 0
+	uint camIdx = blockIdx.z;
+
+	float4 tempKappa = cameraParameterBuffer[camIdx].g_Kappa;
+	float4 tempTangential = cameraParameterBuffer[camIdx].g_Tangential;
+	float4 tempFocal = cameraParameterBuffer[camIdx].g_F;
+	float4 tempPrincipal = cameraParameterBuffer[camIdx].g_P;
+
+	uint width, height, depth;
+	processedColor4.GetDimensions(width, height, depth);
+
+
+	uint outX = blockIdx.x * 32 + threadIdx.x;
+	uint outY = blockIdx.y * 32 + threadIdx.y;
+	uint outZ = blockIdx.z;
+	
+	//from texture coordinate back into camera coordinates 
+	float x = tempFocal.z * (outX/* + 0.5*/) + tempPrincipal.z;
+	float y = tempFocal.w * (outY/* + 0.5*/) + tempPrincipal.w;
+
+	float r2 = x * x + y * y;
+
+	float a = (1.f + tempKappa[0] * r2 + tempKappa[1] * r2*r2 + tempKappa[2] * r2*r2*r2);
+	float rd = a;
+	if (cameraParameterBuffer[camIdx].g_IsR6kt == 1)
+	{
+		float b = (1.f + tempKappa[3] * r2 + tempTangential[2] * r2*r2 + tempTangential[3] * r2*r2*r2);
+
+		float bi = 1.f;
+		if (b != 0.f)
+		{
+			bi = 1.f / b;
+		}
+		rd = a * bi;
+	}
+
+	float dx = 2.f * x * y * tempTangential[0] + (r2 + 2.f * x * x) * tempTangential[1];
+	float dy = 2.f * x * y * tempTangential[1] + (r2 + 2.f * y * y) * tempTangential[0];
+
+	float tx = x * rd + dx;
+	float ty = y * rd + dy;
+
+	//camera back into texture coordinate
+	float sx = tempFocal.x * tx + tempPrincipal.x;
+	float sy = tempFocal.y * ty + tempPrincipal.y;
+
+	uint inX = floor(sx);
+	uint inY = floor(sy);
+
+	float u = frac(sx);
+	float v = frac(sy);
+	float ui = 1.0f - u;
+	float vi = 1.0f - v;
+
+	float4 d00 = processedColor4[int3(inX + 0, inY + 0, camIdx)];
+													  
+	// bilinear interpolation						  
+	float4 d01 = processedColor4[int3(inX + 0, inY + 1, camIdx)];
+	float4 d10 = processedColor4[int3(inX + 1, inY + 0, camIdx)];
+	float4 d11 = processedColor4[int3(inX + 1, inY + 1, camIdx)];
+
+	float4 dXA = u * d10 + ui * d00;
+	float4 dXB = u * d11 + ui * d01;
+	float4 dOut = v * dXB + vi * dXA;
+
+	const uint cBorderInvalidWidth = 1;
+	float alpha = dOut.w;
+	if (d00.w == 0.0f || sx < cBorderInvalidWidth || sy < cBorderInvalidWidth || sx > width -cBorderInvalidWidth || sy > colorHeight - cBorderInvalidWidth)
+	{
+		alpha = 0.0f;		
+	}
+
+	output4[int3(outX , outY, camIdx )] = float4(dOut.rgb, alpha);
+}

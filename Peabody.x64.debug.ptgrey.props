@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <PTGREY_ROOT>$(PEABODY_DEPENDENCY_DIR)Point Grey Research\FlyCapture2\</PTGREY_ROOT>
+    <PTGREY_LIB_DIR>$(PTGREY_ROOT)lib64\vs2015\</PTGREY_LIB_DIR>
+    <PTGREY_INC_DIR>$(PTGREY_ROOT)include\</PTGREY_INC_DIR>
+    <PTGREY_FLYCAP_DLL_DIR>C:\Program Files\Point Grey Research\FlyCapture2\bin64\vs2015\</PTGREY_FLYCAP_DLL_DIR>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ExecutablePath>$(PTGREY_FLYCAP_DLL_DIR);$(ExecutablePath)</ExecutablePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(PTGREY_INC_DIR);%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(PTGREY_LIB_DIR)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>FlyCapture2d_v140.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PostBuildEvent>
+      <Command>echo "Copying Point-Grey Flycap DLLs"
+copy "$(PTGREY_FLYCAP_DLL_DIR)FlyCapture2d_v140.dll" "$(OutDir)"
+copy "$(PTGREY_FLYCAP_DLL_DIR)libiomp5md.dll" "$(OutDir)"
+copy "$(PTGREY_FLYCAP_DLL_DIR)msvcp140.dll" "$(OutDir)"
+%(Command)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="PTGREY_ROOT">
+      <Value>$(PTGREY_ROOT)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PTGREY_LIB_DIR">
+      <Value>$(PTGREY_LIB_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PTGREY_INC_DIR">
+      <Value>$(PTGREY_INC_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PTGREY_FLYCAP_DLL_DIR">
+      <Value>$(PTGREY_FLYCAP_DLL_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

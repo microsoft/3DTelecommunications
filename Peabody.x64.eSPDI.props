@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <ESPDI_ROOT>$(PEABODY_DEPENDENCY_DIR)eSPDI\</ESPDI_ROOT>
+    <ESPDI_LIB_DIR>$(SPDI_ROOT)x64\</ESPDI_LIB_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ESPDI_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(ESPDI_LIB_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>eSPDI.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="ESPDI_ROOT">
+      <Value>$(ESPDI_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ESPDI_LIB_DIR">
+      <Value>$(ESPDI_LIB_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

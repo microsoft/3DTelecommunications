@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{76F10C63-CA82-4047-A868-DC1C6C4A6F50}</ProjectGuid>
+    <RootNamespace>Basics</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PeabodyConfigurationMacros.props" />
+    <Import Project="..\3DReconstructionOutputPaths.props" />
+    <Import Project="..\..\Peabody.x64.VXL.props" />
+    <Import Project="..\..\Peabody.x64.zlib.props" />
+    <Import Project="..\..\Peabody.x64.debug.cuda.props" />
+    <Import Project="..\..\Peabody.x64.JSON.props" />
+    <Import Project="..\..\Peabody.x64.debug.ceres-solver.props" />
+    <Import Project="..\..\Peabody.x64.debug.opencv.props" />
+    <Import Project="..\..\Peabody.x64.McLib2.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PeabodyConfigurationMacros.props" />
+    <Import Project="..\3DReconstructionOutputPaths.props" />
+    <Import Project="..\..\Peabody.x64.VXL.props" />
+    <Import Project="..\..\Peabody.x64.zlib.props" />
+    <Import Project="..\..\Peabody.x64.release.cuda.props" />
+    <Import Project="..\..\Peabody.x64.JSON.props" />
+    <Import Project="..\..\Peabody.x64.release.ceres-solver.props" />
+    <Import Project="..\..\Peabody.x64.release.opencv.props" />
+    <Import Project="..\..\Peabody.x64.McLib2.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\CameraView;..\Utility;..\CSurface;..\glmOBJ;..\MaxFlow;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\CameraView;..\Utility;..\CSurface;..\glmOBJ;..\MaxFlow;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="basic_geometry.cpp" />
+    <ClCompile Include="basic_structure.cpp" />
+    <ClCompile Include="DDF.cpp" />
+    <ClCompile Include="depth_map_filter.cpp" />
+    <ClCompile Include="distortion_correction.cpp" />
+    <ClCompile Include="KL_features.cpp" />
+    <ClCompile Include="normal_estimation.cpp" />
+    <ClCompile Include="voxel_data_io.cpp" />
+    <ClInclude Include="basic_structure.hpp" />
+    <ClInclude Include="func_jacobians.h" />
+    <ClInclude Include="normal_estimation.h" />
+    <ClCompile Include="S3DPointMatchSet.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="track_extraction_basic.cpp" />
+    <ClCompile Include="TSDF.cpp" />
+    <ClCompile Include="visual_feature_matching.cpp" />
+    <ClInclude Include="voxel_data_io.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="basic_geometry.h" />
+    <ClInclude Include="basic_geometry.hpp" />
+    <ClInclude Include="basic_structure.h" />
+    <ClInclude Include="bgSub.h" />
+    <ClInclude Include="DDF.h" />
+    <ClInclude Include="depth_map_filter.h" />
+    <ClInclude Include="distortion_correction.h" />
+    <ClInclude Include="distortion_correction.hpp" />
+    <ClInclude Include="KL_features.h" />
+    <ClInclude Include="RigidTransformModel.h" />
+    <ClInclude Include="S3DPointMatchSet.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="surface_misc.h" />
+    <ClInclude Include="surface_misc.hpp" />
+    <ClInclude Include="track_extraction_basic.h" />
+    <ClInclude Include="TSDF.h" />
+    <ClInclude Include="visual_feature_matching.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Utility\Utility.vcxproj">
+      <Project>{9c286b03-3dec-4a13-852c-9105a68400ef}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
