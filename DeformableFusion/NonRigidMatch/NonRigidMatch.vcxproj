@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{135A0214-46E7-4FAD-B99E-760A98EDB4C6}</ProjectGuid>
+    <RootNamespace>NonRigidMatch</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PeabodyConfigurationMacros.props" />
+    <Import Project="..\..\Peabody.x64.debug.ceres-solver.props" />
+    <Import Project="..\..\Peabody.x64.VXL.props" />
+    <Import Project="..\..\Peabody.x64.JSON.props" />
+    <Import Project="..\..\Peabody.x64.debug.opencv.props" />
+    <Import Project="..\..\Peabody.x64.McLib2.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PeabodyConfigurationMacros.props" />
+    <Import Project="..\..\Peabody.x64.VXL.props" />
+    <Import Project="..\..\Peabody.x64.JSON.props" />
+    <Import Project="..\..\Peabody.x64.release.ceres-solver.props" />
+    <Import Project="..\..\Peabody.x64.release.opencv.props" />
+    <Import Project="..\..\Peabody.x64.McLib2.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\registration_3D;..\Utility;..\CSurface;..\Basics;..\CameraView;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\registration_3D;..\Utility;..\CSurface;..\Basics;..\CameraView;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
+      <PreprocessorDefinitions>NDEBUG;GLOG_NO_ABBREVIATED_SEVERITIES;USE_CERES_SOLVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="affines_nonrigid_pw_opt.h" />
+    <ClInclude Include="DeformationGraphOptBasic.h" />
+    <ClInclude Include="DeformationGraphOptPlus.h" />
+    <ClInclude Include="DeformGraph.h" />
+    <ClInclude Include="DeformGraphCore.h" />
+    <ClInclude Include="DeformGraphOptDensePtsAndClr.h" />
+    <ClInclude Include="LMICP.h" />
+    <ClInclude Include="nonrigid_matching_surface.h" />
+    <ClInclude Include="surface_geodesic_distance.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="affines_nonrigid_pw_opt.cpp" />
+    <ClCompile Include="DeformationGraphOptBasic_ceres.cpp" />
+    <ClCompile Include="DeformationGraphOptPlus_ceres.cpp" />
+    <ClCompile Include="DeformGraph.cpp" />
+    <ClCompile Include="DeformGraphOptDensePtsAndClr_ceres.cpp" />
+    <ClCompile Include="LMICP.cpp" />
+    <ClCompile Include="nonrigid_matching_surface.cpp" />
+    <ClCompile Include="surface_geodesic_distance.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

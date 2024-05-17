@@ -1,0 +1,335 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C3EE02AB-C76C-4179-8B2C-B37C3805ADA2}</ProjectGuid>
+    <RootNamespace>FastNonrigidMatching</RootNamespace>
+    <CudaToolkitCustomDir>
+    </CudaToolkitCustomDir>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.4.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PeabodyConfigurationMacros.props" />
+    <Import Project="..\..\Peabody.x64.VXL.props" />
+    <Import Project="..\..\Peabody.x64.debug.cuda.props" />
+    <Import Project="..\..\Peabody.x64.JSON.props" />
+    <Import Project="..\..\Peabody.x64.debug.SuiteSparse_mkl.props" />
+    <Import Project="..\..\Peabody.x64.McLib2.props" />
+    <Import Project="..\..\Peabody.x64.debug.opencv.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PeabodyConfigurationMacros.props" />
+    <Import Project="..\..\Peabody.x64.VXL.props" />
+    <Import Project="..\..\Peabody.x64.release.cuda.props" />
+    <Import Project="..\..\Peabody.x64.JSON.props" />
+    <Import Project="..\..\Peabody.x64.release.SuiteSparse_mkl.props" />
+    <Import Project="..\..\Peabody.x64.McLib2.props" />
+    <Import Project="..\..\Peabody.x64.release.opencv.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\CSurface;$(MSBuildProjectDirectory)\..\Utility;$(MSBuildProjectDirectory)\..\Basics;$(MSBuildProjectDirectory)\..\CameraView;$(MSBuildProjectDirectory)\..\NonrigidMatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+      <CodeGeneration>compute_52,sm_52;compute_75,sm_75;compute_86,sm_86;</CodeGeneration>
+      <GenerateLineInfo>true</GenerateLineInfo>
+      <PtxAsOptionV>true</PtxAsOptionV>
+      <GenerateLineInfo>true</GenerateLineInfo>
+      <FastMath>true</FastMath>
+      <Include>%(Include)</Include>
+      <AdditionalOptions>--default-stream per-thread %(AdditionalOptions)</AdditionalOptions>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\CSurface;$(MSBuildProjectDirectory)\..\Utility;$(MSBuildProjectDirectory)\..\Basics;$(MSBuildProjectDirectory)\..\CameraView;$(MSBuildProjectDirectory)\..\NonrigidMatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+      <CodeGeneration>compute_52,sm_52;compute_75,sm_75;compute_86,sm_86;</CodeGeneration>
+      <Include>$(MSBuildProjectDirectory)\Utility;%(Include)</Include>
+      <PtxAsOptionV>true</PtxAsOptionV>
+      <GenerateLineInfo>true</GenerateLineInfo>
+      <FastMath>true</FastMath>
+      <AdditionalOptions>-prec-div=true -prec-sqrt=true --default-stream per-thread %(AdditionalOptions)</AdditionalOptions>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BlockedHessianMatrix.h" />
+    <ClInclude Include="CMotionFieldEstimationF2F.h" />
+    <ClInclude Include="cuda_utility.h" />
+    <ClInclude Include="DeformGraphCuda.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="DeformGraphCudaImpl.cuh">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <!-- <ClInclude Include="DeformGraphCudaImpl_GPU1.cuh" /> -->
+    <ClInclude Include="DeformGraphCuda_GPU.h" />
+    <ClInclude Include="DeformGraphCudaImpl_GPU.cuh" />
+    <!-- <ClInclude Include="DeformGraphCuda_GPU1.h" /> -->
+    <ClInclude Include="EDMatchingHelperCuda.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="EDMatchingHelperCudaImpl.cuh">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <!-- <ClInclude Include="EDMatchingHelperCudaImpl_GPU1.cuh" /> -->
+    <ClInclude Include="EDMatchingHelperCuda_GPU.h" />
+    <ClInclude Include="EDMatchingHelperCudaImpl_GPU.cuh" />
+    <!-- <ClInclude Include="EDMatchingHelperCuda_GPU1.h" /> -->
+    <ClInclude Include="EDMatchingJacobianHelper.h" />
+    <ClInclude Include="EDMatchingLSQProblemCudaCore.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="EDMatchingLSQProblemCuda.h" />
+    <!-- <ClInclude Include="EDMatchingLSQProblemCuda_GPU1.h" /> -->
+    <ClInclude Include="fast_pcg.cuh" />
+    <ClInclude Include="Fusion4DGPUKeyFrames.h" />
+    <ClInclude Include="geometry_types_cuda.h" />
+    <ClInclude Include="LinearSolverCuSolver.h" />
+    <ClInclude Include="mc_mesh_processing.cuh">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="NormalEquationSolverPCGCuda.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="NormalEquationSolverPCGCuda_GPU.h" />
+    <ClInclude Include="lmsolver.h" />
+    <ClInclude Include="lmsolver_gpu.h" />
+    <ClInclude Include="matrix_types_cuda.h" />
+    <ClInclude Include="matrix_types_cuda_io.h" />
+    <!-- <ClInclude Include="NormalEquationSolverPCGCuda_GPU1.h" /> -->
+    <ClInclude Include="NormalEquationSolverSuiteSparse.h" />
+    <ClInclude Include="EDMatchingLSQProblem.h" />
+    <ClInclude Include="PCGCuda.cuh">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="PCGCuda_GPU.cuh" />
+    <!-- <ClInclude Include="PCGCuda_GPU1.cuh" /> -->
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="suitesparse.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="triangle_table.h" />
+    <ClInclude Include="volumetric_fusion.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="volumetric_fusion_GPU.h" />
+    <!-- <ClInclude Include="volumetric_fusion_GPU1.h" /> -->
+    <ClInclude Include="volumetric_fusion_impl.cuh">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="volumetric_fusion_impl_GPU.cuh" />
+    <!-- <ClInclude Include="volumetric_fusion_impl_GPU1.cuh" /> -->
+    <ClInclude Include="volumetric_fusion_io.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CMotionFieldEstimationF2F.cpp" />
+    <ClCompile Include="CudaGlobalMemory.cpp" />
+    <ClCompile Include="DeformGraphCuda.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="DeformGraphCuda_GPU.cpp" />
+    <!-- <ClCompile Include="DeformGraphCuda_GPU1.cpp" /> -->
+    <ClCompile Include="EDMatchingHelperCuda.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="EDMatchingHelperCuda_GPU.cpp" />
+    <!-- <ClCompile Include="EDMatchingHelperCuda_GPU1.cpp" /> -->
+    <ClCompile Include="EDMatchingJacobianHelper.cpp" />
+    <ClCompile Include="EDMatchingLSQProblemCudaCore_cpu.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="EDMatchingLSQProblemCudaCore_gpu.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="EDMatchingLSQProblemCuda.cpp" />
+    <!-- <ClCompile Include="EDMatchingLSQProblemCuda_GPU1.cpp" /> -->
+    <ClCompile Include="Fusion4DGPUKeyFrames.cpp" />
+    <ClCompile Include="LinearSolverCuSolver.cpp" />
+    <ClCompile Include="volumetric_fusion.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="volumetric_fusion_GPU.cpp" />
+    <!-- <ClCompile Include="volumetric_fusion_GPU1.cpp" /> -->
+    <CudaCompile Include="DeformGraphCudaImpl.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="DeformGraphCudaImpl_GPU.cu" />
+    <!-- <CudaCompile Include="DeformGraphCudaImpl_GPU1.cu" /> -->
+    <CudaCompile Include="EDMatchingHelperCudaImpl.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImplInit.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImplInit_v2.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImplRegTerm.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImpl_GPU.cu" />
+    <!-- <CudaCompile Include="EDMatchingHelperCudaImpl_GPU1.cu" /> -->
+    <CudaCompile Include="EDMatchingHelperCudaImpl_keypts.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImpl_residual.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImpl_rigid.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="EDMatchingHelperCudaImpl_visualhull.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="lmsolver_gpu_impl.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="mc_mesh_processing.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="NormalEquationSolverPCGCuda.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="NormalEquationSolverPCGCuda_GPU.cu" />
+    <ClCompile Include="lmsolver.cpp" />
+    <ClCompile Include="EDMatchingLSQProblem.cpp" />
+    <ClCompile Include="lmsolver_gpu.cpp" />
+    <ClCompile Include="matrix_types_cuda_io.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="suitesparse.cpp" />
+    <!-- <CudaCompile Include="NormalEquationSolverPCGCuda_GPU1.cu" /> -->
+    <CudaCompile Include="PCGCuda.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="PCGCuda_GPU.cu" />
+    <!-- <CudaCompile Include="PCGCuda_GPU1.cu" /> -->
+    <CudaCompile Include="volumetric_fusion_impl.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="volumetric_fusion_impl_GPU.cu" />
+    <!-- <CudaCompile Include="volumetric_fusion_impl_GPU1.cu" /> -->
+    <CudaCompile Include="volumetric_fusion_impl_post_processing.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="volumetric_fusion_impl_v1.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="volumetric_fusion_impl_v2.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="volumetric_fusion_marchingcubes.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="volumetric_fusion_marchingcubes_vMesh.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="cuda_common_kernels.cu" />
+    <CudaCompile Include="fast_pcg.cu" />
+    <ClInclude Include="cuda_math_common.cuh" />
+    <None Include="cuda_matrix_fixed.cuh" />
+    <None Include="cuda_vector_fixed.cuh" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.4.targets" />
+  </ImportGroup>
+</Project>

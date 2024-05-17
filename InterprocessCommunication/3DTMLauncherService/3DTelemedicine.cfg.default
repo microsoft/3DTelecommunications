@@ -1,0 +1,21 @@
+[Configuration]
+# THIS FILE#
+ConfigurationFile=C:\3DTelemedicine\3DTelemedicine.cfg
+
+[Network]
+FusionIPAddress=192.168.102.250
+FusionIPAddress_PODNetwork=192.168.101.250
+RendererIPAddress=192.168.102.249
+ControlPanelIPAddress=192.168.102.251
+
+[Ports]
+EventPort=14520
+StatusPort=14512
+DaemonPort=14511
+RendererColorStreamPort=7777
+Renderer3DStreamPort=3074
+# Depth pod daemons use CONCAT(DepthPodDaemonPortBase,DepthPodNumber) for the port.  Depth Pod numbering is 1-based, NOT 0-based.
+# nothing will broadcast directly on the port number specified here, it will always be concat([DepthPodDaemonPortBase], 1..[DepthCameraCount])
+# we use the range starting in 14531 for daemons, and 14571 for applications
+DepthPodDaemonPortBase=1453
+DepthPodApplicationStatusPortBase=1457

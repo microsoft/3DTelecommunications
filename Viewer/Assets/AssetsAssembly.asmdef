@@ -1,0 +1,20 @@
+{
+    "name": "AssetsAssembly",
+    "references": [
+        "Unity.ProBuilder",
+        "SimpleFileBrowser.Runtime",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI",
+        "ModernUI",
+        "HoloportationDecoders"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

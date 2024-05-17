@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <ZLIB_ROOT>$(PEABODY_DEPENDENCY_DIR)zlib\</ZLIB_ROOT>
+    <ZLIB_INC_DIR>$(ZLIB_ROOT)include\</ZLIB_INC_DIR>
+    <ZLIB_LIB_DIR>$(ZLIB_ROOT)lib\</ZLIB_LIB_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ZLIB_INC_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>zlib-$(Platform)-$(Configuration).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ZLIB_LIB_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>%(Command)
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="ZLIB_ROOT">
+      <Value>$(ZLIB_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ZLIB_INC_DIR">
+      <Value>$(ZLIB_INC_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ZLIB_LIB_DIR">
+      <Value>$(ZLIB_LIB_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

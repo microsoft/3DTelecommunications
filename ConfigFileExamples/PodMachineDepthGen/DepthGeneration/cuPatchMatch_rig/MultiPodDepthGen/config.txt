@@ -1,0 +1,44 @@
+MachineId = 0
+CaptureFolder =C:\PeabodyData\Captures\LiveDepthGenCaptures\
+# LiveCalibFilePod0 is the calibration file that is read from disk on startup.  File must exist, 
+# but the calibration read from that file will be overwritten by whatever calibration you load in the control
+# panel
+LiveCalibFilePod0 = C:\Peabody\PodMachineDepthGen\DepthGeneration\cuPatchMatch_rig\MultiPodDepthGen\calibPod0.txt
+LiveCalibFilePod1 = C:\Peabody\PodMachineDepthGen\DepthGeneration\cuPatchMatch_rig\MultiPodDepthGen\calibPod1.txt
+# When new calibration data is sent from the control panel, this machine will use the cam[LiveCalibPod[0,1]Number] folders specified by the number
+# in LiveCalibPod0Number.  The data received will be saved locally into calibPod0 and calibPod1 respectively and loaded into
+# the system.  So it is recommended that you set LiveCalibFilePod0 and LiveCalibFilePod1 to calibPod0 and calibPod1, so that on restart
+# this machine will load the calibration that was most recently sent from Control Panel.
+# LiveCalibPodNumber can be ignored. This will be deprecated in future versions.
+LiveCalibPod0Number = 2
+LiveCalibPod1Number = 3
+BackgroundImagesFolder = D:\PeabodyData\Captures\BackgroundCaptures\
+# PodNumber can be ignored. Will be deprecated in future versions.
+PodNumber = 2
+
+# Naming convention: 
+# Numbers increase from left to right from camera perspective.
+# Pods are not numbered. This differs from Camera Recorder config convention.
+PodMonoCam0 = 15190567
+PodMonoCam1 = 14135927
+PodColorCam0 = 15190934
+PodMonoCam2 = 15190894
+PodMonoCam3 = 15190565
+PodColorCam1 = 15307267
+
+SequenceMode = 0
+ShowDepth = 1
+PortNumber = 30000
+
+UseEncodedStream = 1
+StreamSourceIP = 127.0.0.1
+StreamSourcePort = 62015
+SampleEncodedStreamPath = C:\TestH264BitStream\output.h264
+PTXFilePath = C:\Peabody\PodMachineDepthGen\DepthGeneration\cuPatchMatch_rig\MultiPodDepthGen\Decoding
+LocalMachineNumber = 1
+ControlPanelIP = PEABODY-009
+MyInterfaceIP = PEABODY-001
+EventTCPPort = 62016
+EventEPGMPort = 62017
+StatusTCPPort = 62018
+StatusEPGMPort = 62019

@@ -1,0 +1,73 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel DepthDilationKernel
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+
+#define KERNEL_SIZE 32
+int resolutionWidth;
+int resolutionHeight;
+int steps;
+int stepSize;
+Texture2D<float> inputDepth;
+RWTexture2D<float> Result;
+RWStructuredBuffer<int> stepSizes;
+
+int indexFromXY(int2 uv)
+{
+    int xMul = uv.x / resolutionWidth;
+    int yMul = 1 - (uv.y / resolutionHeight);
+
+    return xMul + (yMul) * 4;
+}
+
+[numthreads(KERNEL_SIZE,KERNEL_SIZE,1)]
+void DepthDilationKernel(uint3 blockIdx : SV_GroupID,
+    uint3 DTid : SV_DispatchThreadID,
+    uint3 threadIdx : SV_GroupThreadID,
+    uint GI : SV_GroupIndex)
+{
+
+    int2 convertedUV = int2(blockIdx.x * KERNEL_SIZE + threadIdx.x,
+						blockIdx.y * KERNEL_SIZE + threadIdx.y);
+    //which pixel of current image to look at
+
+
+    int dirOffset[3] = { -1 , 0, 1 };
+    float currDepth = inputDepth[convertedUV];
+    float currMin = currDepth;
+    float currMax = currDepth;
+
+ 
+    for(int step = 1; step < steps + 1; ++ step)
+    {   
+        for (int x = 0; x < 3; ++x)
+        {
+            for(int y =0; y < 3; ++y)
+            {
+                int id = indexFromXY(convertedUV);
+                int2 newOffset = step * stepSizes[id] * int2(dirOffset[x], dirOffset[y]);
+                float newOffsetDepth = inputDepth[convertedUV + newOffset];
+                if(newOffsetDepth > currMax)
+                {
+                    currMax = newOffsetDepth;
+                }
+                if(newOffsetDepth < currMin && newOffsetDepth > 0.001f)
+                {
+                    currMin = newOffsetDepth;
+                }
+            }
+        }
+    }
+
+    if (currDepth < 1.0 && currDepth> 0.0)
+    {
+        Result[convertedUV] = currMax;
+    }
+	else
+	{
+		Result[convertedUV] = 0;
+	}
+   // Result[convertedUV] = float4(256.0f, 256.0f, 256.0f, 1); 10000.0f;
+	//Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+}

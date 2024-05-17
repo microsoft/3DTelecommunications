@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <LIBFREENECT_ROOT>$(PEABODY_DEPENDENCY_DIR)libfreenect2\</LIBFREENECT_ROOT>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(LIBFREENECT_ROOT)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(LIBFREENECT_ROOT)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freenect2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>%(Command) 
+echo copy "$(LIBFREENECT_ROOT)bin\*.dll" "$(OutDir)" 
+copy "$(LIBFREENECT_ROOT)bin\*.dll" "$(OutDir)" </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="LIBFREENECT_ROOT">
+      <Value>$(LIBFREENECT_ROOT)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

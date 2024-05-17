@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <LIBLZ4_ROOT>$(PEABODY_DEPENDENCY_DIR)LZ4\</LIBLZ4_ROOT>
+    <LIBLZ4_LIB_DIR>$(LIBLZ4_ROOT)lib\$(Configuration)\</LIBLZ4_LIB_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(LIBLZ4_ROOT)include;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(LIBLZ4_ROOT)lib\$(Configuration)\;%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lz4_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>%(Command)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="LIBLZ4_ROOT">
+      <Value>$(LIBLZ4_ROOT)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="LIBLZ4_LIB_DIR">
+      <Value>$(LIBLZ4_LIB_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+      <PEABODY_DIR>$(MSBuildThisFileDirectory)</PEABODY_DIR>
+      <PEABODY_DEPENDENCY_DIR Condition="Exists('$(MSBuildThisFileDirectory)\Dependencies\Depends_Version.txt')">$(MSBuildThisFileDirectory)Dependencies\</PEABODY_DEPENDENCY_DIR>
+      <PEABODY_DEPENDENCY_DIR Condition="!Exists('$(MSBuildThisFileDirectory)\Dependencies\Depends_Version.txt')">$(SYS_PEABODY_DEPENDENCY_DIR)</PEABODY_DEPENDENCY_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="PEABODY_DIR">
+      <Value>$(PEABODY_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PEABODY_DEPENDENCY_DIR">
+      <Value>$(PEABODY_DEPENDENCY_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

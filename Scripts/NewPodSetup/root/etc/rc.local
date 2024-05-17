@@ -1,0 +1,11 @@
+#!/bin/sh 
+1>/tmp/rc.local.log 2>&1
+mv /home/peabody/staging/AKLauncherDaemon /usr/local/bin/AKLauncherDaemon
+chmod +x /usr/local/bin/AKLauncherDaemon
+number=`cat /etc/hostname | grep -Eo '[0-9]*'`
+chmod a+w /dev/ttyACM1
+chmod a+w /dev/ttyACM0
+echo "POD${number}" > /dev/ttyACM1
+umount /mnt/USB
+
+

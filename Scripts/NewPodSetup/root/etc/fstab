@@ -1,0 +1,12 @@
+# /etc/fstab: static file system information.
+#
+# These are the filesystems that are always mounted on boot, you can
+# override any of these by copying the appropriate line from this file into
+# /etc/fstab and tweaking it as you see fit.  See fstab(5).
+#
+# <file system> <mount point>             <type>          <options>                               <dump> <pass>
+/dev/root            /                     ext4           defaults                                     0 1
+#Configure the USB scratch drive so it does not automount, does not fail if not present, but if present
+#can be mountable by user, not requiring root, and mounts to /mnt/USB
+/dev/disk/by-uuid/913d950f-5f4f-4e13-a8a4-42a268d06a73  /mnt/USB        ext4    user,noauto,nofail,rw,exec      0       0
+

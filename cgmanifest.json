@@ -1,0 +1,174 @@
+{
+    "Registrations":[
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "ASIO",
+                    "Version": "1.10.6",
+                    "DownloadUrl": "https://sourceforge.net/projects/asio/files/asio/1.10.6%20%28Stable%29/asio-1.10.6.tar.bz2/download"
+                }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Open CV",
+                    "Version": "4.5.5",
+                    "DownloadUrl": "https://sourceforge.net/projects/opencvlibrary/files/4.5.5/opencv-4.5.5-vc14_vc15.exe/download"
+                }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/ceres-solver/ceres-solver", "CommitHash": "00c8a061929b912bda3cfd4615fb8688c246c969" }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/open-source-parsers/jsoncpp", "CommitHash": "414b179d8696804c9f71242d18745732d82e1c20" }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "zlib",
+                    "Version": "1.2.5",
+                    "DownloadUrl": "https://sourceforge.net/projects/libpng/files/zlib/1.2.5/zlib-1.2.5.tar.bz2/download"
+                }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/jlblancoc/suitesparse-metis-for-windows", "CommitHash": "e8d953dffb8a99aa8b65ff3ff03e12a3ed72f90c" }
+            },
+            "DevelopmentDependency" : true
+        },        
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Freeglut",
+                    "Version": "3.0.0",
+                    "DownloadUrl": "https://sourceforge.net/projects/freeglut/files/freeglut/3.0.0/freeglut-3.0.0.tar.gz/download"
+                }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/nigels-com/glew", "CommitHash": "4a5f85e49034c7c3364dc2658040dc18cb8eed71" }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/matus-chochlik/oglplus", "CommitHash": "703ea4a7cfa5812937d41e4acbb693684aa4d4c6" }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/zeromq/libzmq", "CommitHash": "097bf26e8dacf73abc2a6cdd6f9e4dce824b8208" }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/lz4/lz4/", "CommitHash": "d86dc916771c126afb797637dda9f6421c0cb998" }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/qhull/qhull", "CommitHash": "98f336ea8cda566ddc6f46d4a33954ed0aded40b" }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "other",
+                "Other": {
+                    "Name": "Xerces",
+                    "Version": "3.1.1",
+                    "DownloadUrl": "https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.1.1.zip"
+                }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/vxl/vxl", "CommitHash": "dac1c7ed8e183e9c6de8b928c8b0294a7bd1d8ee" }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/andrewrk/libsoundio", "CommitHash": "dc4f84339039ac518b6cd1c0e7683e88e25be470" }
+            },
+            "DevelopmentDependency" : true
+        },
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/jlennox/LibYuvSharp", "CommitHash": "3b71425b693172f34db29e5a17b966bf7fb818af" }
+            },
+            "DevelopmentDependency" : true
+        },      
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/naudio/NAudio", "CommitHash": "f3c2a15379731239363fd0c26d6b5fe8162a5087" }
+            },
+            "DevelopmentDependency" : true
+        }, 
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/sharpdx/SharpDX", "CommitHash": "8e5df9f17b1d328c595a9df5851dbb2537b55621" }
+            },
+            "DevelopmentDependency" : true
+        }, 
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/cemdervis/SharpConfig", "CommitHash": "42c99d8f2728328cef4792b896d93bb10b2bf4b1" }
+            },
+            "DevelopmentDependency" : true
+        }, 
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/zeromq/netmq", "CommitHash": "52c91fb7ae6dd088b4865e058409b7567d95d65d" }
+            },
+            "DevelopmentDependency" : true
+        }, 
+        {
+            "Component": {
+                "Type": "git",
+                "git": { "RepositoryUrl": "https://github.com/somdoron/AsyncIO", "CommitHash": "0b0cf4c65b049b2e483b172e530f4db970db25e4" }
+            },
+            "DevelopmentDependency" : true
+        }, 
+        
+    ]
+}
+
+

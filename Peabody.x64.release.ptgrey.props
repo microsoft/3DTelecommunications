@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <PTGREY_ROOT>C:\Program Files\Point Grey Research\FlyCapture2\</PTGREY_ROOT>
+    <PTGREY_LIB_DIR>$(PTGREY_ROOT)lib64\</PTGREY_LIB_DIR>
+    <PTGREY_INC_DIR>$(PTGREY_ROOT)include\</PTGREY_INC_DIR>
+    <PTGREY_FLYCAP_DLL_DIR>C:\Program Files\Point Grey Research\FlyCapture2\bin64\</PTGREY_FLYCAP_DLL_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(PTGREY_INC_DIR);%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(PTGREY_LIB_DIR)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>FlyCapture2_v100.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>echo copy "$(PTGREY_FLYCAP_DLL_DIR)FlyCapture2_v100.dll" "$(OutDir)"
+copy "$(PTGREY_FLYCAP_DLL_DIR)FlyCapture2_v100.dll" "$(OutDir)"
+%(Command)
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="PTGREY_ROOT">
+      <Value>$(PTGREY_ROOT)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PTGREY_LIB_DIR">
+      <Value>$(PTGREY_LIB_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PTGREY_INC_DIR">
+      <Value>$(PTGREY_INC_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PTGREY_FLYCAP_DLL_DIR">
+      <Value>$(PTGREY_FLYCAP_DLL_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

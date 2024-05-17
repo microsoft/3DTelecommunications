@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\Networking\ControlPanelConnector.cpp" />
+    <ClCompile Include="..\..\Networking\fusion_srv\ConnectionManager.cpp" />
+    <ClCompile Include="..\..\Networking\fusion_srv\TCPConnection.cpp" />
+    <ClCompile Include="..\..\Networking\fusion_srv\TCPListener.cpp" />
+    <ClCompile Include="DataCaptureThread.cpp" />
+    <ClCompile Include="FusionControlPanelConnector.cpp" />
+    <ClCompile Include="GlobalDataStatic.cpp" />
+    <ClCompile Include="GPU2Scheduler.cpp" />
+    <ClCompile Include="LiveFusionDemo.cpp" />
+    <ClCompile Include="network_loader.cpp" />
+    <ClCompile Include="TofinoPacket.cpp" />
+    <ClCompile Include="TofinoMeshServer.cpp" />
+    <ClCompile Include="..\..\Networking\BufferAggregator.cpp" />
+    <ClCompile Include="FusionConfig.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Networking\ControlPanelConnector.h" />
+    <ClInclude Include="..\..\Networking\fusion_srv\ConnectionManager.h" />
+    <ClInclude Include="..\..\Networking\fusion_srv\I3DCompressor.h" />
+    <ClInclude Include="..\..\Networking\fusion_srv\LinkedList.h" />
+    <ClInclude Include="..\..\Networking\fusion_srv\sr_stdafx.h" />
+    <ClInclude Include="..\..\Networking\fusion_srv\TCPConnection.h" />
+    <ClInclude Include="..\..\Networking\fusion_srv\TCPListener.h" />
+    <ClInclude Include="..\..\Networking\NetworkingDataTypes.h" />
+    <ClInclude Include="DataCaptureThread.h" />
+    <ClInclude Include="FusionControlPanelConnector.h" />
+    <ClInclude Include="GlobalDataStatic.h" />
+    <ClInclude Include="GPU2Scheduler.h" />
+    <ClInclude Include="LiveFusionDemo.h" />
+    <ClInclude Include="ShadowMap.h" />
+    <ClInclude Include="TemporalFusionThread.h" />
+    <ClInclude Include="data_format.h" />
+    <ClInclude Include="abstract_loader.h" />
+    <ClInclude Include="network_loader.h" />
+    <ClInclude Include="TofinoPacket.h" />
+    <ClInclude Include="TofinoMeshServer.h" />
+    <ClInclude Include="FusionConfig.h" />
+    <ClInclude Include="..\..\Peabody.h">
+      <Filter>Kinect</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\Networking\BufferAggregator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Kinect">
+      <UniqueIdentifier>{2a19af20-cc70-488d-a2d1-d69dadb75b2b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="LiveFusionDemo-Multiview.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="shaders\deferred_shadows_fs.txt" />
+    <CopyFileToFolders Include="shaders\deferred_shadows_vs.txt" />
+  </ItemGroup>
+</Project>

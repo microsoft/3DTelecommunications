@@ -1,0 +1,12 @@
+Release/*
+Debug/*
+x64/*
+*.opensdf
+*.sdf
+*.suo
+*.log
+*.tlog
+*.obj
+*.user
+*.pdb
+*.idb

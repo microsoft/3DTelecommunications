@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <SUITESPARSE_ROOT>$(PEABODY_DEPENDENCY_DIR)Suitesparse-metis-for-windows\</SUITESPARSE_ROOT>
+    <SUITESPARSE_DIR>$(SUITESPARSE_ROOT)VSBUILD\</SUITESPARSE_DIR>
+    <SUITESPARSE_INC_DIR>$(SUITESPARSE_DIR)include\suitesparse\</SUITESPARSE_INC_DIR>
+    <SUITESPARSE_LIB_DIR>$(SUITESPARSE_DIR)lib\</SUITESPARSE_LIB_DIR>
+    <SUITESPARSE_MKL_LIB_DIR>$(SUITESPARSE_ROOT)mkl_lib_intel64\</SUITESPARSE_MKL_LIB_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SUITESPARSE_INC_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SUITESPARSE_MKL_LIB_DIR);$(SUITESPARSE_LIB_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libamdd.lib;libbtfd.lib;libcamdd.lib;libccolamdd.lib;libcholmodd.lib;libcolamdd.lib;libcxsparsed.lib;libklud.lib;libldld.lib;libspqrd.lib;libumfpackd.lib;suitesparseconfigd.lib;mkl_core.lib;mkl_intel_lp64.lib;mkl_intel_ilp64.lib;mkl_sequential.lib;mkl_blacs_intelmpi_ilp64.lib;mkl_blacs_intelmpi_lp64.lib;mkl_blacs_mpich2_ilp64.lib;mkl_blacs_mpich2_lp64.lib;mkl_blacs_msmpi_ilp64.lib;mkl_blacs_msmpi_lp64.lib;mkl_blas95_ilp64.lib;mkl_blas95_lp64.lib;mkl_cdft_core.lib;mkl_intel_sp2dp.lib;mkl_intel_thread.lib;mkl_lapack95_ilp64.lib;mkl_lapack95_lp64.lib;mkl_pgi_thread.lib;mkl_scalapack_ilp64.lib;mkl_scalapack_lp64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>%(Command)
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="SUITESPARSE_ROOT">
+      <Value>$(SUITESPARSE_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SUITESPARSE_DIR">
+      <Value>$(SUITESPARSE_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SUITESPARSE_INC_DIR">
+      <Value>$(SUITESPARSE_INC_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SUITESPARSE_LIB_DIR">
+      <Value>$(SUITESPARSE_LIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SUITESPARSE_MKL_LIB_DIR">
+      <Value>$(SUITESPARSE_MKL_LIB_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

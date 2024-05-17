@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <GLEW_ROOT>$(PEABODY_DEPENDENCY_DIR)glew\glew-1.7.0-win64\</GLEW_ROOT>
+    <GLEW_INC_DIR>$(GLEW_ROOT)include\</GLEW_INC_DIR>
+    <GLEW_LIB_DIR>$(GLEW_ROOT)lib\</GLEW_LIB_DIR>
+    <GLEW_BIN_DIR>$(GLEW_ROOT)bin\</GLEW_BIN_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(GLEW_INC_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(GLEW_LIB_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32-64bit.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>Echo Copying GLEW dlls
+copy $(GLEW_BIN_DIR)glew32.dll $(OutDir)
+
+%(Command)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="GLEW_ROOT">
+      <Value>$(GLEW_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GLEW_INC_DIR">
+      <Value>$(GLEW_INC_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GLEW_LIB_DIR">
+      <Value>$(GLEW_LIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GLEW_BIN_DIR">
+      <Value>$(GLEW_BIN_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

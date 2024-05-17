@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ConfigFileUpdater": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\3DTelemedicine"
+    }
+  }
+}

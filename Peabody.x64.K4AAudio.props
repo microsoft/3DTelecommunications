@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <K4A_SDK_ROOT>$(PEABODY_DEPENDENCY_DIR)Azure-Kinect-Sensor-SDK\</K4A_SDK_ROOT>
+    <K4A_TOOLS_DIR>$(K4A_SDK_ROOT)tools\</K4A_TOOLS_DIR>
+    <K4A_VIEWER_DIR>$(K4A_TOOLS_DIR)k4aviewer\</K4A_VIEWER_DIR>
+    <K4A_LIBUSB_INC_DIR>$(K4A_SDK_ROOT)extern\libusb\src\libusb\</K4A_LIBUSB_INC_DIR>
+    <K4A_LIBUSB_LIB_DIR>$(K4A_SDK_ROOT)build\Win-$(Platform)-$(Configuration)-Ninja\extern\libusb\</K4A_LIBUSB_LIB_DIR>
+    <K4A_SOUNDIO_INC_DIR>$(K4A_SDK_ROOT)extern\libsoundio\src\soundio\</K4A_SOUNDIO_INC_DIR>
+    <K4A_SOUNDIO_LIB_DIR>$(K4A_SDK_ROOT)build\Win-$(Platform)-$(Configuration)-Ninja\extern\libsoundio\src\</K4A_SOUNDIO_LIB_DIR>
+    <K4A_BIN_DIR>$(K4A_SDK_ROOT)build\Win-$(Platform)-$(Configuration)-Ninja\bin\</K4A_BIN_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(K4A_VIEWER_DIR);$(K4A_LIBUSB_INC_DIR);$(K4A_SOUNDIO_INC_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>setupapi.lib;libusb.lib;soundio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(K4A_LIBUSB_LIB_DIR);$(K4A_SOUNDIO_LIB_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>echo "Copying Soundio DLL"
+xcopy /Y $(K4A_BIN_DIR)soundio.dll $(OUTDIR)
+%(Command)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="K4A_SDK_ROOT">
+      <Value>$(K4A_SDK_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="K4A_TOOLS_DIR">
+      <Value>$(K4A_TOOLS_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="K4A_VIEWER_DIR">
+      <Value>$(K4A_VIEWER_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="K4A_LIBUSB_INC_DIR">
+      <Value>$(K4A_LIBUSB_INC_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="K4A_LIBUSB_LIB_DIR">
+      <Value>$(K4A_LIBUSB_LIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="K4A_SOUNDIO_INC_DIR">
+      <Value>$(K4A_SOUNDIO_INC_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="K4A_SOUNDIO_LIB_DIR">
+      <Value>$(K4A_SOUNDIO_LIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="K4A_BIN_DIR">
+      <Value>$(K4A_BIN_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

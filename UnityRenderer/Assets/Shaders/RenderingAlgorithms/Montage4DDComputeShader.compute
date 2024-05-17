@@ -1,0 +1,421 @@
+﻿/**
+* Montage4D Compute Shaders
+* Ruofei Du
+* University of Maryland, College Park & Microsoft Research
+*/
+#undef RGBA_COLOR
+#define USE_OCCLUSION_SEAMS
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel InitVertexWeightsKernel
+#pragma kernel InitTriangleSeamsKernel
+#pragma kernel ComputeVertexWeightsKernel
+#define VERTEX_BLOCK_STRIDE 32 // was 32 for smaller scenes with at most 262144 vertices
+#define VERTEX_THREAD_STRIDE 32
+#define TRI_BLOCK_STRIDE 32
+#define TRI_THREAD_STRIDE 32
+#define NUM_PODS 10
+
+#define DIFFUSION_STEP_SIZE 20.0f;
+
+#define IMAGE_WIDTH_COLOR 2048.0f
+#define IMAGE_HEIGHT_COLOR 2048.0f
+
+
+#ifdef  RGBA_COLOR
+#define NUM_PODS 2
+#define IMAGE_WIDTH_COLOR 1920.0f
+#define IMAGE_HEIGHT_COLOR 1080.0f
+#endif
+
+//for texture UV coordinates
+#define UNITYDEPTH_DIM_X 4
+#define UNITYDEPTH_DIM_Y 2
+
+#define DEPTH_UVCOORD_X 1.0f / UNITYDEPTH_DIM_X
+#define DEPTH_UVCOORD_Y 1.0f / UNITYDEPTH_DIM_Y
+
+#define COLOR_UVCOORD_Y 1.0f / NUM_PODS
+
+#define EPS 0.00001f
+#define INF 100.0f
+#define NINF -INF
+
+#define DEPTH_REDUCTION 1.f		
+#define IMAGE_WIDTH_DEPTH (IMAGE_WIDTH_COLOR / DEPTH_REDUCTION)
+#define IMAGE_HEIGHT_DEPTH (IMAGE_HEIGHT_COLOR / DEPTH_REDUCTION)
+
+#define PIXEL_SIZE_X_DEPTH (1.0 / IMAGE_WIDTH_DEPTH)
+#define PIXEL_SIZE_Y_DEPTH (1.0 / IMAGE_HEIGHT_DEPTH)
+#define PIXEL_SIZE_X_COLOR (1.0 / IMAGE_WIDTH_COLOR)
+#define PIXEL_SIZE_Y_COLOR (1.0 / IMAGE_HEIGHT_COLOR)
+
+// Create a RenderTexture with enableRandomWrite flag and set it 
+// with cs.SetTexture
+
+#define OPT_UNROLL unroll // for release
+// #define OPT_UNROLL loop // for quicker compilation and debugging 
+
+
+/**
+* Structure and buffers
+*/
+struct VertexTextureWeightsStruct {
+	float w[NUM_PODS];
+};
+
+struct VertexTextureDoubleWeightsStruct {
+	float w[NUM_PODS * 2];
+};
+
+struct VertexTextureRanksStruct {
+	int r[NUM_PODS];
+};
+
+struct MatrixStruct {
+	float4x4 m[NUM_PODS];
+};
+
+
+int m;	// total number of triangles
+int n;	// total number of vertices
+float itLimit;
+float GeodesicScale;
+float NormalWeightsThreshold;
+int prev;
+int curr;
+float3 currentCamCenter;
+// float4x4 cameraMatrix;
+float4x4 modelTransform;
+float4x4 unity_ObjectToWorld;
+float4 texCamCenters[NUM_PODS];
+float4x4 gl_TextureMatrices[NUM_PODS];
+float4x4 gl_TextureInvMatrices[NUM_PODS];
+
+StructuredBuffer<int> indices;
+StructuredBuffer<int> verticesHalf;
+// RWStructuredBuffer<float> verticesWeights;
+RWStructuredBuffer<VertexTextureWeightsStruct> vtTexWeights;
+#ifdef USE_OCCLUSION_SEAMS
+RWStructuredBuffer<VertexTextureWeightsStruct> vtOcculusionSeams;
+#endif
+RWStructuredBuffer<VertexTextureWeightsStruct> vtGeodesicWeights;
+// RWStructuredBuffer<int> visibilities;
+
+Texture2D<float4> AtlasColorMap;
+Texture2D<float> AtlasDepthMap;
+
+/**
+* Helper functions
+*/
+float3 project(float4x4 mat, float3 p)
+{
+	float4 h = mul(mat, float4(p, 1));
+	return h.xyz / h.w;
+}
+
+float distanceSqr(float3 a, float3 b)
+{
+	float3 diff = a - b;
+	return dot(diff, diff);
+}
+
+float dist2(int i, float depth1, float depth2)
+{
+	float4x4 matToUse = gl_TextureInvMatrices[i];
+	float3 p1 = project(matToUse, float3(0.5, 0.5, 0.5 * depth1 + 0.5));
+	float3 p2 = project(matToUse, float3(0.5, 0.5, 0.5 * depth2 + 0.5));
+	return distanceSqr(p1, p2);
+}
+
+void decodePositionNormal(int idx, out float3 position, out float3 normal) {
+	int newIndex = idx * 3;
+	int packedHalf = verticesHalf[newIndex++];
+	position.x = f16tof32(packedHalf & 0xFFFF);
+	position.y = -f16tof32((packedHalf >> 16) & 0xFFFF);	// flip y 
+
+	packedHalf = verticesHalf[newIndex++];
+	position.z = f16tof32(packedHalf & 0xFFFF);
+	normal.x = f16tof32((packedHalf >> 16) & 0xFFFF);
+
+	packedHalf = verticesHalf[newIndex];
+	normal.y = f16tof32(packedHalf & 0xFFFF);
+	normal.z = f16tof32((packedHalf >> 16) & 0xFFFF);
+
+	position *= 0.01f;
+}
+
+float sampleDepthMap(float2 uv) { 
+	if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) 
+		return INF; 
+	return  (1 - AtlasDepthMap[int2(round(uv.x * IMAGE_WIDTH_DEPTH * 4.0), round(uv.y * IMAGE_HEIGHT_DEPTH * 2.0))]) * 2.0 - 1.0; 
+}
+float  sampleDepthMap(float u, float v) { 
+	return sampleDepthMap(float2(u, v)); 
+}
+float3 sampleColor(float2 uv) { 
+	if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) 
+		return float3(0.0, 0.0, 0.0);
+	return AtlasColorMap[uint2(round(uv.x * IMAGE_WIDTH_COLOR), round(uv.y * IMAGE_HEIGHT_COLOR * NUM_PODS))].rgb; 
+}
+
+float3 sampleColor(float u, float v) { 
+	return sampleColor(float2(u, v)); 
+}
+
+/**
+* Initialize the weights of every vertex on the GPU
+*/
+[numthreads(VERTEX_THREAD_STRIDE, VERTEX_THREAD_STRIDE, 1)]
+void InitVertexWeightsKernel(
+	uint3 blockIdx : SV_GroupID,
+	uint3 DTid : SV_DispatchThreadID,
+	uint3 threadIdx : SV_GroupThreadID,
+	uint GI : SV_GroupIndex) {
+
+	uint vtIndex = ((blockIdx.x * VERTEX_BLOCK_STRIDE + blockIdx.y) * VERTEX_THREAD_STRIDE + threadIdx.x) * VERTEX_THREAD_STRIDE + threadIdx.y;
+	if (vtIndex >= (uint)n) return;
+
+	float3 vertexPosObjectSpace, normal;
+	decodePositionNormal(vtIndex, vertexPosObjectSpace, normal);
+	float4 transformedPosition = mul(modelTransform, float4(vertexPosObjectSpace, 1.0));
+	float4 projectedPosition = mul(unity_ObjectToWorld, transformedPosition);
+	projectedPosition = mul(unity_ObjectToWorld, float4(vertexPosObjectSpace, 1.0));
+
+	//float4 pos = float4(p, 1.0); 
+
+	float w[NUM_PODS];
+	uint i = 0;
+
+	//float3 flippedY_WorldSpaceCameraPos = currentCamCenter;  
+	//flippedY_WorldSpaceCameraPos.y = -flippedY_WorldSpaceCameraPos.y;
+	[OPT_UNROLL] for (i = 0; i < NUM_PODS; ++i) {
+		w[i] = pow(max(0.0, dot(normalize(texCamCenters[i].xyz - vertexPosObjectSpace.xyz), -normalize(normal))), 2.0);
+		//w[i] = dot( normalize(flippedY_WorldSpaceCameraPos - pos),  normalize(texCamCenters[i].xyz - pos) ); //+ emphasis[i];  
+		//w[i] = dot( normalize(flippedY_WorldSpaceCameraPos - pos),  normalize(texCamCenters[i].xyz - pos) ) * dot( normalize(texCamCenters[i].xyz - pos), -normalize(normal) ); 
+		//w[i] =  max( dot( normalize(flippedY_WorldSpaceCameraPos - pos),  normalize(texCamCenters[i].xyz - pos) ), dot( normalize(texCamCenters[i].xyz - pos), -normalize(normal) ) );
+	}
+	// 0. Calculate the corresponding uv coordinates in the texture map and depth map
+	float3 mDepthTexCoord[NUM_PODS];
+	float2 mColorTexCoord[NUM_PODS];
+	[OPT_UNROLL] for (i = 0; i < NUM_PODS; ++i) {
+		float4 t = mul(gl_TextureMatrices[i], projectedPosition);
+		mColorTexCoord[i] = float2(t.x / t.w, t.y / t.w * COLOR_UVCOORD_Y + COLOR_UVCOORD_Y * i);
+		mDepthTexCoord[i].x = t.x / t.w * DEPTH_UVCOORD_X + DEPTH_UVCOORD_X * float(i % 4);
+		mDepthTexCoord[i].y = t.y / t.w * DEPTH_UVCOORD_Y + DEPTH_UVCOORD_Y * float(i < 4);
+		mDepthTexCoord[i].z = t.z / t.w;
+	}
+
+	// 2. Discard the textures which are occulded, or have discontinuout in depth / color   
+	float3 color_candidates[NUM_PODS];
+	[OPT_UNROLL] for (i = 0; i < NUM_PODS; ++i) color_candidates[i] = float3(0.f, 0.f, 0.f);
+
+	const int search_radius = 4, search_step = 2;
+
+	bool unobserved = false;
+	float3 meanColor = float3(0.0f, 0.0f, 0.0f);
+	const float depth_tolerance = 20.0 / 100;
+	const float depth_tolerance2 = depth_tolerance * depth_tolerance * depth_tolerance;
+	const float depth_tolerance_sil = 50000.0 / 100;
+	const float depth_tolerance_sil2 = depth_tolerance_sil * depth_tolerance_sil;
+	const float COLOR_EPS = 0.01f;
+
+	for (i = 0; i < NUM_PODS; ++i) {
+		color_candidates[i] = float3(-1.0f, -1.0f, -1.0f);
+		float3 depthTexCoord = mDepthTexCoord[i];
+		float2 colorTexCoord = mColorTexCoord[i];
+		float d0 = sampleDepthMap(depthTexCoord.xy);
+		// w[i] = d0; // for debugging
+
+		// new) hard thresholding
+		if (w[i] < NormalWeightsThreshold) {
+			w[i] = NINF;
+			continue;
+		}
+
+		// a) discard the candidates whose depth are out of boundary or directed occulded
+		if (d0 >= 1.0f || depthTexCoord.z > d0 + 0.008f) {
+			w[i] = NINF;
+			continue;
+		}
+
+		float3 curColor = sampleColor(colorTexCoord).rgb;
+		color_candidates[i] = curColor;
+
+		if (curColor.x < COLOR_EPS && curColor.y < COLOR_EPS && curColor.z < COLOR_EPS) {
+			w[i] = NINF;
+			continue;
+		}
+		// actually, we don't need the discontinuity factor if we aim to diffuse the occlusion seams
+		continue;
+		float discontinuity_factor = 0.f;
+		float discontinuity_total_w = 0.000001f;
+
+		[loop] for (float x = -search_radius; x <= search_radius; x += search_step) {
+			[loop] for (float y = -search_radius; y <= search_radius; y += search_step) {
+				float depth_x = depthTexCoord.x + 0.25f * x * PIXEL_SIZE_X_DEPTH;
+				float dpeth_y = depthTexCoord.y + 0.5f * y * PIXEL_SIZE_Y_DEPTH;
+				float dw = 1.f;
+				discontinuity_total_w += dw;
+				float di = sampleDepthMap(depth_x, dpeth_y);
+				float distance2 = dist2(i, depthTexCoord.z, di);
+				if (distance2 > depth_tolerance_sil2) w[i] = NINF;
+
+				if (distance2 > depth_tolerance2) {
+					discontinuity_factor += dw;
+
+					float color_x = colorTexCoord.x + x * PIXEL_SIZE_X_COLOR;
+					float color_y = colorTexCoord.y + COLOR_UVCOORD_Y * y * PIXEL_SIZE_Y_COLOR;
+					float3 color_i = sampleColor(color_x, color_y);
+
+					float3 diff = (color_i - curColor);
+
+					if (!((dot(diff, diff) > 0.001) || (color_i.r < 0.1 && color_i.b < 0.1 && color_i.g < 0.1))) {
+						w[i] = NINF;
+					}
+				}
+			}
+		}
+		if (w[i] < 0) continue;
+		discontinuity_factor /= discontinuity_total_w * 0.4;
+		discontinuity_factor = 1.0f - saturate(discontinuity_factor);
+		w[i] = w[i] * discontinuity_factor;
+	}
+
+	// write weights and ranks 
+	[OPT_UNROLL] for (i = 0; i < NUM_PODS; ++i) {
+		vtTexWeights[vtIndex].w[i] = w[i];
+#ifdef USE_OCCLUSION_SEAMS
+		vtOcculusionSeams[vtIndex].w[i] = 0.0;
+#endif
+		vtGeodesicWeights[vtIndex].w[i] = 0.0;
+	}
+}
+
+
+/**
+* intialize the weights of each vertices in GPU
+*/
+[numthreads(VERTEX_THREAD_STRIDE, VERTEX_THREAD_STRIDE, 1)]
+void occlusionSeamIdenficationKernel(
+	uint3 blockIdx : SV_GroupID,
+	uint3 DTid : SV_DispatchThreadID,
+	uint3 threadIdx : SV_GroupThreadID,
+	uint GI : SV_GroupIndex) {
+
+	uint triIdx = ((blockIdx.x * TRI_BLOCK_STRIDE + blockIdx.y) * TRI_THREAD_STRIDE + threadIdx.x) * TRI_THREAD_STRIDE + threadIdx.y;
+	if (triIdx * 3 >= (uint)m) return;
+}
+
+/**
+* Identify the occlusion seams from the vertex buffers.
+*/
+[numthreads(TRI_THREAD_STRIDE, TRI_THREAD_STRIDE, 1)]
+void InitTriangleSeamsKernel(
+	uint3 blockIdx : SV_GroupID,
+	uint3 DTid : SV_DispatchThreadID,
+	uint3 threadIdx : SV_GroupThreadID,
+	uint GI : SV_GroupIndex) {
+
+	uint triIdx = ((blockIdx.x * TRI_BLOCK_STRIDE + blockIdx.y) * TRI_THREAD_STRIDE + threadIdx.x) * TRI_THREAD_STRIDE + threadIdx.y;
+	// if (triIdx * 3 >= (uint)m) return; 
+	triIdx = triIdx % (3 * m);
+
+	int v0 = indices[triIdx * 3];
+	int v1 = indices[triIdx * 3 + 1];
+	int v2 = indices[triIdx * 3 + 2];
+
+	// Calculate occluding seams
+	for (int i = 0; i < NUM_PODS; ++i) {
+		float w0 = vtTexWeights[v0].w[i];
+		float w1 = vtTexWeights[v1].w[i];
+		float w2 = vtTexWeights[v2].w[i];
+		float occluded = step(w0, 0) + step(w1, 0) + step(w2, 0);
+
+		if (occluded > 2.5) {
+			vtGeodesicWeights[v0].w[i] = 1.0;
+			vtGeodesicWeights[v1].w[i] = 1.0;
+			vtGeodesicWeights[v2].w[i] = 1.0;
+#ifdef USE_OCCLUSION_SEAMS
+			vtOcculusionSeams[v0].w[i] = 1.0;
+			vtOcculusionSeams[v1].w[i] = 1.0;
+			vtOcculusionSeams[v2].w[i] = 1.0;
+#endif
+		}
+	}
+}
+
+/**
+* Distance from the point p, to the line [la, lb]
+*/
+float p2ldis(float3 p, float3 la, float3 lb) {
+	return distance(p, (la + lb) * 0.5f);
+}
+
+/**
+* Iterate through each triangle, and propogate the seams and geodesic weights
+* For the real-time performance over 100 fps, 
+* we use a simplified and approximate approach to measure the geodesic weights.
+*/
+[numthreads(TRI_THREAD_STRIDE, TRI_THREAD_STRIDE, 1)]
+void ComputeVertexWeightsKernel(
+	uint3 blockIdx : SV_GroupID,
+	uint3 DTid : SV_DispatchThreadID,
+	uint3 threadIdx : SV_GroupThreadID,
+	uint GI : SV_GroupIndex) {
+
+	uint triIdx = ((blockIdx.x * TRI_BLOCK_STRIDE + blockIdx.y) * TRI_THREAD_STRIDE + threadIdx.x) * TRI_THREAD_STRIDE + threadIdx.y;
+	if (triIdx * 3 >= (uint)m) return;
+
+	int v0 = indices[triIdx * 3];
+	int v1 = indices[triIdx * 3 + 1];
+	int v2 = indices[triIdx * 3 + 2];
+
+	float3 p0, n0, p1, n1, p2, n2;
+	decodePositionNormal(v0, p0, n0);
+	decodePositionNormal(v1, p1, n1);
+	decodePositionNormal(v2, p2, n2);
+	// AllMemoryBarrierWithGroupSync();
+
+	const float WEPS = 0.05;
+	const float DELTA = 1.0f / DIFFUSION_STEP_SIZE;
+
+	// occulusion seams 
+	for (int i = 0; i < NUM_PODS; ++i) {
+		float u0 = vtGeodesicWeights[v0].w[i];
+		float u1 = vtGeodesicWeights[v1].w[i];
+		float u2 = vtGeodesicWeights[v2].w[i];
+
+#ifdef USE_OCCLUSION_SEAMS
+		float w0 = vtOcculusionSeams[v0].w[i];
+		float w1 = vtOcculusionSeams[v1].w[i];
+		float w2 = vtOcculusionSeams[v2].w[i];
+		float maxW = (w0 > w1) ? ((w0 > w2) ? w0 : w2) : ((w1 > w2 ? w1 : w2));
+		float unoccluded = step(w0, 0.99) + step(w1, 0.99) + step(w2, 0.99);
+		if (unoccluded == 0) continue;
+		if (maxW > itLimit) {
+			if (w0 < WEPS) {
+				vtOcculusionSeams[v0].w[i] = itLimit - DELTA;
+			}
+			if (w1 < WEPS) {
+				vtOcculusionSeams[v1].w[i] = itLimit - DELTA;
+			}
+			if (w2 < WEPS) {
+				vtOcculusionSeams[v2].w[i] = itLimit - DELTA;
+			}
+#else
+		float maxU = (u0 > u1) ? ((u0 > u2) ? u0 : u2) : ((u1 > u2 ? u1 : u2));
+		if (maxU > itLimit) {
+#endif
+
+			vtGeodesicWeights[v0].w[i] = max(
+				u0, //max(u0, (u1 + u2) * 0.5 - p2ldis(p0, p1, p2) ), 
+				max(u1 - distance(p0, p1) * GeodesicScale, u2 - distance(p0, p2) * GeodesicScale));
+			vtGeodesicWeights[v1].w[i] = max(
+				u1, //max(u1, (u0 + u2) * 0.5 - p2ldis(p1, p0, p2) ),
+				max(u0 - distance(p0, p1) * GeodesicScale, u2 - distance(p1, p2) * GeodesicScale));
+			vtGeodesicWeights[v2].w[i] = max(
+				u2, //max(u2, (u0 + u1) * 0.5 - p2ldis(p2, p0, p1) ),
+				max(u0 - distance(p0, p2) * GeodesicScale, u1 - distance(p1, p2) * GeodesicScale));
+		}
+	}
+}

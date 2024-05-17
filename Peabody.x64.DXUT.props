@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <DXUT_DIR>$(PEABODY_DEPENDENCY_DIR)DXUT\</DXUT_DIR>
+    <DXUT_CORE_DIR>$(DXUT_DIR)Core\</DXUT_CORE_DIR>
+    <DXUT_OPT_DIR>$(DXUT_DIR)Optional\</DXUT_OPT_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile />
+    <Link />
+    <PostBuildEvent>
+      <Command>%(Command)</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>DXUT.lib;DXUTOpt.lib;d3dcompiler.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(DXUT_OPT_DIR)Bin\Desktop_2019_Win10\$(Platform)\$(Configuration);$(DXUT_CORE_DIR)Bin\Desktop_2019_Win10\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(DXUT_CORE_DIR);$(DXUT_OPT_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="DXUT_DIR">
+      <Value>$(DXUT_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DXUT_CORE_DIR">
+      <Value>$(DXUT_CORE_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DXUT_OPT_DIR">
+      <Value>$(DXUT_OPT_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <SPARSELM_ROOT>$(PEABODY_DEPENDENCY_DIR)sparselm_build\</SPARSELM_ROOT>
+    <SPARSELM_INC_DIR>$(SPARSELM_ROOT)include\</SPARSELM_INC_DIR>
+    <SPARSELM_LIB_DIR>$(SPARSELM_ROOT)lib\</SPARSELM_LIB_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SPARSELM_INC_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SPARSELM_LIB_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>splm.lib;blas_win32_MT.lib;lapack_win32_MT.lib;libamd.lib;libcamd.lib;libcblas.lib;libccolamd.lib;libcerbla.lib;libcholmod.lib;libcolamd.lib;libf2c.lib;libgoto_CHOLMOD.lib;libmetis_CHOLMOD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>echo Copying SparseLM dependency DLLs
+copy $(SPARSELM_LIB_DIR)*.dll $(OutDir)
+%(Command)
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="SPARSELM_ROOT">
+      <Value>$(SPARSELM_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SPARSELM_INC_DIR">
+      <Value>$(SPARSELM_INC_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SPARSELM_LIB_DIR">
+      <Value>$(SPARSELM_LIB_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
