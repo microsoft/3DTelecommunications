@@ -7,20 +7,28 @@
 The typical system layout for 3D Telemedicine is to have one machine running Fusion, and a separate machine running Render and Viewer.  The pods all run their own copy of the K4AToFusion code and should be networked into the same network as Fusion.  Control panel can be run on the Fusion PC, the Render PC, or a separate PC or tablet.
 
 ### Minimum Operating Requirements (Fusion)
-Windows 11
-CUDA 11.7
-NVidia GPU 2080Ti or larger
-10 Gigabit ethernet adapter
-OpenCV 4.5.4
-We use OpenCV with CUDA libraries.  This means you cannot just use the binaries available directly on the website, although there are typically additional sites that provide OpenCV with CUDA built in.
-Currently our project requires the opencv_contrib folder also be checked out of GIT and compiled as part of OpenCV.  We hope to remove this dependency in the future.
+- Windows 11
+- CUDA 11.7
+- Nvidia GPU 2080Ti or larger
+- 10 Gigabit ethernet adapter
+- OpenCV 4.5.4
+
+We use OpenCV with CUDA libraries.  This means you cannot just use the binaries available directly on the website, although there are typically additional sites that provide OpenCV with CUDA built in.Currently our project requires the opencv_contrib folder also be checked out of GIT and compiled as part of OpenCV.  We hope to remove this dependency in the future.
 
 
-### Minimum Operating Requirements (Render)
-Windows 11
-CUDA 11.7
-NVidia GPU 2080Ti or larger
-1 Gigabit ethernet adapter
+### Minimum Operating Requirements (Render, Viewer)
+- Windows 11
+- CUDA 11.7
+- Nvidia GPU 2080Ti or larger
+- 10 Gigabit ethernet adapter
+
+### Minimum Operating Requirements (Control Panel)
+- Windows 11
+- 1 Gigabit ethernet adapter
+
+### Minimum Operating Requirements (K4AToFusion, K4ARecorder)
+- Azure Kinect SDK
+- Nvidia Jetson Nano
 
 ## Building from Source
 ## 3rd Party Components (Windows)
@@ -94,19 +102,25 @@ It is written in C++ and uses the ZeroMQ library for communication.
 In certain configurations where the camera system may be on a separate subnet from the control panel, the Kinect Nano Communicator Service can act as a router to route messages from the Azure Kinect Launcher Daemon and K4A To Fusion components of each camera unit up to the control panel on a separate subnet.
 
 ## Setup [Windows components]
-Check out the repository to a location of your choice, we'll refer to it as [3dtmroot]
+### System requirements
+The Windows components (Fusion, Render, Viewer, Control Panel, Calibration Software, 3DTM Launcher Service, and Kinect Nano Communicator Service) leverage code implemented using C#, CUDA 11.4+, and Unity. As such, a build agent containing an Nvidia GPU (RTX 2080 or later), Windows 10+ OS, and Unity 2019.4.14f1 is necessary to compile the components.
 
-Create the folder for the dependencies, [3dtmroot]\Dependencies
+### Component download
+Check out the repository to a location of your choice, we'll refer to it as [3dtmroot].
 
-Download the dependencies and install them into the Dependencies folder
+Create the folder for the dependencies, [3dtmroot]\Dependencies.
+
+Download the dependencies and install them into the Dependencies folder.
 
 ### Build (Fusion)
 Fusion is built using the DeformableFusion solution in the DeformableFusion folder of the repository.  It should be built in Release, x64 configuration.  Debug currently does not compile. The DeformableFusion solution contains a number of helper libraries that will be built first, and the Fusion executable is built as part of the LiveFusionDemo-MultiView project, which is selected as the startup project.
 
-
 ## Setup [Linux components]
-The linux components (Azure Kinect Launcher Daemon, K4A To Fusion, K4ARecorder) are built for the ARM64 architecture of the Nvidia Jetson Nano.  Our build system uses the Ubuntu 18.04 image from the Nvidia Jetson website that includes CUDA.
 
+### System requirements
+The Linux components (Azure Kinect Launcher Daemon, K4A To Fusion, K4ARecorder) are built for the ARM64 architecture of the Nvidia Jetson Nano. Our build system uses the Ubuntu 18.04 image from the Nvidia Jetson website that includes CUDA. We have only built source code on Nvidia Jetson TX1 using the aforementioned Ubuntu image. The system should compile on newer Nvidia Jetson hardware, so long as the Ubuntu 18.04 image is used for backwards compatibility with existing PODs.
+
+### Component download
 Check out the repository to a location of your choice, we'll refer to it as [3dtmroot]
 
 Clone the Azure Kinect SDK: https://github.com/microsoft/Azure-Kinect-Sensor-SDK.git
@@ -138,11 +152,11 @@ cd zeromq-${ZMQ_VERSION}
 ./configure --prefix=${PREFIX} --enable-drafts
 make -j && make install
 ```
-You can install cppzmq from here: https://github.com/zeromq/cppzmq
+You can install cppzmq from here: https://github.com/zeromq/cppzmq.
 
-You'll also need OpenCV 4.5.5.  Here's a great tutorial to get it built on the nano: https://qengineering.eu/install-opencv-4.5-on-jetson-nano.html
+You'll also need OpenCV 4.5.5.  Here's a great tutorial to get it built on the nano: https://qengineering.eu/install-opencv-4.5-on-jetson-nano.html.
 
-Now set up the paths correctly in the cmakelists.txt
+Now set up the paths correctly in the cmakelists.txt.
 
 ### Build (Linux)
 You can build all of the linux projects at the same time by
