@@ -1337,7 +1337,6 @@ int main(int argc, char* argv[])
     g_writeToDisk = (IS_CALIB_CAPTURE() || IS_OFFLINE_CAPTURE());
     g_captureIR = IS_CALIB_CAPTURE() || IS_CONFIG_CAPTURE();
     g_writeDepthToBinFiles = currentConfig.GetValueWithDefault("PodGlobalConfig", "calibCaptureDepth", IS_OFFLINE_CAPTURE());
-    g_undistortDepth = currentConfig.GetValueWithDefault("PodGlobalConfig", "UndisortDepth", (IS_STREAM_CAPTURE() || IS_CONFIG_CAPTURE() /*|| IS_OFFLINE_CAPTURE()*/));
 
     g_calib_transmit_activeIR = currentConfig.GetValueWithDefault("PodGlobalConfig", "calibCaptureActiveIR",false);
     

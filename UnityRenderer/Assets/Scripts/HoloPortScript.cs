@@ -507,7 +507,7 @@ public class HoloPortScript : MonoBehaviour
             }
             else
             {
-                Debug.Log("Using Built int Configuration for HoloportScript");
+                Debug.Log("Using Built-in Configuration for HoloportScript");
             }
         }
         UseCameraTexture = new float[RigConfiguration.NumPods];
