@@ -311,7 +311,7 @@ namespace ControlPanel
                     }
                    if (setupFPS)//don't update if we dont have fpsSETUp
                    {
-                       componentStatusContainer.SetFPSText(0);
+                       componentStatusContainer.SetFPSText(new double[] {0.0, 0.0});
                    }
                    heartBeatRunning = false; // no need to detect heartbeat if we know it stopped correctly
                });
@@ -329,12 +329,18 @@ namespace ControlPanel
                 {
                     UpdateTimeLastHBReceived();
                   
-                    if(update.Length < sizeof(double))
+                    if(update.Length < sizeof(double)+sizeof(byte))
                     {
-                        OutputHelper.OutputLog("FPS packetsize (9 expected): " + update.Length);
+                        int expectedSize = sizeof(double)+sizeof(byte);
+                        OutputHelper.OutputLog($"FPS packetsize ({expectedSize} expected): " + update.Length);
                         return;
                     }
-                    double fps = BitConverter.ToDouble(update, 1);
+                    double fps = BitConverter.ToDouble(update, sizeof(byte));
+                    double temperature = 0.0;
+                    if(update.Length > sizeof(double)+sizeof(byte))
+                    {
+                        temperature = BitConverter.ToDouble(update, sizeof(byte) + sizeof(double));
+                    }
                     if(fps > componentStatusContainer.componentStatus.FPS_max)
                     {
                         componentStatusContainer.componentStatus.FPS_max = fps;
@@ -344,7 +350,7 @@ namespace ControlPanel
                         componentStatusContainer.componentStatus.FPS_min = fps;
                     }
                     //this.Form.OutputLog("Fusion FPS: " + fps.ToString());
-                    componentStatusContainer.SetFPSText(fps);
+                    componentStatusContainer.SetFPSText(new double[] {fps, temperature});
                     componentStatusContainer.SetToRunning();
                     heartBeatRunning = true;
 
