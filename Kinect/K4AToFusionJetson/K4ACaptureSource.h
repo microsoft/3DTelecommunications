@@ -69,6 +69,8 @@ private:
 
     uint8_t* m_audioBuffer;
 
+    k4a_imu_sample_t m_imuReading;
+
 public:
     K4ACaptureSource();
     ~K4ACaptureSource();
