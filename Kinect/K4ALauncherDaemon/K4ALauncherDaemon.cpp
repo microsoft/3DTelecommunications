@@ -212,6 +212,10 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 			LOGGER()->error("Failed to compile regex for %s", commandLineRegex[i].c_str());
 			return;
 		}
+		else
+		{
+			LOGGER()->debug("Compiled regex for %s", commandLineRegex[i].c_str());
+		}
 	}
 	while(daemon->runThread)
 	{
