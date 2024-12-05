@@ -14,8 +14,8 @@ const std::string defaultCalibrationDirectory(defaultWorkingDirectory+"/K4AToFus
 const std::string commandLineRegexDefault[SOFTWARE::COUNT] = 
 {
 	"", // SYSTEM_START
-	"AzureKinectNanoToFusion "+defaultCalibrationDirectory+"/3DTelemedicine.cfg 0 ", // CALIBRATION
-	"AzureKinectNanoToFusion "+defaultCalibrationDirectory+"/3DTelemedicine.cfg 1 ", // CAPTURE
+	"AzureKinectNanoToFusion "+defaultCalibrationDirectory+"/3DTelemedicine.cfg 0 ", // STREAM
+	"AzureKinectNanoToFusion "+defaultCalibrationDirectory+"/3DTelemedicine.cfg 1 ", // CALIBRATION - no longer used
 	"AzureKinectNanoToFusion "+defaultCalibrationDirectory+"/3DTelemedicine.cfg 2 ", // BACKGROUND_CAPTURE
 	"LiveFusionDemo-MultiView.exe", // FUSION 
 	"HoloportRenderer.exe", // RENDER
@@ -202,6 +202,17 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 	PROCTAB *ptp;
 	int flags = PROC_FILLCOM;
 	char cmd[4096];
+	regex_t regular_expressions[SOFTWARE::COUNT];
+	for(int i = 0; i < SOFTWARE::COUNT; i++)
+	{
+		if(commandLineRegex[i] == "")
+			continue;
+		if(regcomp(&regular_expressions[i], commandLineRegex[i].c_str(), REG_EXTENDED|REG_NOSUB|REG_ICASE) != 0)
+		{
+			LOGGER()->error("Failed to compile regex for %s", commandLineRegex[i].c_str());
+			return;
+		}
+	}
 	while(daemon->runThread)
 	{
 		for(int i = 0; i < SOFTWARE::COUNT; i++)
@@ -213,7 +224,6 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 		proc_t task;
 		memset(&task, 0, sizeof(task));
 		
-		regex_t * preg = (regex_t*)malloc(sizeof(regex_t));
 		while(readproc(ptp, &task)) {
 			if(task.cmdline)
 			{
@@ -231,14 +241,17 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 					bytes -= strlen(task.cmdline[i++]) + 1;
 				}
 
-				LOGGER()->trace("[PROCLIST] %s", cmd);
+				LOGGER()->debug("[RAW CMDLINE] %s", task.cmdline[0]);
+				for (int j = 1; task.cmdline[j] != nullptr; ++j) {
+					LOGGER()->debug("[RAW CMDLINE] %s", task.cmdline[j]);
+				}
+				LOGGER()->debug("[PROCLIST] %s", cmd);
 				for(int i = 0; i < SOFTWARE::COUNT; i++)
 				{
 					if(commandLineRegex[i] == "")
 						continue;
-					regcomp(preg, commandLineRegex[i].c_str(), REG_EXTENDED|REG_NOSUB);
 					// match with the commands I care about
-					if(regexec (preg, cmd, 0, NULL, 0) == 0)
+					if(regexec (&regular_expressions[i], cmd, 0, NULL, 0) == 0)
 					{					
 						LOGGER()->debug("Process %d (%s) matched (%s).  Setting PID", task.tid, cmd, commandLineRegex[i].c_str());
 						daemon->SetPID(i, task.tid);
@@ -249,11 +262,9 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 							daemon->SetState(i, SOFTWARE_STATE::SS_RUNNING);
 						}
 					}
-					regfree(preg);
 				}
 			}
 		}
-		free(preg);
 
 		closeproc(ptp);
 
@@ -279,6 +290,14 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 		// Always send an update.  Small packet every 0.5s should not take up any noticeable bandwidth
 		daemon->SendSoftwareStateUpdate();
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	}
+	
+	for(int i = 0; i < SOFTWARE::COUNT; i++)
+	{
+		if(commandLineRegex[i] != "")
+		{
+			regfree(&regular_expressions[i]);
+		}
 	}
 	LOGGER()->info("State monitor thread terminating.");
 }
@@ -402,6 +421,7 @@ long K4ALauncherDaemon::EventReceived(CONTROL_PANEL_EVENT eventType, void* event
                 case SOFTWARE::CAPTURE:
 					*LOGGER() << Logger::Verbosity::Info << "[" <<  ctime(&timenow) << "] Daemon is killing capture software" << Logger::endl;
 					KillSoftware(SOFTWARE::CAPTURE, SIGTERM);
+					KillSoftware(SOFTWARE::CAPTURE, SIGINT);
                 break;
 				case SOFTWARE::BACKGROUND_CAPTURE:
 					*LOGGER() << Logger::Verbosity::Info << "[" <<  ctime(&timenow) << "] Daemon is killing background capture software" << Logger::endl;
@@ -822,10 +842,13 @@ void K4ALauncherDaemon::KillSoftware(int idx, int signal)
 	{
 		*LOGGER() << Logger::Verbosity::Info << "Sending " << signal << " to proc " << pid << Logger::endl;
 		kill(GetPID(idx), signal);
+		std::string command = "pkill -" + std::to_string(signal) + " -P " + std::to_string(pid);
+		int retval = system(command.c_str());
+		*LOGGER() << Logger::Verbosity::Trace << "pkill returned " << retval << Logger::endl;
 	}
 	else
 	{
-		*LOGGER() << Logger::Verbosity::Error << "Can't kill software, process doesn't exist." << Logger::endl;
+		*LOGGER() << Logger::Verbosity::Error << "Can't kill software " << idx << ", process doesn't exist." << Logger::endl;
 	}
 }
 
