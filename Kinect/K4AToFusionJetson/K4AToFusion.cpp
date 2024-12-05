@@ -82,6 +82,8 @@ uint64_t timestampForNextCapture = 0;
 bool gShouldPublishTimeStamp = false;
 
 static K4AControlPanelConnector* K4ACPC = nullptr;
+k4a_imu_sample_t gIMUSample;
+std::mutex gIMUSampleMutex;
 
 uint g_verbosity;
 //bool g_CalibDetectCheckerboard = true;
@@ -851,12 +853,13 @@ void ProcessFramesFn(K4AFusionStream* stream, SharedSettings shrdSettings)
             }
             auto end = std::chrono::high_resolution_clock::now();            
             std::chrono::duration<double> elapsed_seconds = end - start;
-            k4a_imu_sample_t imuSample = stream->source->GetIMUReading();
-            double frameRate[2] = {(double)frameCounter/elapsed_seconds.count(), imuSample.temperature}; 
+            gIMUSampleMutex.lock();
+            double frameRate[2] = {(double)frameCounter/elapsed_seconds.count(), gIMUSample.temperature}; 
+            gIMUSampleMutex.unlock();
             if(g_verbosity > 0)
             {
                 printf("[PROCFR: %.2f]\r\n", frameRate[0]);
-                printf("IMU Reading: %.2f C\r\n", imuSample.temperature);
+                printf("IMU Reading: %.2f C\r\n", frameRate[1]);
             }
             frameCounter = 0;
             start = std::chrono::high_resolution_clock::now();
@@ -1059,6 +1062,9 @@ void CaptureFramesFn(K4AFusionStream* stream, SharedSettings shrdSettings)
             printf("[CAPTFR: %.2f]\r\n", frameRate);
             frameCounter = 0;
             start = std::chrono::high_resolution_clock::now();
+            gIMUSampleMutex.lock();
+            gIMUSample = stream->source->GetIMUReading();
+            gIMUSampleMutex.unlock();
         }
     }
     K4ACPC->SendStatusUpdate(CPC_STATUS::STOPPED);
