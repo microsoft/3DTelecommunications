@@ -374,7 +374,8 @@ namespace ControlPanelConnector
 		if (dataSize > 0 && statusData != NULL)
 		{
 			memcpy_s(&data[1], dataSize, statusData, dataSize);
-			if(verbosity >= Logger::Trace)
+			// This is ABOVE trace, because it puts out a LOT of output
+			if(verbosity > Logger::Trace)
 			{
 				for(int i = 0; i < dataSize; i++)
 				{
