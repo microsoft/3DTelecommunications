@@ -282,28 +282,6 @@ std::vector<int> getPIDsByPattern(const std::string& pattern) {
 void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 {
 	printf("K4ALauncherDaemon StateMonitor is starting.\r\n");
-	regex_t regular_expressions[SOFTWARE::COUNT];
-	for(int i = 0; i < SOFTWARE::COUNT; i++)
-	{
-		if(commandLineRegex[i] == "")
-			continue;
-
-		std::string regexPattern = normalizeWhitespace(commandLineRegex[i]);
-		LOGGER()->debug("Compiling regex for [%s]\r\n", regexPattern.c_str());
-		int ret = regcomp(&regular_expressions[i], commandLineRegex[i].c_str(), REG_EXTENDED|REG_NOSUB|REG_ICASE);
-		if(ret != 0)
-		{
-            char errbuf[256];
-            regerror(ret, &regular_expressions[i], errbuf, sizeof(errbuf));
-            LOGGER()->debug("Failed to compile regex for %s: %s", commandLineRegex[i].c_str(), errbuf);
-            return;
-		}
-		else
-		{
-			LOGGER()->debug("Compiled regex for %s\r\n", commandLineRegex[i].c_str());
-		}
-	}
-
 
 	while(daemon->runThread)
 	{
@@ -326,7 +304,7 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 			LOGGER()->trace("I found %d PIDs for pattern %s", pids.size(), regexPattern.c_str());
             for (int pid : pids) {
                 // Get the command line of the process
-                LOGGER()->debug("Process matched with PID: %d.  Daemon's current state is %d", pid, daemon->GetState(i));
+                LOGGER()->trace("Process %s matched with PID: %d.  Daemon's current state is %d", commandLineRegex[i], pid, daemon->GetState(i));
                 daemon->SetPID(i, pid);
                 if (daemon->GetState(i) != SOFTWARE_STATE::SS_STOPPED && daemon->GetState(i) != SOFTWARE_STATE::SS_RUNNING)
                 {
@@ -356,14 +334,7 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 		daemon->SendSoftwareStateUpdate();
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
-	
-	for(int i = 0; i < SOFTWARE::COUNT; i++)
-	{
-		if(commandLineRegex[i] != "")
-		{
-			regfree(&regular_expressions[i]);
-		}
-	}
+
 	LOGGER()->info("State monitor thread terminating.");
 }
 
