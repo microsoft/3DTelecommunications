@@ -36,12 +36,13 @@ std::string workingDirectory;
 std::string calibrationDirectory;
 K4ALauncherDaemon* launcherDaemon;
 
-// Helper function to remove all whitespace from a string
+// Helper function to remove all whitespace from a string and trim any whitespace from the end
 std::string normalizeWhitespace(const std::string& str) {
-    std::string result;
-    std::regex ws_re("\\s+"); // matches one or more whitespace characters
-    result = std::regex_replace(str, ws_re, " ");
-    return result;
+	std::string result;
+	std::regex ws_re("\\s+"); // matches one or more whitespace characters
+	result = std::regex_replace(str, ws_re, " ");
+	result.erase(result.find_last_not_of(" \n\r\t") + 1); // trim trailing whitespace
+	return result;
 }
 
 static int GetIntFromDataPacket(void* eventData, int pos)
@@ -288,7 +289,7 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 			continue;
 
 		std::string regexPattern = normalizeWhitespace(commandLineRegex[i]);
-		LOGGER()->debug("Compiling regex for %s\r\n", regexPattern.c_str());
+		LOGGER()->debug("Compiling regex for [%s]\r\n", regexPattern.c_str());
 		int ret = regcomp(&regular_expressions[i], commandLineRegex[i].c_str(), REG_EXTENDED|REG_NOSUB|REG_ICASE);
 		if(ret != 0)
 		{
@@ -325,23 +326,7 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 			LOGGER()->trace("I found %d PIDs for pattern %s", pids.size(), regexPattern.c_str());
             for (int pid : pids) {
                 // Get the command line of the process
-                std::string cmdline = getCmdlineByPID(pid);
-				LOGGER()->trace("Cmdline is %s", cmdline.c_str());
-                LOGGER()->trace("Process PID: %d, cmdline: %s", pid, cmdline.c_str());
-
-                // Skip processes that start with "sh -c"
-                if (cmdline.find("sh -c") == 0) {
-					LOGGER()->trace("Skipping process with PID: %d because it starts with sh -c", pid);
-                    continue;
-                }
-
-                // Check if the command line is empty
-                if (cmdline.empty()) {
-                    LOGGER()->trace("Empty command line for PID: %d", pid);
-                    continue;
-                }
-
-                LOGGER()->debug("Process matched with PID: %d", pid);
+                LOGGER()->debug("Process matched with PID: %d.  Daemon's current state is %d", pid, daemon->GetState(i));
                 daemon->SetPID(i, pid);
                 if (daemon->GetState(i) != SOFTWARE_STATE::SS_STOPPED && daemon->GetState(i) != SOFTWARE_STATE::SS_RUNNING)
                 {
