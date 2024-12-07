@@ -22,7 +22,7 @@ const std::string commandLineRegexDefault[SOFTWARE::COUNT] =
 	"AzureKinectNanoToFusion "+defaultCalibrationDirectory+"/3DTelemedicine.cfg 2", // BACKGROUND_CAPTURE
 	"", // FUSION 
 	"", // RENDER
-	"AKLauncherDaemon", // LINUX_DAEMON, we don't actually want to monitor our own state here
+	"", // LINUX_DAEMON, we don't actually want to monitor our own state here
     "", // WINDOWS_SERVICE,
 	"" // KINECT_COMMUNICATOR
 };
@@ -209,7 +209,7 @@ void K4ALauncherDaemon::SetConfig(CConfig* new_config)
 std::string getCmdlineByPID(int pid) {
     std::string cmdline;
     std::string command = "ps -p " + std::to_string(pid) + " -o cmd --no-headers";
-	LOGGER()->debug("Executing command: %s\n", command.c_str());
+	LOGGER()->trace("Executing command: %s\n", command.c_str());
     FILE* pipe = popen(command.c_str(), "r");
     if (!pipe) {
         std::cerr << "Failed to run ps command" << std::endl;
@@ -221,7 +221,7 @@ std::string getCmdlineByPID(int pid) {
         cmdline = buffer;
         // Remove trailing newline character
         cmdline.erase(std::remove(cmdline.begin(), cmdline.end(), '\n'), cmdline.end());
-		LOGGER()->debug("Cmdline is %s", cmdline.c_str());
+		LOGGER()->trace("Cmdline is %s", cmdline.c_str());
     }
 	else {
         std::cerr << "Failed to read from pipe for PID: " << pid << std::endl;
@@ -239,7 +239,7 @@ std::string getCmdlineByPID(int pid) {
 std::vector<int> getPIDsByPattern(const std::string& pattern) {
     std::vector<int> pids;
     std::string command = "pgrep -f '" + pattern + "'";
-	LOGGER()->debug("Executing pgrep command: %s\n", command.c_str());
+	LOGGER()->trace("Executing pgrep command: %s\n", command.c_str());
     FILE* pipe = popen(command.c_str(), "r");
     if (!pipe) {
         std::cerr << "Failed to run pgrep command" << std::endl;
@@ -251,15 +251,15 @@ std::vector<int> getPIDsByPattern(const std::string& pattern) {
     while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
 		if (buffer[0] != '\0')
 		{
-			LOGGER()->debug("pgrep buffer was not empty, contains: %s", buffer);		
+			LOGGER()->trace("pgrep buffer was not empty, contains: %s", buffer);		
 			int pid = atoi(buffer);
 			if (pid > 0) {
 				std::string cmdline = getCmdlineByPID(pid);
 				if (kill(pid, 0) == 0 && cmdline.find("pgrep") == std::string::npos && cmdline.find("[sh] <defunct>") == std::string::npos) {
-					LOGGER()->debug("pushing PID %d onto list", pid);
+					LOGGER()->trace("pushing PID %d onto list", pid);
 					pids.push_back(pid);
 				} else {
-					LOGGER()->debug("Invalid PID %d or pgrep process, not adding to list", pid);
+					LOGGER()->trace("Invalid PID %d or pgrep process, not adding to list", pid);
 				}
 			}
 		}
@@ -273,7 +273,7 @@ std::vector<int> getPIDsByPattern(const std::string& pattern) {
         printf("pgrep command exited with status %d\n", WEXITSTATUS(status));
     }
 
-    LOGGER()->debug("Done getting PIDsByPattern, I found %d PIDs", pids.size());
+    LOGGER()->trace("Done getting PIDsByPattern, I found %d PIDs", pids.size());
     return pids;
 }
 
@@ -302,6 +302,8 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 			LOGGER()->debug("Compiled regex for %s\r\n", commandLineRegex[i].c_str());
 		}
 	}
+
+
 	while(daemon->runThread)
 	{
 		for(int i = 0; i < SOFTWARE::COUNT; i++)
@@ -320,22 +322,22 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 
             // Get PIDs matching the pattern
             std::vector<int> pids = getPIDsByPattern(regexPattern);
-			LOGGER()->debug("I found %d PIDs for pattern %s", pids.size(), regexPattern.c_str());
+			LOGGER()->trace("I found %d PIDs for pattern %s", pids.size(), regexPattern.c_str());
             for (int pid : pids) {
                 // Get the command line of the process
                 std::string cmdline = getCmdlineByPID(pid);
-				LOGGER()->debug("Cmdline is %s", cmdline.c_str());
-                LOGGER()->debug("Process PID: %d, cmdline: %s", pid, cmdline.c_str());
+				LOGGER()->trace("Cmdline is %s", cmdline.c_str());
+                LOGGER()->trace("Process PID: %d, cmdline: %s", pid, cmdline.c_str());
 
                 // Skip processes that start with "sh -c"
                 if (cmdline.find("sh -c") == 0) {
-					LOGGER()->debug("Skipping process with PID: %d because it starts with sh -c", pid);
+					LOGGER()->trace("Skipping process with PID: %d because it starts with sh -c", pid);
                     continue;
                 }
 
                 // Check if the command line is empty
                 if (cmdline.empty()) {
-                    LOGGER()->debug("Empty command line for PID: %d", pid);
+                    LOGGER()->trace("Empty command line for PID: %d", pid);
                     continue;
                 }
 
@@ -347,7 +349,18 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
                     daemon->SetState(i, SOFTWARE_STATE::SS_RUNNING);
                 }
             }
+			// after looping through the full process list I never set the PID for a process, set it's state to NOT_RUNNING
+			if(daemon->GetPID(i) == -1)
+			{				
+				// don't change to NOT_STARTED if I've received a start command, because the process is still starting
+				if(daemon->GetState(i) != SOFTWARE_STATE::SS_STARTED && daemon->GetState(i) != SOFTWARE_STATE::SS_NOT_RUNNING) 
+				{
+					LOGGER()->debug("Didn't find application %d setting state to NOT_RUNNING", i);
+					daemon->SetState(i, SOFTWARE_STATE::SS_NOT_RUNNING);					
+				}
+			}
 		}
+
 		if(daemon->AllApplicationsStopped() && !daemon->calibrationSoftwarePart2Running)
 		{
 			// Running session stop request.  Transition the LEDs back to idle
