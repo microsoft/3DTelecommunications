@@ -435,11 +435,11 @@ namespace ControlPanel
                 }
 
                 //bot setup start
-                depthGenDaemonBots[i] = new StatusBot(hostNameOrIP, dgName, tcpPort);
+                depthGenDaemonBots[i] = new StatusBot(hostNameOrIP, dgName, controlPanel, tcpPort);
                 depthGenDaemonBots[i].SetDepthGenID(i);
                 depthGenDaemonBots[i].DepthGenMachineID = i;
                 DefaultStatusForwarderSetup(depthGenDaemonBots[i]);
-                depthGenDaemonBots[i].DefaultStatusUpdateSetup();
+                depthGenDaemonBots[i].DefaultStatusUpdateSetup(false);
                 SetupSocket(depthGenDaemonBots[i], hostNameOrIP);
 
                 depthGenDaemonBots[i].componentStatus = new ComponentStatus
@@ -481,6 +481,17 @@ namespace ControlPanel
                         OutputHelper.OutputLog($"[ {DateTime.UtcNow} ] {currBot.UnitName} Daemon UpdateContent: [{states[(int)SOFTWARE.CAPTURE]}][{states[(int)SOFTWARE.CALIBRATION]}]", OutputHelper.Verbosity.Trace);
                         //status updated
                         RespondToDaemonUpdate();
+                        //There's a condition where we might start up the software, the daemons start up, and find that there's already
+                        //a copy of AKNF running.  In this case, they'll update the software state here, but there won't be a status bot connected to the pod
+                        //so start up the status bot here for that pod
+                        if (states[(int)SOFTWARE.CAPTURE] == SOFTWARE_STATE.RUNNING)
+                        {
+                            if (depthGenStatusBots[currBotID] != null && depthGenStatusBots[currBotID].componentStatus.Status != Status.Running)
+                            {
+                                OutputHelper.OutputLog($"Daemon {currBot.UnitName} says the application running, but status bot says it is not running.  Reconnecting status bot.", OutputHelper.Verbosity.Debug);
+                                depthGenStatusBots[currBotID].Reconnect();
+                            }
+                        }
                     }
                     //packet was received, so can update timeout counter
                     currBot.UpdateTimeLastHBReceived();
@@ -603,7 +614,7 @@ namespace ControlPanel
             //create fusion/render daemon (3dtm service) monitors
             string daemonPort = SettingsManager.Instance.GetValueWithDefault("Ports/Fusion", "DaemonPort", SettingsManager.Instance.GetValueWithDefault("Ports", "DaemonPort", "14511", true));
 
-            fusionDaemonBot = new StatusBot(null, "3DTMLauncherService_Fusion", daemonPort);
+            fusionDaemonBot = new StatusBot(null, "3DTMLauncherService_Fusion", controlPanel, daemonPort);
             DefaultStatusForwarderSetup(fusionDaemonBot);
             SetupSocket(fusionDaemonBot, SettingsManager.Instance.GetValueWithDefault("Network", "FusionIPAddress", "FUSION", true));
             fusionDaemonBot.componentStatus = new ComponentStatus
@@ -625,7 +636,7 @@ namespace ControlPanel
 
             //Renderer
             daemonPort = SettingsManager.Instance.GetValueWithDefault("Ports/Renderer", "DaemonPort", SettingsManager.Instance.GetValueWithDefault("Ports", "DaemonPort", "14511", true));
-            renderDaemonBot = new StatusBot(null, "3DTMLauncherService_Render", daemonPort);
+            renderDaemonBot = new StatusBot(null, "3DTMLauncherService_Render", controlPanel, daemonPort);
             DefaultStatusForwarderSetup(renderDaemonBot);
             SetupSocket(renderDaemonBot, SettingsManager.Instance.GetValueWithDefault("Network", "RendererIPAddress", "RENDER", true));
             renderDaemonBot.componentStatus = new ComponentStatus
@@ -650,7 +661,7 @@ namespace ControlPanel
             for (int i = 0; i < windowsDaemonBots.Length; ++i)
             {
                 StatusBot currBot = windowsDaemonBots[i];
-                currBot.DefaultStatusUpdateSetup();
+                currBot.DefaultStatusUpdateSetup(false);
                 currBot.RegisterUpdateFunction(CPC_STATUS.IS_ALIVE, (byte[] update) =>
                 {
                     currBot.UpdateSoftwareState(SOFTWARE.WINDOWS_SERVICE, SOFTWARE_STATE.RUNNING);
@@ -960,13 +971,11 @@ namespace ControlPanel
             if (IsCleaningUp)
             {
                 OutputHelper.OutputLog("Still cleaning up previous session.. ", OutputHelper.Verbosity.Debug);
-                //DialogManager.Instance.UpdateMessage("Waiting for cleanup to finish.", DialogManager.Instance.WarningMessage);
                 return new Tuple<bool, DAEMON_GROUP_STATE>(false, DAEMON_GROUP_STATE.UNKNOWN);
             }
             else if (!BotManager.Instance.depthDaemonBotsCreated)
             {
                 OutputHelper.OutputLog("waiting to create bots", OutputHelper.Verbosity.Debug);
-                //DialogManager.Instance.UpdateMessage("Waiting for DaemonBot Creation.", DialogManager.Instance.WarningMessage);
                 return new Tuple<bool, DAEMON_GROUP_STATE>(false, DAEMON_GROUP_STATE.UNKNOWN);
             }
 
@@ -1055,7 +1064,7 @@ namespace ControlPanel
                     hostNameOrIP = SettingsManager.Instance.GetValueWithDefault("Network", "DepthPodIPBase", "192.168.101.", true) + (i + 1).ToString();
                 }
 
-                StatusBot currBot = new StatusBot(hostNameOrIP, dgName, dgPort.ToString());
+                StatusBot currBot = new StatusBot(hostNameOrIP, dgName, controlPanel, dgPort.ToString());
                 currBot.SetDepthGenID(i);
                 currBot.DepthGenMachineID = i;
                 currBot.DefaultStatusUpdateSetup();
@@ -1111,7 +1120,7 @@ namespace ControlPanel
             }
 
             //CalibrationSoftware
-            calibrationSoftwareStatusBot = new StatusBot(null, "CalibrationSoftware");
+            calibrationSoftwareStatusBot = new StatusBot(null, "CalibrationSoftware", controlPanel);
 
             calibrationSoftwareStatusBot.DefaultStatusUpdateSetup();
 
@@ -1158,7 +1167,7 @@ namespace ControlPanel
             {
                 fusionStatusBot.Stop();
             }
-            fusionStatusBot = new StatusBot(null, "Fusion");
+            fusionStatusBot = new StatusBot(null, "Fusion", controlPanel);
             fusionStatusBot.DefaultStatusUpdateSetup();
             DefaultStatusForwarderSetup(fusionStatusBot);
 
@@ -1188,7 +1197,7 @@ namespace ControlPanel
             {
                 renderStatusBot.Stop();
             }
-            renderStatusBot = new StatusBot(null, "Render");
+            renderStatusBot = new StatusBot(null, "Render", controlPanel);
             renderStatusBot.DefaultStatusUpdateSetup();
             DefaultStatusForwarderSetup(renderStatusBot);
 
@@ -1504,12 +1513,12 @@ namespace ControlPanel
             broadcastThread = new Thread(() =>
             {
                 OutputHelper.OutputLog("Broadcast stop thread is starting");
-                int runningDGBots = GetBotsWithCaptureRunning();
+                int runningDGBots = GetBotsWithCaptureRunning() + GetBotsSendingFPS();
                 OutputHelper.OutputLog($"Broadcast stop Thread started.  Running DGs: {runningDGBots}/{depthGenStatusBots.Length}");
                 byte[] dataArray =
                 [
                     // Coying startType into dataArray
-                    (byte)startType,
+                    //(byte)startType,
                 ];
                 while (runBroadcastThread && runningDGBots > 0)
                 {
@@ -1523,52 +1532,45 @@ namespace ControlPanel
             runBroadcastThread = true;
             broadcastThread.Start();
         }
-
-        public void BroadcastStartUntilAllDGStart(SOFTWARE startType, byte[] eventData = null)
+        public void BroadcastSystemStartUntilAllDGStartTransmitting()
         {
             StopBroadcastThread();
-            if (startType != SOFTWARE.SYSTEM_START)
-            {
-                lastStartType = startType;
-            }
             broadcastThread = new Thread(() =>
             {
                 OutputHelper.OutputLog("Broadcast thread is starting");
-                byte[] dataArray = null;
-                if (startType != SOFTWARE.SYSTEM_START)
+                byte[] dataArray = new byte[1];
+                // Copying startType into dataArray
+                dataArray[0] = (byte)SOFTWARE.CAPTURE;
+                int runningDGBots = GetBotsSendingFPS();
+                OutputHelper.OutputLog($"Broadcast Thread started.  Running DGs: {runningDGBots}/{depthGenStatusBots.Length}");
+                while (runBroadcastThread && runningDGBots < depthGenStatusBots.Length)
                 {
-                    if (eventData != null)
-                    {
-                        dataArray = new byte[eventData.Length + 1];
-
-                        // Coying startType into dataArray
-                        dataArray[0] = (byte)startType;
-
-                        // Copying payload
-                        eventData.CopyTo(dataArray, 1);
-                    }
-                    else
-                    {
-                        dataArray = new byte[1];
-
-                        // Coying startType into dataArray
-                        dataArray[0] = (byte)startType;
-                    }
+                    BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, new byte[0]);
+                    OutputHelper.OutputLog(String.Format("Broadcasting {0}-{1} for DGs: {2}/{3}", CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, SOFTWARE.SYSTEM_START,
+                        runningDGBots, BotManager.Instance.depthGenStatusBots.Length), OutputHelper.Verbosity.Warning);
+                    Thread.Sleep(3000);
+                    runningDGBots = GetBotsSendingFPS();
                 }
+            }
+            );
+            runBroadcastThread = true;
+            broadcastThread.Start();
+        }
+        public void BroadcastSoftwareStartUntilAllDGStart()
+        {
+            StopBroadcastThread();
+            broadcastThread = new Thread(() =>
+            {
+                OutputHelper.OutputLog("Broadcast thread is starting");
+                byte[] dataArray = new byte[1];
+                // Copying startType into dataArray
+                dataArray[0] = (byte)SOFTWARE.CAPTURE;
                 int runningDGBots = GetBotsWithCaptureRunning();
                 OutputHelper.OutputLog($"Broadcast Thread started.  Running DGs: {runningDGBots}/{depthGenStatusBots.Length}");
                 while (runBroadcastThread && runningDGBots < depthGenStatusBots.Length)
                 {
-                    if (startType != SOFTWARE.SYSTEM_START)
-                    {
-                        BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, dataArray);
-                    }
-                    else
-                    {
-                        //no real data to send 
-                        BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, new byte[0]);
-                    }
-                    OutputHelper.OutputLog(String.Format("Broadcasting {0}-{1} for DGs: {2}/{3}", CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, startType,
+                    BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, dataArray);
+                    OutputHelper.OutputLog(String.Format("Broadcasting {0}-{1} for DGs: {2}/{3}", CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, SOFTWARE.CAPTURE,
                         runningDGBots, BotManager.Instance.depthGenStatusBots.Length), OutputHelper.Verbosity.Warning);
                     Thread.Sleep(3000);
                     runningDGBots = GetBotsWithCaptureRunning();
@@ -1581,15 +1583,23 @@ namespace ControlPanel
 
         public int GetBotsWithCaptureRunning()
         {
-            // Iterate over the depthGenDaemonBots and count how many have softwareStates[(int)SOFTWARE.CAPTURE] == SOFTWARE_STATE.RUNNING
+            // Iterate over the depthGenStatusBots and count how many have componentStatus.Status == Status.Running
             int runningDGBots = 0;
-            if (depthGenDaemonBots != null)
+            if (depthGenStatusBots != null)
             {
                 for (int i = 0; i < depthGenStatusBots.Length; ++i)
                 {
-                    if (depthGenDaemonBots[i].softwareStates[(int)SOFTWARE.CAPTURE] == SOFTWARE_STATE.RUNNING)
+                    if (depthGenStatusBots[i].componentStatus.Status == Status.Ready)
                     {
-                        runningDGBots++;
+                        // do a double check to make sure the daemon says the actual process is still running, it could have crashed
+                        if (depthGenDaemonBots[i].softwareStates[(int)SOFTWARE.CAPTURE] == SOFTWARE_STATE.RUNNING)
+                        {
+                            runningDGBots++;
+                        }
+                        else
+                        {
+                            OutputHelper.OutputLog($"The status bot for {depthGenStatusBots[i].UnitName} says it is running, but AKLD does not see an active process!", OutputHelper.Verbosity.Error);
+                        }    
                     }
                 }
             }
@@ -1874,6 +1884,23 @@ namespace ControlPanel
             {
                 OutputHelper.OutputLog($"Exception while reading version data from {path}: {e.Message}", OutputHelper.Verbosity.Warning);
             }
+        }
+
+        internal int GetBotsSendingFPS()
+        {
+            // Iterate over the depthGenDaemonBots and count how many have softwareStates[(int)SOFTWARE.CAPTURE] == SOFTWARE_STATE.RUNNING
+            int runningDGBots = 0;
+            if (depthGenStatusBots != null)
+            {
+                for (int i = 0; i < depthGenStatusBots.Length; ++i)
+                {
+                    if (depthGenStatusBots[i].componentStatus.FPS > 0)
+                    {
+                        runningDGBots++;
+                    }
+                }
+            }
+            return runningDGBots;
         }
     }
 }

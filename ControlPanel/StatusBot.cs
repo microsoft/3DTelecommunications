@@ -64,13 +64,20 @@ namespace ControlPanel
         public string Temp => componentStatus.Temperature.ToString();
 
         public string ComponentStatus => componentStatus.Status.ToString();
+        public string CameraName => "Camera " + (DepthGenID + 1).ToString();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName)
         {
-            OutputHelper.OutputLog($"~~~Invoking property changed event for {propertyName} for bot {this.UnitName}", OutputHelper.Verbosity.Trace);
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if(_controlPanel.InvokeRequired)
+            {
+                _controlPanel.Invoke(new Action(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName))));
+            }
+            else
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
 
 
@@ -97,9 +104,12 @@ namespace ControlPanel
         // Status State
         public ComponentStatus componentStatus;
 
-        public StatusBot(String ip, String name, string overrideTCPPort ="", string overrideEPGMPORT="")
+        private ControlPanel _controlPanel;
+
+        public StatusBot(String ip, String name, ControlPanel controlPanel, string overrideTCPPort ="", string overrideEPGMPORT="")
             : base(ip, name)
         {
+            this._controlPanel = controlPanel;
             this.DepthGenID = -1;
             this.depthGenMachineID = -1;
             ResetHBTime();
@@ -132,13 +142,30 @@ namespace ControlPanel
             options.SendHighWatermark = 10000;
         }
 
+        public void Reconnect()
+        {
+            if (eventSubscriberSocket != null)
+            {
+                OutputHelper.OutputLog("Reinitializing status bot for pod " + this.DepthGenID);
+                eventSubscriberSocket.Disconnect("tcp://" + this.IP + ":" + StatusTCPPort);
+                Thread.Sleep(100);
+                eventSubscriberSocket.Connect("tcp://" + this.IP + ":" + StatusTCPPort);
+            }
+            else if(!IsThreadAlive())
+            {
+                Start();
+            }
+        }
+
         public void Start()
         {
             if (IsThreadAlive())
             {
                 OutputHelper.OutputLog("Warning! attemping to start statusbot while it's still running");
+                Reconnect();
                 return; // don't actually reset the threads
             }
+            OutputHelper.OutputLog($"Starting up status bot for pod {this.DepthGenID}");
             heartBeatRunning = true;
             HeartbeatThread = new Thread(CheckHeartbeatThread);
             HeartbeatThread.Start();
@@ -149,6 +176,8 @@ namespace ControlPanel
             {
                 eventSubscriberSocket = new SubscriberSocket();
                 SetDefaultSocketOptions(eventSubscriberSocket.Options);
+                eventSubscriberSocket.Options.TcpKeepalive = true;
+                eventSubscriberSocket.Options.ReconnectInterval = TimeSpan.FromSeconds(5);
                 try
                 {
                     OutputHelper.OutputLog("Subscriber connecting to " + this.UnitName + " publisher at " + this.IP + ":" + this.StatusTCPPort + " over TCP");
@@ -308,10 +337,8 @@ namespace ControlPanel
                 if (timeSinceLastHB > TimeSpan.FromSeconds(MAX_HB_TIMEOUT_SEC))
                 {
                     OutputHelper.OutputLog(String.Format("Havent heard from {0} in > {1} sec. Resetting known state...", this.UnitName, MAX_HB_TIMEOUT_SEC));
-
                     componentStatus.Status = Status.TimedOut;
                     OnPropertyChanged(nameof(ComponentStatus));
-
                 }
                 else if (timeSinceLastHB > TimeSpan.FromSeconds(WRN_HB_TIMEOUT_SEC))
                 {
@@ -326,15 +353,17 @@ namespace ControlPanel
             LastHBReceived = DateTime.UtcNow;
         }
 
+        // Inside the StatusBot class, replace the method UpdateSoftwareState with the following:
+
         public void UpdateSoftwareState(SOFTWARE software, SOFTWARE_STATE newStatus)
         {
             softwareStates[(int)software] = newStatus;
             OutputHelper.OutputLog($"Updating bot {this.UnitName} software state for {software.ToString()} to {newStatus.ToString()}", OutputHelper.Verbosity.Trace);
-            if(software == SOFTWARE.WINDOWS_SERVICE)
+            if (software == SOFTWARE.WINDOWS_SERVICE)
             {
                 OnPropertyChanged(nameof(WindowsServiceStatus));
             }
-            if(software == SOFTWARE.LINUX_DAEMON)
+            if (software == SOFTWARE.LINUX_DAEMON)
             {
                 OnPropertyChanged(nameof(LinuxDaemonStatus));
             }
@@ -396,28 +425,29 @@ namespace ControlPanel
                 {
                     UpdateTimeLastHBReceived();
                     componentStatus.Status = Status.Ready;
+                    OnPropertyChanged(ComponentStatus);
                 });
             RegisterUpdateFunction( CPC_STATUS.BUILD_VERSION,
                 delegate ( byte [] update )
                 {
                     OutputHelper.OutputLog($"{UnitName} default updater calling only SaveVersionData");
                     SaveVersionData(update);
-                } );
+                    OnPropertyChanged(VersionString);
+                });
 
             RegisterUpdateFunction(CPC_STATUS.RECEIVED_NEW_DATA, 
                 delegate (byte[] update)
             {
                 OutputHelper.OutputLog($"{UnitName} received valid calibration data.");
-                    //if(componentStatusContainer != null)
-                    //{
-                    //    componentStatusContainer.componentStatus.NewDataReceived = true;
-                    //}
+                componentStatus.NewDataReceived = true;
+                OnPropertyChanged(ComponentStatus);
             });
 
             RegisterUpdateFunction( CPC_STATUS.RUNNING,
                delegate (byte[] update)
                {
                    componentStatus.Status = Status.Running;
+                   OnPropertyChanged(ComponentStatus);
                    heartBeatRunning = true;
                });
 
@@ -429,7 +459,8 @@ namespace ControlPanel
                    {
                        componentStatus.FPS = 0.0f;
                        componentStatus.Temperature = 0.0f;
-                   }    
+                   }
+                   OnPropertyChanged(ComponentStatus);
                    heartBeatRunning = false; // no need to detect heartbeat if we know it stopped correctly
                });
             RegisterUpdateFunction(CPC_STATUS.IS_ALIVE, (byte[] update) =>
@@ -466,7 +497,7 @@ namespace ControlPanel
                     {
                         componentStatus.FPS_min = fps;
                     }
-                    OutputHelper.OutputLog($"Got FPS Packet. FPS: {fps} Temperature: {temperature}");
+                    OutputHelper.OutputLog($"Got FPS Packet for {UnitName}. FPS: {fps} Temperature: {temperature}");
                     //this.Form.OutputLog("Fusion FPS: " + fps.ToString());
                     componentStatus.FPS = fps;
                     componentStatus.Temperature = temperature;
@@ -481,6 +512,9 @@ namespace ControlPanel
                         int frameNumber = (int)System.BitConverter.ToInt32(update, 1+sizeof(double));
                         componentStatus.FrameNum = frameNumber;
                     }
+                    OnPropertyChanged(nameof(FPS));
+                    OnPropertyChanged(nameof(Temp));
+                    OnPropertyChanged(nameof(ComponentStatus));
                     // Don't update status here, FPS status is just used for sending data back to the control panel
                 });
             }                 

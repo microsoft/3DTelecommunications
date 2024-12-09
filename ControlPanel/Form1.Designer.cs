@@ -29,14 +29,16 @@
         private void InitializeComponent()
         {
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             tabControl1 = new TabControl();
             tabPage_broadcast = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
             panel_podStatus = new Panel();
             tableLayoutPanel3 = new TableLayoutPanel();
-            dataGridView_broadcast_camera_daemons = new DataGridView();
+            textBox1 = new TextBox();
             dataGridView_broadcast_camera_applications = new DataGridView();
             textBox_podStatusTitle = new TextBox();
+            dataGridView_broadcast_camera_daemons = new DataGridView();
             tableLayoutPanel_fusion_render_status = new TableLayoutPanel();
             tableLayoutPanel_fusion = new TableLayoutPanel();
             textBox_fusion_title = new TextBox();
@@ -71,8 +73,8 @@
             tableLayoutPanel1.SuspendLayout();
             panel_podStatus.SuspendLayout();
             tableLayoutPanel3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridView_broadcast_camera_daemons).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView_broadcast_camera_applications).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dataGridView_broadcast_camera_daemons).BeginInit();
             tableLayoutPanel_fusion_render_status.SuspendLayout();
             tableLayoutPanel_fusion.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
@@ -113,17 +115,16 @@
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Controls.Add(panel_podStatus, 1, 0);
-            tableLayoutPanel1.Controls.Add(textBox_podStatusTitle, 0, 0);
-            tableLayoutPanel1.Controls.Add(tableLayoutPanel_fusion_render_status, 0, 2);
-            tableLayoutPanel1.Controls.Add(button_start_session, 0, 3);
+            tableLayoutPanel1.Controls.Add(tableLayoutPanel_fusion_render_status, 0, 1);
+            tableLayoutPanel1.Controls.Add(button_start_session, 0, 2);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(3, 3);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 4;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
+            tableLayoutPanel1.RowCount = 3;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle());
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutPanel1.Size = new Size(1892, 744);
             tableLayoutPanel1.TabIndex = 2;
             // 
@@ -131,9 +132,9 @@
             // 
             panel_podStatus.Controls.Add(tableLayoutPanel3);
             panel_podStatus.Dock = DockStyle.Fill;
-            panel_podStatus.Location = new Point(3, 63);
+            panel_podStatus.Location = new Point(3, 3);
             panel_podStatus.Name = "panel_podStatus";
-            panel_podStatus.Size = new Size(1886, 418);
+            panel_podStatus.Size = new Size(1886, 478);
             panel_podStatus.TabIndex = 2;
             // 
             // tableLayoutPanel3
@@ -141,16 +142,50 @@
             tableLayoutPanel3.ColumnCount = 2;
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel3.Controls.Add(dataGridView_broadcast_camera_daemons, 0, 0);
-            tableLayoutPanel3.Controls.Add(dataGridView_broadcast_camera_applications, 1, 0);
+            tableLayoutPanel3.Controls.Add(textBox1, 1, 0);
+            tableLayoutPanel3.Controls.Add(dataGridView_broadcast_camera_applications, 1, 1);
+            tableLayoutPanel3.Controls.Add(textBox_podStatusTitle, 0, 0);
+            tableLayoutPanel3.Controls.Add(dataGridView_broadcast_camera_daemons, 0, 1);
             tableLayoutPanel3.Dock = DockStyle.Fill;
             tableLayoutPanel3.Location = new Point(0, 0);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
-            tableLayoutPanel3.RowCount = 1;
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel3.Size = new Size(1886, 418);
+            tableLayoutPanel3.RowCount = 2;
+            tableLayoutPanel3.RowStyles.Add(new RowStyle());
+            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel3.Size = new Size(1886, 478);
             tableLayoutPanel3.TabIndex = 2;
+            // 
+            // textBox1
+            // 
+            textBox1.Dock = DockStyle.Left;
+            textBox1.Location = new Point(946, 3);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(384, 55);
+            textBox1.TabIndex = 4;
+            textBox1.Text = "Kinect Nano to Fusion";
+            // 
+            // dataGridView_broadcast_camera_applications
+            // 
+            dataGridView_broadcast_camera_applications.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dataGridView_broadcast_camera_applications.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dataGridView_broadcast_camera_applications.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView_broadcast_camera_applications.Dock = DockStyle.Fill;
+            dataGridView_broadcast_camera_applications.Location = new Point(946, 64);
+            dataGridView_broadcast_camera_applications.Name = "dataGridView_broadcast_camera_applications";
+            dataGridView_broadcast_camera_applications.RowHeadersWidth = 62;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dataGridView_broadcast_camera_applications.RowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridView_broadcast_camera_applications.Size = new Size(937, 411);
+            dataGridView_broadcast_camera_applications.TabIndex = 2;
+            // 
+            // textBox_podStatusTitle
+            // 
+            textBox_podStatusTitle.Dock = DockStyle.Left;
+            textBox_podStatusTitle.Location = new Point(3, 3);
+            textBox_podStatusTitle.Name = "textBox_podStatusTitle";
+            textBox_podStatusTitle.Size = new Size(436, 55);
+            textBox_podStatusTitle.TabIndex = 3;
+            textBox_podStatusTitle.Text = "Kinect Launcher Daemons";
             // 
             // dataGridView_broadcast_camera_daemons
             // 
@@ -158,32 +193,14 @@
             dataGridView_broadcast_camera_daemons.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             dataGridView_broadcast_camera_daemons.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView_broadcast_camera_daemons.Dock = DockStyle.Fill;
-            dataGridView_broadcast_camera_daemons.Location = new Point(3, 3);
+            dataGridView_broadcast_camera_daemons.Location = new Point(3, 64);
             dataGridView_broadcast_camera_daemons.MinimumSize = new Size(0, 400);
             dataGridView_broadcast_camera_daemons.Name = "dataGridView_broadcast_camera_daemons";
             dataGridView_broadcast_camera_daemons.RowHeadersWidth = 62;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 10F);
-            dataGridView_broadcast_camera_daemons.RowsDefaultCellStyle = dataGridViewCellStyle1;
-            dataGridView_broadcast_camera_daemons.Size = new Size(937, 412);
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 10F);
+            dataGridView_broadcast_camera_daemons.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridView_broadcast_camera_daemons.Size = new Size(937, 411);
             dataGridView_broadcast_camera_daemons.TabIndex = 1;
-            // 
-            // dataGridView_broadcast_camera_applications
-            // 
-            dataGridView_broadcast_camera_applications.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView_broadcast_camera_applications.Dock = DockStyle.Fill;
-            dataGridView_broadcast_camera_applications.Location = new Point(946, 3);
-            dataGridView_broadcast_camera_applications.Name = "dataGridView_broadcast_camera_applications";
-            dataGridView_broadcast_camera_applications.RowHeadersWidth = 62;
-            dataGridView_broadcast_camera_applications.Size = new Size(937, 412);
-            dataGridView_broadcast_camera_applications.TabIndex = 2;
-            // 
-            // textBox_podStatusTitle
-            // 
-            textBox_podStatusTitle.Location = new Point(3, 3);
-            textBox_podStatusTitle.Name = "textBox_podStatusTitle";
-            textBox_podStatusTitle.Size = new Size(153, 55);
-            textBox_podStatusTitle.TabIndex = 3;
-            textBox_podStatusTitle.Text = "Cameras";
             // 
             // tableLayoutPanel_fusion_render_status
             // 
@@ -495,11 +512,11 @@
             tabPage_broadcast.ResumeLayout(false);
             tabPage_broadcast.PerformLayout();
             tableLayoutPanel1.ResumeLayout(false);
-            tableLayoutPanel1.PerformLayout();
             panel_podStatus.ResumeLayout(false);
             tableLayoutPanel3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dataGridView_broadcast_camera_daemons).EndInit();
+            tableLayoutPanel3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView_broadcast_camera_applications).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dataGridView_broadcast_camera_daemons).EndInit();
             tableLayoutPanel_fusion_render_status.ResumeLayout(false);
             tableLayoutPanel_fusion.ResumeLayout(false);
             tableLayoutPanel_fusion.PerformLayout();
@@ -528,9 +545,6 @@
         private TabPage tabPage_log;
         private TextBox textBox_systemLog;
         private TableLayoutPanel tableLayoutPanel1;
-        private Panel panel_podStatus;
-        private DataGridView dataGridView_broadcast_camera_daemons;
-        private TextBox textBox_podStatusTitle;
         private TableLayoutPanel tableLayoutPanel_fusion_render_status;
         private Button button_start_session;
         private TextBox textBox_render_title;
@@ -549,7 +563,11 @@
         private TextBox textBox_fusion_fps;
         private TextBox textBox_render_application_status;
         private TextBox textBox_render_fps;
+        private Panel panel_podStatus;
         private TableLayoutPanel tableLayoutPanel3;
         private DataGridView dataGridView_broadcast_camera_applications;
+        private TextBox textBox_podStatusTitle;
+        private DataGridView dataGridView_broadcast_camera_daemons;
+        private TextBox textBox1;
     }
 }

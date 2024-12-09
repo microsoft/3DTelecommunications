@@ -9,7 +9,8 @@ namespace ControlPanel
 {
     public partial class ControlPanel : Form
     {
-        bool ContinueRunningSession = false;
+        private bool _isClosing = false;
+        bool SessionStarting = false;
         Thread BroadcastSessionStartupThread;
         public ControlPanel()
         {
@@ -22,9 +23,21 @@ namespace ControlPanel
             this.FormClosing += ControlPanel_FormClosing;
         }
 
-        private void ControlPanel_FormClosing(object? sender, FormClosingEventArgs e)
+        private async void ControlPanel_FormClosing(object? sender, FormClosingEventArgs e)
         {
-            BotManager.Instance.OnDestroy();
+            if (_isClosing)
+            {
+                return;
+            }
+            _isClosing = true;
+            // Make sure we close everything else first
+            e.Cancel = true;
+            this.Enabled = false;
+            SessionStarting = false;
+            await Task.Run(() => BotManager.Instance.OnDestroy());
+
+            // Now finish closing
+            this.Close();
         }
 
         private void ControlPanel_Loaded(object? sender, EventArgs e)
@@ -92,10 +105,18 @@ namespace ControlPanel
         }
         internal void UpdateLogText(string message)
         {
-            textBox_systemLog.AppendText(message + Environment.NewLine);
+            if (InvokeRequired)
+            {
+                Invoke(new Action<string>(UpdateLogText), message);
+                return;
+            }
+            // Prepend the new message to the existing text
+            textBox_systemLog.Text = message + Environment.NewLine + textBox_systemLog.Text;
+
+            // Optionally, you can limit the length of the text to avoid performance issues
             if (textBox_systemLog.Text.Length > 100000)
             {
-                textBox_systemLog.Text = textBox_systemLog.Text.Substring(textBox_systemLog.Text.Length - 100000);
+                textBox_systemLog.Text = textBox_systemLog.Text.Substring(0, 100000);
             }
         }
         internal void BindPodBotsToUI()
@@ -109,15 +130,12 @@ namespace ControlPanel
             int dgNum = SettingsManager.Instance.GetValueWithDefault("DepthGeneration", "DepthCameraCount", 0, true);
 
             dataGridView_broadcast_camera_daemons.Visible = true;
-            dataGridView_broadcast_camera_applications.Visible = false;
+            dataGridView_broadcast_camera_applications.Visible = true;
             // Create a BindingSource
-            BindingSource bindingSource = new BindingSource();
-
-            // Set the DataSource of the BindingSource to the depthGenDaemonBots array
-            bindingSource.DataSource = BotManager.Instance.depthGenDaemonBots;
+            BindingList<StatusBot> bindingList = new BindingList<StatusBot>(BotManager.Instance.depthGenDaemonBots);
 
             // Bind the BindingSource to the DataGridView
-            dataGridView_broadcast_camera_daemons.DataSource = bindingSource;
+            dataGridView_broadcast_camera_daemons.DataSource = bindingList;
             // Customize the DataGridView columns
             dataGridView_broadcast_camera_daemons.AutoGenerateColumns = false;
             dataGridView_broadcast_camera_daemons.Columns.Clear();
@@ -125,13 +143,8 @@ namespace ControlPanel
             // Add columns for specific properties of DaemonBot
             dataGridView_broadcast_camera_daemons.Columns.Add(new DataGridViewTextBoxColumn
             {
-                DataPropertyName = "DepthGenID",
+                DataPropertyName = "CameraName",
                 HeaderText = "#"
-            });
-            dataGridView_broadcast_camera_daemons.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "VersionString",
-                HeaderText = "Version"
             });
             dataGridView_broadcast_camera_daemons.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -148,21 +161,20 @@ namespace ControlPanel
                 DataPropertyName = "CalibrationStatus",
                 HeaderText = "Calibration Software"
             });
+            dataGridView_broadcast_camera_daemons.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "VersionString",
+                HeaderText = "Version"
+            });
 
-            bindingSource = new BindingSource();
-            bindingSource.DataSource = BotManager.Instance.depthGenStatusBots;
-            dataGridView_broadcast_camera_applications.DataSource = bindingSource;
+            bindingList = new BindingList<StatusBot>(BotManager.Instance.depthGenStatusBots);
+            dataGridView_broadcast_camera_applications.DataSource = bindingList;
             dataGridView_broadcast_camera_applications.AutoGenerateColumns = false;
             dataGridView_broadcast_camera_applications.Columns.Clear();
             dataGridView_broadcast_camera_applications.Columns.Add(new DataGridViewTextBoxColumn
             {
-                DataPropertyName = "DepthGenID",
+                DataPropertyName = "CameraName",
                 HeaderText = "#"
-            });
-            dataGridView_broadcast_camera_applications.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "VersionString",
-                HeaderText = "Version"
             });
             dataGridView_broadcast_camera_applications.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -171,8 +183,13 @@ namespace ControlPanel
             });
             dataGridView_broadcast_camera_applications.Columns.Add(new DataGridViewTextBoxColumn
             {
-                DataPropertyName = "Temperature",
+                DataPropertyName = "Temp",
                 HeaderText = "Temp"
+            });
+            dataGridView_broadcast_camera_applications.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "VersionString",
+                HeaderText = "Version"
             });
             // refresh the data grid view
             dataGridView_broadcast_camera_daemons.Refresh();
@@ -181,6 +198,11 @@ namespace ControlPanel
 
         public void Refresh()
         {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(Refresh));
+                return;
+            }
             dataGridView_broadcast_camera_daemons.Refresh();
             textBox_fusion_application_status.Refresh();
             textBox_fusion_daemon_status.Refresh();
@@ -200,9 +222,8 @@ namespace ControlPanel
             if (button_start_session.Text == "Start Session")
             {
                 OutputHelper.OutputLog("New session start button clicked!");
-                button_start_session.Enabled = false;
-                ContinueRunningSession = true;
-                dataGridView_broadcast_camera_applications.Visible = true;
+                StartingStartSessionButton();
+                SessionStarting = true;
 
                 BroadcastSessionStartupThread = new Thread(() =>
                 {
@@ -211,41 +232,56 @@ namespace ControlPanel
                     //kick off the sequence of tasks
                     //start the DG's status bots 
                     for (int i = 0; i < dgNum; ++i)
-                    {
+                    { 
                         BotManager.Instance.depthGenStatusBots[i].Start();
                     }
                     //Tell the DG Daemons to start in Capture mode
                     OutputHelper.OutputLog($"Start button clicked.  Broadcasting the start capture signal.");
-                    BotManager.Instance.BroadcastStartUntilAllDGStart(SOFTWARE.CAPTURE);
+                    BotManager.Instance.BroadcastSoftwareStartUntilAllDGStart();
 
                     // Wait for all DG to be running
-                    while(ContinueRunningSession && BotManager.Instance.GetBotsWithCaptureRunning() < dgNum)
+                    while(SessionStarting && BotManager.Instance.GetBotsWithCaptureRunning() < dgNum)
                     {
                         Thread.Sleep(250);
                     }
-                    /*  ENABLE WHEN READY
-                    if (!ContinueRunningSession)
+                    if(!SessionStarting)
+                    {
+                        return;
+                    }
+                    // Now send the depth gen start capture command
+                    OutputHelper.OutputLog("All bots have application running.  Sending the global start signal.");
+                    BotManager.Instance.BroadcastSystemStartUntilAllDGStartTransmitting();
+                    int botsSendingFPS = 0;
+                    while(SessionStarting && botsSendingFPS < dgNum)
+                    {
+                        Thread.Sleep(250);
+                        botsSendingFPS = BotManager.Instance.GetBotsSendingFPS();
+                        OutputHelper.OutputLog($"Waiting for all DG's to start sending FPS {botsSendingFPS}/{BotManager.Instance.depthGenStatusBots.Length}");
+                    }
+                    if(!SessionStarting)
+                    {
+                        return;
+                    }   
+                    if (!SessionStarting)
                         return;
                     // Start fusion
                     BotManager.Instance.fusionStatusBot.Start();
                     BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.FUSION));
 
-                    while(ContinueRunningSession && BotManager.Instance.fusionStatusBot.componentStatus.Status != Status.Running)
+                    while(SessionStarting && BotManager.Instance.fusionStatusBot.componentStatus.Status != Status.Running)
                     {
                         Thread.Sleep(250);
                     }
 
                     BotManager.Instance.renderStatusBot.Start();
                     BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.RENDER));
-                    */
 
                 });
                 BroadcastSessionStartupThread.Start();
             }
             else
             {
-                ContinueRunningSession = false;
-                dataGridView_broadcast_camera_applications.Visible = false;
+                SessionStarting = false;
                 BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_STOP_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.RENDER));
                 BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_STOP_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.FUSION));
                 BotManager.Instance.BroadcastStopUntilAllDGStop(SOFTWARE.CAPTURE);
@@ -259,11 +295,25 @@ namespace ControlPanel
                 Invoke(new Action(EnableStartSessionButton));
                 return;
             }
-            button_start_session.BackColor = Color.LightGreen;
-            button_start_session.Enabled = true;
-            button_start_session.Text = "Start Session";
+            if (!SessionStarting)
+            {
+                button_start_session.BackColor = Color.LightGreen;
+                button_start_session.Enabled = true;
+                button_start_session.Text = "Start Session";
+            }
         }
 
+        internal void StartingStartSessionButton()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(StartingStartSessionButton));
+                return;
+            }
+            button_start_session.BackColor = Color.Yellow;
+            button_start_session.Enabled = false;  
+            button_start_session.Text = "Starting";
+        }
         internal void DisableStartSessionButton()
         {
             if (InvokeRequired)
