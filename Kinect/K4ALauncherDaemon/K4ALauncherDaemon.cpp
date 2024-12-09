@@ -3,6 +3,9 @@
 #include <experimental/filesystem>
 #include "LEDSerialWriter.hpp"
 #include <json/json.h>
+#include <algorithm>
+#include <cctype>
+#include <regex>
 
 std::string LockFile("/var/lock/AKLauncherDaemon"); 
 std::string LogFile("/var/log/K4AToFusion/AKLauncherDaemon.log"); // default--overwritten by config file
@@ -14,16 +17,15 @@ const std::string defaultCalibrationDirectory(defaultWorkingDirectory+"/K4AToFus
 const std::string commandLineRegexDefault[SOFTWARE::COUNT] = 
 {
 	"", // SYSTEM_START
-	"AzureKinectNanoToFusion "+defaultCalibrationDirectory+"/3DTelemedicine.cfg 0 ", // CALIBRATION
-	"AzureKinectNanoToFusion "+defaultCalibrationDirectory+"/3DTelemedicine.cfg 1 ", // CAPTURE
-	"AzureKinectNanoToFusion "+defaultCalibrationDirectory+"/3DTelemedicine.cfg 2 ", // BACKGROUND_CAPTURE
-	"LiveFusionDemo-MultiView.exe", // FUSION 
-	"HoloportRenderer.exe", // RENDER
+	"AzureKinectNanoToFusion "+defaultCalibrationDirectory+"/3DTelemedicine.cfg 0", // STREAM
+	"K4ARecorder " + defaultCalibrationDirectory + "/3DTelemedicine.cfg", // PAI CalibrationSoftware
+	"AzureKinectNanoToFusion "+defaultCalibrationDirectory+"/3DTelemedicine.cfg 2", // BACKGROUND_CAPTURE
+	"", // FUSION 
+	"", // RENDER
 	"", // LINUX_DAEMON, we don't actually want to monitor our own state here
     "", // WINDOWS_SERVICE,
 	"" // KINECT_COMMUNICATOR
 };
-const std::string K4ARecorderCommandLineRegex = "K4ARecorder " + defaultCalibrationDirectory + "/3DTelemedicine.cfg"; // PAI CalibrationSoftware
 
 
 std::string configfile(defaultCalibrationDirectory+"/3DTelemedicine.cfg");
@@ -33,6 +35,15 @@ std::string commandLineRegex[SOFTWARE::COUNT];
 std::string workingDirectory;
 std::string calibrationDirectory;
 K4ALauncherDaemon* launcherDaemon;
+
+// Helper function to remove all whitespace from a string and trim any whitespace from the end
+std::string normalizeWhitespace(const std::string& str) {
+	std::string result;
+	std::regex ws_re("\\s+"); // matches one or more whitespace characters
+	result = std::regex_replace(str, ws_re, " ");
+	result.erase(result.find_last_not_of(" \n\r\t") + 1); // trim trailing whitespace
+	return result;
+}
 
 static int GetIntFromDataPacket(void* eventData, int pos)
 {
@@ -195,71 +206,113 @@ void K4ALauncherDaemon::SetConfig(CConfig* new_config)
 {
 	config = new_config;
 }
+// Helper function to get the command line of a process by PID
+std::string getCmdlineByPID(int pid) {
+    std::string cmdline;
+    std::string command = "ps -p " + std::to_string(pid) + " -o cmd --no-headers";
+	LOGGER()->trace("Executing command: %s\n", command.c_str());
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe) {
+        std::cerr << "Failed to run ps command" << std::endl;
+        return cmdline;
+    }
+
+    char buffer[4096];
+    if (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        cmdline = buffer;
+        // Remove trailing newline character
+        cmdline.erase(std::remove(cmdline.begin(), cmdline.end(), '\n'), cmdline.end());
+		LOGGER()->trace("Cmdline is %s", cmdline.c_str());
+    }
+	else {
+        std::cerr << "Failed to read from pipe for PID: " << pid << std::endl;
+    }
+
+	int status = pclose(pipe);
+    if (status == -1) {
+        std::cerr << "Failed to close pipe for PID: " << pid << std::endl;
+    } else {
+        printf("ps command exited with status %d for PID: %d\n", status, pid);
+    }
+    return cmdline;
+}
+// Helper function to execute a command and get the output
+std::vector<int> getPIDsByPattern(const std::string& pattern) {
+    std::vector<int> pids;
+    std::string command = "pgrep -f '" + pattern + "'";
+	LOGGER()->trace("Executing pgrep command: %s\n", command.c_str());
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe) {
+        std::cerr << "Failed to run pgrep command" << std::endl;
+        return pids;
+    }
+
+    char buffer[128];
+	memset(buffer, '\0', sizeof(buffer));
+    while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
+		if (buffer[0] != '\0')
+		{
+			LOGGER()->trace("pgrep buffer was not empty, contains: %s", buffer);		
+			int pid = atoi(buffer);
+			if (pid > 0) {
+				std::string cmdline = getCmdlineByPID(pid);
+				if (kill(pid, 0) == 0 && cmdline.find("pgrep") == std::string::npos && cmdline.find("[sh] <defunct>") == std::string::npos) {
+					LOGGER()->trace("pushing PID %d onto list", pid);
+					pids.push_back(pid);
+				} else {
+					LOGGER()->trace("Invalid PID %d or pgrep process, not adding to list", pid);
+				}
+			}
+		}
+		memset(buffer, '\0', sizeof(buffer));
+    }
+
+    int status = pclose(pipe);
+    if (status == -1) {
+        std::cerr << "Failed to close pipe for pgrep command" << std::endl;
+    } else {
+        printf("pgrep command exited with status %d\n", WEXITSTATUS(status));
+    }
+
+    LOGGER()->trace("Done getting PIDsByPattern, I found %d PIDs", pids.size());
+    return pids;
+}
+
 
 void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 {
-	LOGGER()->info("K4ALauncherDaemon StateMonitor is starting.");
-	PROCTAB *ptp;
-	int flags = PROC_FILLCOM;
-	char cmd[4096];
+	printf("K4ALauncherDaemon StateMonitor is starting.\r\n");
+
 	while(daemon->runThread)
 	{
 		for(int i = 0; i < SOFTWARE::COUNT; i++)
 		{
 			daemon->SetPID(i, -1);
 		}
-		ptp = openproc(flags);
-
-		proc_t task;
-		memset(&task, 0, sizeof(task));
-		
-		regex_t * preg = (regex_t*)malloc(sizeof(regex_t));
-		while(readproc(ptp, &task)) {
-			if(task.cmdline)
-			{
-				int bytes = sizeof(cmd) - 1;
-				int i = 0;
-				cmd[bytes] = 0;
-				--bytes;
-
-				strncpy(cmd, task.cmdline[i], bytes);
-				bytes -= strlen(task.cmdline[i++]);
-				while(task.cmdline[i] && bytes > 0)
-				{
-					strncat (cmd, " ", bytes);
-					strncat (cmd, task.cmdline[i], bytes);
-					bytes -= strlen(task.cmdline[i++]) + 1;
-				}
-
-				LOGGER()->trace("[PROCLIST] %s", cmd);
-				for(int i = 0; i < SOFTWARE::COUNT; i++)
-				{
-					if(commandLineRegex[i] == "")
-						continue;
-					regcomp(preg, commandLineRegex[i].c_str(), REG_EXTENDED|REG_NOSUB);
-					// match with the commands I care about
-					if(regexec (preg, cmd, 0, NULL, 0) == 0)
-					{					
-						LOGGER()->debug("Process %d (%s) matched (%s).  Setting PID", task.tid, cmd, commandLineRegex[i].c_str());
-						daemon->SetPID(i, task.tid);
-						// don't change to RUNNING if I've received a stop command, because the process is still stopping
-						if(daemon->GetState(i) != SOFTWARE_STATE::SS_STOPPED && daemon->GetState(i) != SOFTWARE_STATE::SS_RUNNING) 
-						{ 
-							LOGGER()->debug("Setting application %d PID [%d] to RUNNING", i, task.tid); 
-							daemon->SetState(i, SOFTWARE_STATE::SS_RUNNING);
-						}
-					}
-					regfree(preg);
-				}
-			}
-		}
-		free(preg);
-
-		closeproc(ptp);
 
 		// after looping through the full process list I never set the PID for a process, set it's state to NOT_RUNNING
 		for(int i = 0; i < SOFTWARE::COUNT; i++)
 		{
+			if (commandLineRegex[i] == "")
+				continue;
+
+            // Normalize whitespace in the regex pattern
+            std::string regexPattern = normalizeWhitespace(commandLineRegex[i]);
+
+            // Get PIDs matching the pattern
+            std::vector<int> pids = getPIDsByPattern(regexPattern);
+			LOGGER()->trace("I found %d PIDs for pattern %s", pids.size(), regexPattern.c_str());
+            for (int pid : pids) {
+                // Get the command line of the process
+                LOGGER()->trace("Process %s matched with PID: %d.  Daemon's current state is %d", commandLineRegex[i], pid, daemon->GetState(i));
+                daemon->SetPID(i, pid);
+                if (daemon->GetState(i) != SOFTWARE_STATE::SS_STOPPED && daemon->GetState(i) != SOFTWARE_STATE::SS_RUNNING)
+                {
+                    LOGGER()->debug("Setting application %d PID [%d] to RUNNING", i, pid);
+                    daemon->SetState(i, SOFTWARE_STATE::SS_RUNNING);
+                }
+            }
+			// after looping through the full process list I never set the PID for a process, set it's state to NOT_RUNNING
 			if(daemon->GetPID(i) == -1)
 			{				
 				// don't change to NOT_STARTED if I've received a start command, because the process is still starting
@@ -270,6 +323,7 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 				}
 			}
 		}
+
 		if(daemon->AllApplicationsStopped() && !daemon->calibrationSoftwarePart2Running)
 		{
 			// Running session stop request.  Transition the LEDs back to idle
@@ -280,6 +334,7 @@ void K4ALauncherDaemon::StateMonitor(K4ALauncherDaemon* daemon)
 		daemon->SendSoftwareStateUpdate();
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
+
 	LOGGER()->info("State monitor thread terminating.");
 }
 
@@ -402,6 +457,7 @@ long K4ALauncherDaemon::EventReceived(CONTROL_PANEL_EVENT eventType, void* event
                 case SOFTWARE::CAPTURE:
 					*LOGGER() << Logger::Verbosity::Info << "[" <<  ctime(&timenow) << "] Daemon is killing capture software" << Logger::endl;
 					KillSoftware(SOFTWARE::CAPTURE, SIGTERM);
+					KillSoftware(SOFTWARE::CAPTURE, SIGINT);
                 break;
 				case SOFTWARE::BACKGROUND_CAPTURE:
 					*LOGGER() << Logger::Verbosity::Info << "[" <<  ctime(&timenow) << "] Daemon is killing background capture software" << Logger::endl;
@@ -822,10 +878,13 @@ void K4ALauncherDaemon::KillSoftware(int idx, int signal)
 	{
 		*LOGGER() << Logger::Verbosity::Info << "Sending " << signal << " to proc " << pid << Logger::endl;
 		kill(GetPID(idx), signal);
+		std::string command = "pkill -" + std::to_string(signal) + " -P " + std::to_string(pid);
+		int retval = system(command.c_str());
+		*LOGGER() << Logger::Verbosity::Trace << "pkill returned " << retval << Logger::endl;
 	}
 	else
 	{
-		*LOGGER() << Logger::Verbosity::Error << "Can't kill software, process doesn't exist." << Logger::endl;
+		*LOGGER() << Logger::Verbosity::Error << "Can't kill software " << idx << ", process doesn't exist." << Logger::endl;
 	}
 }
 
@@ -945,25 +1004,18 @@ int main(int argc, char* argv[])
 	std::string myIP("*");
 	std::string statusTCPPort = config->GetValueWithDefault("Ports", "NanoDaemonStatusPort", "14501");
 
-	launcherDaemon = new K4ALauncherDaemon(controlPanelIP, eventTCPPort, myIP, statusTCPPort, config->GetValueWithDefault(overrideSection, "AzureKinectLauncherDaemon", "DisableHeartbeat", false));
-	launcherDaemon->SetConfig(config);
-	launcherDaemon->SetVersionInformation(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_COMMITS, VERSION_BRANCH_NAME, VERSION_DESCRIPTION, VERSION_SHA1);
-
-	launcherDaemon->Verbosity = config->GetValueWithDefault(overrideSection, "AzureKinectLauncherDaemon", "Verbosity", launcherDaemon->Verbosity);
-	LOGGER()->set_verbosity((Logger::Verbosity)config->GetValueWithDefault("AzureKinectLauncherDaemon", "Verbosity", launcherDaemon->Verbosity));
-	launcherDaemon->serialPortFilename = config->GetValueWithDefault(overrideSection, "PodGlobalConfig", "DisplaySerialPort", "/dev/ttyACM1");
+	for(int i = 0; i < SOFTWARE::COUNT; i++)
+	{
+		commandLineRegex[i] = commandLineRegexDefault[i];
+	}
 	commandLineRegex[SOFTWARE::CAPTURE].assign(config->GetValueWithDefault(overrideSection, "AzureKinectLauncherDaemon", "CaptureRegex", commandLineRegexDefault[SOFTWARE::CAPTURE]));
-	commandLineRegex[SOFTWARE::CALIBRATION].assign(config->GetValueWithDefault(overrideSection, "AzureKinectLauncherDaemon", "K4ARecorderRegex", K4ARecorderCommandLineRegex));
-
-	LOGGER()->info("Using command line for calibration as %s", commandLineRegex[SOFTWARE::CALIBRATION].c_str());
-
+	commandLineRegex[SOFTWARE::CALIBRATION].assign(config->GetValueWithDefault(overrideSection, "AzureKinectLauncherDaemon", "K4ARecorderRegex", commandLineRegexDefault[SOFTWARE::CALIBRATION]));
 	commandLineRegex[SOFTWARE::BACKGROUND_CAPTURE].assign(config->GetValueWithDefault(overrideSection, "AzureKinectLauncherDaemon", "BackgroundCaptureRegex", commandLineRegexDefault[SOFTWARE::BACKGROUND_CAPTURE]));
-	commandLineRegex[SOFTWARE::FUSION] = commandLineRegexDefault[SOFTWARE::FUSION];
-	commandLineRegex[SOFTWARE::RENDER] = commandLineRegexDefault[SOFTWARE::RENDER];
 
 	LOGGER()->info("Setting capture command line regex to %s", commandLineRegex[SOFTWARE::CAPTURE].c_str());
 	LOGGER()->info("Setting calibration command line regex to %s", commandLineRegex[SOFTWARE::CALIBRATION].c_str());
 	LOGGER()->info("Setting background command line regex to %s", commandLineRegex[SOFTWARE::BACKGROUND_CAPTURE].c_str());
+	LOGGER()->info("Using command line for calibration as %s", commandLineRegex[SOFTWARE::CALIBRATION].c_str());
 
 	workingDirectory = config->GetValueWithDefault("AzureKinectLauncherDaemon", "WorkingDirectory", defaultWorkingDirectory);
 	calibrationDirectory = config->GetValueWithDefault("AzureKinectLauncherDaemon", "CalibrationDirectory", defaultCalibrationDirectory);
@@ -985,7 +1037,14 @@ int main(int argc, char* argv[])
 		std::experimental::filesystem::create_directory(workingDirectory);
 	}
 
-	bool g_IsRunning = true;
+	//Note, creating the daemon will start the threads, so be sure that you've initialized anything they need before creating this
+	launcherDaemon = new K4ALauncherDaemon(controlPanelIP, eventTCPPort, myIP, statusTCPPort, config->GetValueWithDefault(overrideSection, "AzureKinectLauncherDaemon", "DisableHeartbeat", false));
+	launcherDaemon->SetConfig(config);
+	launcherDaemon->SetVersionInformation(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_COMMITS, VERSION_BRANCH_NAME, VERSION_DESCRIPTION, VERSION_SHA1);
+
+	launcherDaemon->Verbosity = config->GetValueWithDefault(overrideSection, "AzureKinectLauncherDaemon", "Verbosity", launcherDaemon->Verbosity);
+	LOGGER()->set_verbosity((Logger::Verbosity)config->GetValueWithDefault("AzureKinectLauncherDaemon", "Verbosity", launcherDaemon->Verbosity));
+	launcherDaemon->serialPortFilename = config->GetValueWithDefault(overrideSection, "PodGlobalConfig", "DisplaySerialPort", "/dev/ttyACM1");
 
 	launcherDaemon->SendStatusUpdate(CPC_STATUS::READY, NULL, 0);
 	LOGGER()->warning("Main", "Daemon running.  BuildVer = %d.%d.%d-%s.%d. Build descrip = %s. Press q to stop if in interactive mode.  Otherwise use sudo service aklauncherdaemon stop.\r\n",
@@ -996,6 +1055,7 @@ int main(int argc, char* argv[])
 		VERSION_COMMITS,
 		VERSION_DESCRIPTION);
 
+	bool g_IsRunning = true;
     while (g_IsRunning)
     {       
 		if(!daemonMode)

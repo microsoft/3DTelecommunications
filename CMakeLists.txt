@@ -2,10 +2,9 @@ cmake_minimum_required(VERSION 3.5)
 ## use this to globally use C++11 with in our project
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
-set(CMAKE_CONFIGURATION_TYPES Release)
+
 set(CMAKE_CUDA_COMPILER /usr/local/cuda/bin/nvcc)
 set(CUDA_CUDART_LIBRARY /usr/lcoal/cuda/lib64)
-message("Generated with config types: ${CMAKE_CONFIGURATION_TYPES}")
 
 add_compile_options(-Wall -Werror -fopenmp)
 project(Peabody LANGUAGES CXX)
@@ -37,6 +36,13 @@ set(PEABODY_NETWORKING_SOURCE
     ${PEABODY_NETWORKING}/fusion_srv/ConnectionManager.cpp
     ${PEABODY_NETWORKING_ARM}/fusion_srv/DecodedCompressor.cpp
 )
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+    message("****Setting build type to 'Release' as none was specified.")
+else()
+    message("****Build type is ${CMAKE_BUILD_TYPE}")
+endif()
 
 ## This is where the version.h file will be in the linux build (see the powershell line above)
 include_directories( ${PEABODY_DIR} )
