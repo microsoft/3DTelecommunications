@@ -38,7 +38,7 @@ namespace ControlPanel
                 if (_fps != roundedValue)
                 {
                     _fps = roundedValue;
-                    OnPropertyChanged(nameof(FPS));
+                    //OnPropertyChanged(nameof(FPS));
                 }
             }
         }
@@ -51,7 +51,7 @@ namespace ControlPanel
             set 
             { 
                 _frameNum = value; 
-                OnPropertyChanged(nameof(FrameNum)); 
+                //OnPropertyChanged(nameof(FrameNum)); 
             } 
         }
         public bool NewDataReceived 
@@ -62,7 +62,7 @@ namespace ControlPanel
                 if (_newDataReceived != value)
                 {
                     _newDataReceived = value;
-                    OnPropertyChanged(nameof(NewDataReceived));
+                    //OnPropertyChanged(nameof(NewDataReceived));
                 }
             } 
         }
@@ -75,7 +75,7 @@ namespace ControlPanel
                 if (_temperature != roundedValue)
                 {
                     _temperature = roundedValue;
-                    OnPropertyChanged(nameof(Temperature));
+                    //OnPropertyChanged(nameof(Temperature));
                 }
             }
         }
@@ -87,7 +87,7 @@ namespace ControlPanel
                 if (_status != value)
                 {
                     _status = value;
-                    OnPropertyChanged(nameof(Status));
+                    //OnPropertyChanged(nameof(Status));
                 }
             }
         }
@@ -100,7 +100,7 @@ namespace ControlPanel
                 if (_videoRecordingStarted != value)
                 {
                     _videoRecordingStarted = value;
-                    OnPropertyChanged(nameof(VideoRecordingStarted));
+                    //OnPropertyChanged(nameof(VideoRecordingStarted));
                 }
             }
         }
@@ -112,7 +112,7 @@ namespace ControlPanel
                 if (_videoTransferStarted != value)
                 {
                     _videoTransferStarted = value;
-                    OnPropertyChanged(nameof(VideoTransferStarted));
+                    //OnPropertyChanged(nameof(VideoTransferStarted));
                 }
             }
         }
@@ -124,7 +124,7 @@ namespace ControlPanel
                 if (_videoTransferFinished != value)
                 {
                     _videoTransferFinished = value;
-                    OnPropertyChanged(nameof(VideoTransferFinished));
+                    //OnPropertyChanged(nameof(VideoTransferFinished));
                 }
             }
         }
