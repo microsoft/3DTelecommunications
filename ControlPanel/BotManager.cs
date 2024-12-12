@@ -1269,6 +1269,9 @@ namespace ControlPanel
                 UpdateVersionData(renderStatusBot, update);
             });
             SetVersionDataFromMap(renderStatusBot);
+
+            fusionStatusBot.Start();
+            renderStatusBot.Start();
             //CreateVersionTextObject(renderStatusBot.UnitName, renderStatusBot.GetVersionData(), renderStatusBot.componentStatusContainer);
 
             // request the bots give their latest version

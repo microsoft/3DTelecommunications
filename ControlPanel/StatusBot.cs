@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms.Design;
 using AsyncIO;
 using NetMQ;
 using NetMQ.Sockets;
@@ -39,17 +40,21 @@ namespace ControlPanel
         
         public SOFTWARE_STATE[] softwareStates { get => _softwareStates; protected set
             {
-                if (_softwareStates != value)
+                if (softwareStates == null)
                 {
                     _softwareStates = value;
-                    OnPropertyChanged(nameof(LinuxDaemonStatus));
-                    OnPropertyChanged(nameof(WindowsServiceStatus));
-                    OnPropertyChanged(nameof(CaptureStatus));
-                    OnPropertyChanged(nameof(CalibrationStatus));
-                    OnPropertyChanged(nameof(FusionStatus));
-                    OnPropertyChanged(nameof(CalibrationSoftwareStatus));
-                    OnPropertyChanged(nameof(RenderStatus));
-                }    
+                }
+                else
+                {
+                    for (int i = 0; i < _softwareStates.Length; i++)
+                    {
+                        if (_softwareStates[i] != value[i])
+                        {
+                            _softwareStates[i] = value[i];
+                            OnPropertyChanged(nameof(softwareStates));
+                        }
+                    }
+                }
             }
         }
         // Need these so that we can display the status of each daemon in the DataGridView
@@ -83,13 +88,8 @@ namespace ControlPanel
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
                 if (!_updatePending)
                 {
-                    if (propertyName == "FusionStatus" || propertyName == "RenderStatus")
-                    {
-                        //_controlPanel.Refresh();
-                    }
                     _updatePending = true;
                     _updateTimer.Change(100, Timeout.Infinite);
-                    //_controlPanel.Refresh();
                 }
             }
         }
@@ -386,8 +386,11 @@ namespace ControlPanel
                 else if (timeSinceLastHB > TimeSpan.FromSeconds(WRN_HB_TIMEOUT_SEC))
                 {
                     OutputHelper.OutputLog(String.Format("Havent heard from {0} in {1} sec", this.UnitName, timeSinceLastHB.TotalSeconds));
-                    componentStatus.Status = Status.TimedOut;
-                    OnPropertyChanged(nameof(ComponentStatus));
+                    if (componentStatus.Status != Status.TimedOut)
+                    {
+                        componentStatus.Status = Status.TimedOut;
+                        OnPropertyChanged(nameof(ComponentStatus));
+                    }
                 }
             }
         }
@@ -396,44 +399,52 @@ namespace ControlPanel
         public void UpdateTimeLastHBReceived()
         {
             LastHBReceived = DateTime.UtcNow;
-            componentStatus.Status = Status.Running;
-            OnPropertyChanged(nameof(ComponentStatus));
+            if(componentStatus.Status != Status.Running)
+            {
+                componentStatus.Status = Status.Running;
+                OnPropertyChanged(nameof(ComponentStatus));
+            }
         }
 
         // Inside the StatusBot class, replace the method UpdateSoftwareState with the following:
 
-        public void UpdateSoftwareState(SOFTWARE software, SOFTWARE_STATE newStatus)
+        public bool UpdateSoftwareState(SOFTWARE software, SOFTWARE_STATE newStatus)
         {
-            softwareStates[(int)software] = newStatus;
-            OutputHelper.OutputLog($"Updating bot {this.UnitName} software state for {software.ToString()} to {newStatus.ToString()}", OutputHelper.Verbosity.Trace);
-            if (software == SOFTWARE.WINDOWS_SERVICE)
+            if (softwareStates[(int)software] != newStatus)
             {
-                OnPropertyChanged(nameof(WindowsServiceStatus));
+                softwareStates[(int)software] = newStatus;
+                OutputHelper.OutputLog($"Updating bot {this.UnitName} software state for {software.ToString()} to {newStatus.ToString()}", OutputHelper.Verbosity.Trace);
+                if (software == SOFTWARE.WINDOWS_SERVICE)
+                {
+                    OnPropertyChanged(nameof(WindowsServiceStatus));
+                }
+                if (software == SOFTWARE.LINUX_DAEMON)
+                {
+                    OnPropertyChanged(nameof(LinuxDaemonStatus));
+                }
+                if (software == SOFTWARE.CAPTURE)
+                {
+                    OnPropertyChanged(nameof(CaptureStatus));
+                }
+                if (software == SOFTWARE.CALIBRATION)
+                {
+                    OnPropertyChanged(nameof(CalibrationStatus));
+                }
+                if (software == SOFTWARE.FUSION)
+                {
+                    OnPropertyChanged(nameof(FusionStatus));
+                }
+                if (software == SOFTWARE.CALIBRATION)
+                {
+                    OnPropertyChanged(nameof(CalibrationSoftwareStatus));
+                }
+                if (software == SOFTWARE.RENDER)
+                {
+                    OnPropertyChanged(nameof(RenderStatus));
+                }
+                return true;
             }
-            if (software == SOFTWARE.LINUX_DAEMON)
-            {
-                OnPropertyChanged(nameof(LinuxDaemonStatus));
-            }
-            if (software == SOFTWARE.CAPTURE)
-            {
-                OnPropertyChanged(nameof(CaptureStatus));
-            }
-            if (software == SOFTWARE.CALIBRATION)
-            {
-                OnPropertyChanged(nameof(CalibrationStatus));
-            }
-            if (software == SOFTWARE.FUSION)
-            {
-                OnPropertyChanged(nameof(FusionStatus));
-            }
-            if (software == SOFTWARE.CALIBRATION)
-            {
-                OnPropertyChanged(nameof(CalibrationSoftwareStatus));
-            }
-            if (software == SOFTWARE.RENDER)
-            {
-                OnPropertyChanged(nameof(RenderStatus));
-            }
+            return false;
         }
 
         public bool UpdateSoftwareStates(SOFTWARE_STATE[] states)
@@ -441,15 +452,11 @@ namespace ControlPanel
             bool changed = false;
             for (int i = 0; i < (int)SOFTWARE.COUNT; i++)
             {
-                if (softwareStates[i] != states[i] && states[i] != SOFTWARE_STATE.UNKNOWN) // don't "forget" the state I got from some other update
+                if (states[i] != SOFTWARE_STATE.UNKNOWN) // don't "forget" the state I got from some other update
                 {
-                    UpdateSoftwareState((SOFTWARE)i, states[i]);
-                    changed = true;
+                    if(UpdateSoftwareState((SOFTWARE)i, states[i]))
+                    {  changed = true; }
                 }
-            }
-            if (changed)
-            {
-                OnPropertyChanged(nameof(softwareStates));
             }
             return changed;
         }
@@ -508,17 +515,22 @@ namespace ControlPanel
 
         private void baseStatusBotIsAliveFunction(byte[] update)
         {
-            OutputHelper.OutputLog($"{UnitName} Daemon isAlive. (Base Update Function)", OutputHelper.Verbosity.Trace);
             UpdateTimeLastHBReceived();
-            componentStatus.Status = Status.Running;
-            OnPropertyChanged(nameof(ComponentStatus));
+            if(componentStatus.Status != Status.Running)
+            {
+                componentStatus.Status = Status.Running;
+                OnPropertyChanged(nameof(ComponentStatus));
+            }
         }
 
         private void baseStatusBotReadyFunction(byte[] update)
         {
             UpdateTimeLastHBReceived();
-            componentStatus.Status = Status.Ready;
-            OnPropertyChanged(nameof(ComponentStatus));
+            if (componentStatus.Status != Status.Ready)
+            {
+                componentStatus.Status = Status.Ready;
+                OnPropertyChanged(nameof(ComponentStatus));
+            }
         }
 
         private void baseStatusBotBuildVersionFunction(byte[] update)
@@ -539,8 +551,11 @@ namespace ControlPanel
         {
             ResetKnownStatus();
             componentStatus.VideoRecordingStarted = false;
-            componentStatus.Status = Status.Stopped;
-            OnPropertyChanged(nameof(ComponentStatus));
+            if(componentStatus.Status != Status.Stopped)
+            {
+                componentStatus.Status = Status.Stopped;
+                OnPropertyChanged(nameof(ComponentStatus));
+            }
             heartBeatRunning = false; // no need to detect heartbeat if we know it stopped correctly
         }
 
@@ -584,18 +599,19 @@ namespace ControlPanel
                     componentStatus.VideoRecordingStarted = true;
                 }
             }
-            componentStatus.Status = Status.Running;
             heartBeatRunning = true;
             OnPropertyChanged(nameof(FPS));
             OnPropertyChanged(nameof(Temp));
-            OnPropertyChanged(nameof(ComponentStatus));
             // Don't update status here, FPS status is just used for sending data back to the control panel
         }
 
         public void baseStatusBotRunningFunction(byte[] update)
         {
-            componentStatus.Status = Status.Running;
-            OnPropertyChanged(nameof(ComponentStatus));
+            if (componentStatus.Status != Status.Running)
+            {
+                componentStatus.Status = Status.Running;
+                OnPropertyChanged(nameof(ComponentStatus));
+            }
             heartBeatRunning = true;
         }
 

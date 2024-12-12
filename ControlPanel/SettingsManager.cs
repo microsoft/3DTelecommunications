@@ -6,6 +6,13 @@ using System.IO;
 
 namespace ControlPanel
 {
+    public class ConfigItem
+    {
+        public string? Section { get; set; }
+        public string? Setting { get; set; }
+        public string? Value { get; set; }
+    }
+
     public class SettingsManager
     {
 

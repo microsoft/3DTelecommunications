@@ -25,6 +25,8 @@ namespace ControlPanel
 
             this.Load += ControlPanel_Loaded;
             this.FormClosing += ControlPanel_FormClosing;
+
+            dataGridView_config.CellValueChanged += dataGridView_config_CellValueChanged;
         }
 
         private async void ControlPanel_FormClosing(object? sender, FormClosingEventArgs e)
@@ -58,11 +60,69 @@ namespace ControlPanel
             BindRenderDaemonBotToUI();
             BindFusionStatusBotToUI();
             BindRenderStatusBotToUI();
-
             dataGridView_broadcast_camera_applications.CellFormatting += DataGridView_broadcast_camera_applications_CellFormatting;
 
             BindVersionMapToUI();
+            BindConfigToUI();
         }
+
+        private void BindConfigToUI()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(BindConfigToUI));
+                return;
+            }
+
+            dataGridView_config.Visible = true;
+            dataGridView_config.AutoGenerateColumns = false;
+            dataGridView_config.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+
+            var configItems = LoadConfigItems();
+
+            dataGridView_config.DataSource = new BindingList<ConfigItem>(configItems);
+
+            dataGridView_config.Columns.Clear();
+
+            dataGridView_config.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Section",
+                HeaderText = "Section"
+            });
+            dataGridView_config.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Setting",
+                HeaderText = "Setting"
+            });
+            dataGridView_config.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Value",
+                HeaderText = "Value"
+            });
+
+        }
+        private void dataGridView_config_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            var configItems = (BindingList<ConfigItem>)dataGridView_config.DataSource;
+            var config = new SharpConfig.Configuration();
+
+            foreach (var item in configItems)
+            {
+                if (!string.IsNullOrEmpty(item.Section))
+                {
+                    var section = new SharpConfig.Section(item.Section);
+                    config.Add(section);
+                }
+                else
+                {
+                    var section = config[config.Count() - 1];
+                    section.Add(new SharpConfig.Setting(item.Setting, item.Value));
+                }
+            }
+            SettingsManager.Instance.config = config;
+            SettingsManager.Instance.SaveConfigToDisk(config);
+        }
+
 
         private void BindVersionMapToUI()
         {
@@ -153,6 +213,7 @@ namespace ControlPanel
             }
             // bind the textBox_render_daemon_status to the status parameter of the botManager's render daemon bot
             textBox_render_daemon_status.DataBindings.Clear();
+            textBox_render_application_status.DataBindings.Clear();
             textBox_render_daemon_status.DataBindings.Add("Text", BotManager.Instance.renderDaemonBot, "ComponentStatus");
             textBox_render_application_status.DataBindings.Add("Text", BotManager.Instance.renderDaemonBot, "RenderStatus");
         }
@@ -163,8 +224,10 @@ namespace ControlPanel
                 Invoke(new Action(BindRenderStatusBotToUI));
                 return;
             }
-            textBox_render_application_status.DataBindings.Clear();
+            textBox_render_fps.DataBindings.Clear();
+            textBox_broadcastTab_render_application_status.DataBindings.Clear();
             textBox_render_fps.DataBindings.Add("Text", BotManager.Instance.renderStatusBot, "FPS");
+            textBox_broadcastTab_render_application_status.DataBindings.Add("Text", BotManager.Instance.renderStatusBot.componentStatus, "Status");
         }
 
         private void BindFusionDaemonBotToUI()
@@ -175,6 +238,7 @@ namespace ControlPanel
                 return;
             }
             textBox_fusion_daemon_status.DataBindings.Clear();
+            textBox_fusion_application_status.DataBindings.Clear();
             textBox_fusion_daemon_status.DataBindings.Add("Text", BotManager.Instance.fusionDaemonBot, "ComponentStatus");
             textBox_fusion_application_status.DataBindings.Add("Text", BotManager.Instance.fusionDaemonBot, "FusionStatus");
         }
@@ -185,8 +249,10 @@ namespace ControlPanel
                 Invoke(new Action(BindFusionStatusBotToUI));
                 return;
             }
-            textBox_fusion_application_status.DataBindings.Clear();
+            textBox_fusion_fps.DataBindings.Clear();
+            textBox_broadcastTab_fusion_application_status.DataBindings.Clear();
             textBox_fusion_fps.DataBindings.Add("Text", BotManager.Instance.fusionStatusBot, "FPS");
+            textBox_broadcastTab_fusion_application_status.DataBindings.Add("Text", BotManager.Instance.fusionStatusBot.componentStatus, "Status");
         }
 
         internal void UpdateStatusText(string message)
@@ -328,6 +394,10 @@ namespace ControlPanel
             textBox_render_application_status.Refresh();
             textBox_render_daemon_status.Refresh();
             button_start_session.Refresh();
+            textBox_broadcastTab_render_application_status.Refresh();
+            textBox_broadcastTab_fusion_application_status.Refresh();
+            textBox_fusion_fps.Refresh();
+            textBox_render_fps.Refresh();
         }
         public void RefreshVersionUI()
         {
@@ -757,6 +827,36 @@ namespace ControlPanel
             button_start_calibration.Enabled = false;
             button_start_calibration.Text = "Software Starting...";
             UpdateCalibrationStatusTextbox("New calibration start button clicked.  Starting K4ARecorder on the cameras.");
+        }
+        private List<ConfigItem> LoadConfigItems()
+        {
+            var configItems = new List<ConfigItem>();
+            var config = SettingsManager.Instance.config;
+
+            foreach (var section in config)
+            {
+                // Add a row for the section header
+                configItems.Add(new ConfigItem
+                {
+                    Section = section.Name,
+                    Setting = string.Empty,
+                    Value = string.Empty
+                });
+
+                // Add rows for each setting in the section
+                foreach (var setting in section)
+                {
+                    configItems.Add(new ConfigItem
+                    {
+                        Section = string.Empty,
+                        Setting = setting.Name,
+                        Value = setting.StringValue
+                    });
+                }
+            }
+
+            return configItems;
+
         }
     }
 

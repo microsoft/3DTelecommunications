@@ -41,13 +41,13 @@ namespace ControlPanel
             textBox11 = new TextBox();
             textBox13 = new TextBox();
             textBox14 = new TextBox();
-            textBox16 = new TextBox();
+            textBox_broadcastTab_render_application_status = new TextBox();
             textBox_render_fps = new TextBox();
             tableLayoutPanel_fusion_application_status = new TableLayoutPanel();
             textBox1 = new TextBox();
             textBox3 = new TextBox();
             textBox4 = new TextBox();
-            textBox6 = new TextBox();
+            textBox_broadcastTab_fusion_application_status = new TextBox();
             textBox_fusion_fps = new TextBox();
             panel1 = new Panel();
             button_start_session = new Button();
@@ -92,6 +92,7 @@ namespace ControlPanel
             tabControl_main_menu = new TabControl();
             tabPage_main = new TabPage();
             tabPage_config = new TabPage();
+            dataGridView_config = new DataGridView();
             tabPage_debug = new TabPage();
             tabPage_updates = new TabPage();
             dataGridView_software_version_list = new DataGridView();
@@ -120,6 +121,8 @@ namespace ControlPanel
             tableLayoutPanel_application_panel.SuspendLayout();
             tabControl_main_menu.SuspendLayout();
             tabPage_main.SuspendLayout();
+            tabPage_config.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridView_config).BeginInit();
             tabPage_updates.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView_software_version_list).BeginInit();
             SuspendLayout();
@@ -179,7 +182,7 @@ namespace ControlPanel
             tableLayoutPanel_render_application_status.Controls.Add(textBox11, 0, 0);
             tableLayoutPanel_render_application_status.Controls.Add(textBox13, 0, 1);
             tableLayoutPanel_render_application_status.Controls.Add(textBox14, 0, 2);
-            tableLayoutPanel_render_application_status.Controls.Add(textBox16, 1, 1);
+            tableLayoutPanel_render_application_status.Controls.Add(textBox_broadcastTab_render_application_status, 1, 1);
             tableLayoutPanel_render_application_status.Controls.Add(textBox_render_fps, 1, 2);
             tableLayoutPanel_render_application_status.Location = new Point(1148, 130);
             tableLayoutPanel_render_application_status.Margin = new Padding(2);
@@ -221,15 +224,15 @@ namespace ControlPanel
             textBox14.TabIndex = 11;
             textBox14.Text = "FPS";
             // 
-            // textBox16
+            // textBox_broadcastTab_render_application_status
             // 
-            textBox16.Dock = DockStyle.Fill;
-            textBox16.Font = new Font("Segoe UI", 10F);
-            textBox16.Location = new Point(163, 35);
-            textBox16.Margin = new Padding(2);
-            textBox16.Name = "textBox16";
-            textBox16.Size = new Size(488, 25);
-            textBox16.TabIndex = 13;
+            textBox_broadcastTab_render_application_status.Dock = DockStyle.Fill;
+            textBox_broadcastTab_render_application_status.Font = new Font("Segoe UI", 10F);
+            textBox_broadcastTab_render_application_status.Location = new Point(163, 35);
+            textBox_broadcastTab_render_application_status.Margin = new Padding(2);
+            textBox_broadcastTab_render_application_status.Name = "textBox_broadcastTab_render_application_status";
+            textBox_broadcastTab_render_application_status.Size = new Size(488, 25);
+            textBox_broadcastTab_render_application_status.TabIndex = 13;
             // 
             // textBox_render_fps
             // 
@@ -250,7 +253,7 @@ namespace ControlPanel
             tableLayoutPanel_fusion_application_status.Controls.Add(textBox1, 0, 0);
             tableLayoutPanel_fusion_application_status.Controls.Add(textBox3, 0, 1);
             tableLayoutPanel_fusion_application_status.Controls.Add(textBox4, 0, 2);
-            tableLayoutPanel_fusion_application_status.Controls.Add(textBox6, 1, 1);
+            tableLayoutPanel_fusion_application_status.Controls.Add(textBox_broadcastTab_fusion_application_status, 1, 1);
             tableLayoutPanel_fusion_application_status.Controls.Add(textBox_fusion_fps, 1, 2);
             tableLayoutPanel_fusion_application_status.Location = new Point(1148, 2);
             tableLayoutPanel_fusion_application_status.Margin = new Padding(2);
@@ -292,15 +295,15 @@ namespace ControlPanel
             textBox4.TabIndex = 10;
             textBox4.Text = "FPS";
             // 
-            // textBox6
+            // textBox_broadcastTab_fusion_application_status
             // 
-            textBox6.Dock = DockStyle.Fill;
-            textBox6.Font = new Font("Segoe UI", 10F);
-            textBox6.Location = new Point(163, 35);
-            textBox6.Margin = new Padding(2);
-            textBox6.Name = "textBox6";
-            textBox6.Size = new Size(488, 25);
-            textBox6.TabIndex = 12;
+            textBox_broadcastTab_fusion_application_status.Dock = DockStyle.Fill;
+            textBox_broadcastTab_fusion_application_status.Font = new Font("Segoe UI", 10F);
+            textBox_broadcastTab_fusion_application_status.Location = new Point(163, 35);
+            textBox_broadcastTab_fusion_application_status.Margin = new Padding(2);
+            textBox_broadcastTab_fusion_application_status.Name = "textBox_broadcastTab_fusion_application_status";
+            textBox_broadcastTab_fusion_application_status.Size = new Size(488, 25);
+            textBox_broadcastTab_fusion_application_status.TabIndex = 12;
             // 
             // textBox_fusion_fps
             // 
@@ -851,6 +854,7 @@ namespace ControlPanel
             // 
             // tabPage_config
             // 
+            tabPage_config.Controls.Add(dataGridView_config);
             tabPage_config.Location = new Point(4, 24);
             tabPage_config.Margin = new Padding(2);
             tabPage_config.Name = "tabPage_config";
@@ -858,6 +862,15 @@ namespace ControlPanel
             tabPage_config.TabIndex = 2;
             tabPage_config.Text = "Config";
             tabPage_config.UseVisualStyleBackColor = true;
+            // 
+            // dataGridView_config
+            // 
+            dataGridView_config.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView_config.Dock = DockStyle.Fill;
+            dataGridView_config.Location = new Point(0, 0);
+            dataGridView_config.Name = "dataGridView_config";
+            dataGridView_config.Size = new Size(1596, 579);
+            dataGridView_config.TabIndex = 0;
             // 
             // tabPage_debug
             // 
@@ -937,6 +950,8 @@ namespace ControlPanel
             tableLayoutPanel_application_panel.ResumeLayout(false);
             tabControl_main_menu.ResumeLayout(false);
             tabPage_main.ResumeLayout(false);
+            tabPage_config.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dataGridView_config).EndInit();
             tabPage_updates.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridView_software_version_list).EndInit();
             ResumeLayout(false);
@@ -991,12 +1006,12 @@ namespace ControlPanel
         private TextBox textBox11;
         private TextBox textBox13;
         private TextBox textBox14;
-        private TextBox textBox16;
+        private TextBox textBox_broadcastTab_render_application_status;
         private TableLayoutPanel tableLayoutPanel_fusion_application_status;
         private TextBox textBox1;
         private TextBox textBox3;
         private TextBox textBox4;
-        private TextBox textBox6;
+        private TextBox textBox_broadcastTab_fusion_application_status;
         private TabPage tabPage_updates;
         private DataGridView dataGridView_software_version_list;
         private TableLayoutPanel tableLayoutPanel1;
@@ -1006,5 +1021,6 @@ namespace ControlPanel
         private TextBox textBox_calibration_software_status_title;
         private DataGridView dataGridView_calibration_camera_status;
         private TextBox textBox_calibration_software_status;
+        private DataGridView dataGridView_config;
     }
 }
