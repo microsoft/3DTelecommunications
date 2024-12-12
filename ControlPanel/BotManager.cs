@@ -15,6 +15,7 @@ using System.ComponentModel;
 using System.Collections.Concurrent;
 using NetMQ;
 using NLog;
+using Newtonsoft.Json;
 
 namespace ControlPanel
 {
@@ -33,6 +34,8 @@ namespace ControlPanel
         private bool runDaemonStatusThread = true;
         private bool runBroadcastThread = true;
 
+        public bool CalibrationComplete { get; private set; } = false;
+        public List<VersionContent> versionContentList => instance.versionMap.Values.ToList();
         public static void Init(ControlPanel controlPanel)
         {
             if (BotManager.instance == null)
@@ -64,12 +67,16 @@ namespace ControlPanel
         // Start is called before the first frame update
         public void Start()
         {
+            LoadVersionInformationFromDisk();
             instance.InitializePublisherAndStart();
             instance.CreateDaemonMonitorsBasedOnConfig();
             CheckBotManagerReady(SOFTWARE.CAPTURE);
             instance.CreateStatusBotsBasedOnConfig();
+            instance.CreateCalibrationSoftwareStatusBot();
             mainThreadCallbacks = new ConcurrentQueue<BotManagerCallback>();
-            LoadVersionInformationFromDisk();
+            Tuple<bool, DAEMON_GROUP_STATE> botReadyStatus = CheckBotManagerReady(SOFTWARE.CAPTURE);
+
+
         }
 
         // Update is called once per frame
@@ -143,7 +150,7 @@ namespace ControlPanel
         public long lastDaemonCheckTime = 0;
         const long cDaemonStatusCheckInterval = 5; // in seconds, how often we reissue a status check on daemons for app status
                                                    //daemon status checks suceess and failure callbacks
-        // this facilitates many UnityEngine related calls that need to be executed on the main thread. so we queue these up to be run in Update()
+                                                   // this facilitates many UnityEngine related calls that need to be executed on the main thread. so we queue these up to be run in Update()
         public ConcurrentQueue<BotManagerCallback> mainThreadCallbacks;
 
         public StatusBot[] depthGenStatusBots { get; private set; }
@@ -169,64 +176,17 @@ namespace ControlPanel
             private string currentVersionText = "";
             private string newVersionText = "";
 
-            // should only be called in an Update function!!!
-            //public void UpdateUIElements()
-            //{
-            //    Button updateButton = gameObject.GetComponentInChildren<Button>();
-            //    Text buttonText = updateButton.GetComponentInChildren<Text>();
-            //    Text[] goTexts = gameObject.GetComponentsInChildren<Text>();
-            //    if (newButtonText != "")
-            //    {
-            //        OutputHelper.OutputLog($"Updating button text for {unitName} to {newButtonText}");
-            //        buttonText.text = newButtonText;
-            //        newButtonText = "";
-            //    }
-            //    if (buttonText.text != currentButtonText)
-            //    {
-            //        currentButtonText = buttonText.text;
-            //    }
-            //    if (buttonEnable != updateButton.enabled)
-            //    {
-            //        if (buttonEnable)
-            //        {
-            //            OutputHelper.OutputLog($"Enabling update button for {unitName}", OutputHelper.Verbosity.Debug);
-            //        }
-            //        else
-            //        {
-            //            OutputHelper.OutputLog($"Disabling update button for {unitName}", OutputHelper.Verbosity.Debug);
-            //        }
-            //        updateButton.enabled = buttonEnable;
-            //    }
-            //    if (newVersionText != currentVersionText)
-            //    {
-            //        OutputHelper.OutputLog($"Updating version text for {unitName} to {newVersionText}", OutputHelper.Verbosity.Debug);
-            //        currentVersionText = newVersionText;
-            //        goTexts[0].text = $"{unitName}: {currentVersionText}";
-            //    }
-
-            //}
-
-            public string GetUpdateButtonText()
-            {
-                return currentButtonText;
-            }
-            public void SetUpdateButtonText(string text)
-            {
-                newButtonText = text;
-            }
+            // public string UpdateButtonText { get { return currentButtonText; } set { newButtonText = value; } }
+            public string? UpdateButtonText { get; set; }
             public void EnableUpdateButton(bool enable)
             {
                 buttonEnable = enable;
             }
 
-            public string GetVersionStringText()
-            {
-                return currentVersionText;
-            }
-            public void SetVersionStringText(string text)
-            {
-                newVersionText = text;
-            }
+            //public string VersionStringText { get { return currentVersionText; } set { newVersionText = value; } }
+            public string? Version => versionData.Description;
+
+            public string? OnlineVersion { get; set; }
 
         }
         public ConcurrentDictionary<string, VersionContent> versionMap = new ConcurrentDictionary<string, VersionContent>();
@@ -312,7 +272,7 @@ namespace ControlPanel
             {
                 OutputHelper.OutputLog($"Could not download an update for {programName} because the entry [Updates][{programName + "SoftwareUrl"}] does not exist", OutputHelper.Verbosity.Error);
                 versionContent.EnableUpdateButton(false);
-                versionContent.SetUpdateButtonText($" Error ");
+                versionContent.UpdateButtonText = $" Error ";
                 return;
             }
             var softwareFile = Path.GetTempFileName();
@@ -340,12 +300,12 @@ namespace ControlPanel
         private void Client_DownloadProgressChanged(DownloadProgressChangedEventArgs e, VersionContent vc)
         {
             vc.EnableUpdateButton(false);
-            vc.SetUpdateButtonText($" {e.ProgressPercentage}% ");
+            vc.UpdateButtonText = $" {e.ProgressPercentage}% ";
         }
         private void Client_DownloadFileCompleted(AsyncCompletedEventArgs e, VersionContent vc, string filename)
         {
             vc.EnableUpdateButton(false);
-            vc.SetUpdateButtonText($" Installing... ");
+            vc.UpdateButtonText = $" Installing... ";
 
             // Read the file into memory
             byte[] binary = File.ReadAllBytes(filename);
@@ -457,6 +417,7 @@ namespace ControlPanel
 
                 StatusBot currBot = depthGenDaemonBots[i];
                 int currBotID = i;
+                SetVersionDataFromMap(currBot);
 
                 //currBot.componentStatusContainer.onTimedOutCallback_permanent += () =>
                 //{
@@ -895,11 +856,11 @@ namespace ControlPanel
                 bgcapGroupState == DAEMON_GROUP_STATE.NOT_RUNNING)
             {
 
-                if ((!allDaemonBotsReadyToBeLaunched_Capture && !allDaemonBotsReadyToBeLaunched_Calib && !allDaemonBotsReadyToBeLaunched_BGCap) || hasErrors)
+                if ((!allDaemonBotsReadyToBeLaunched_Capture || !allDaemonBotsReadyToBeLaunched_Calib || !allDaemonBotsReadyToBeLaunched_BGCap) || hasErrors)
                 {
                     //not ready to launch a new session
                     OutputHelper.OutputLog("UpdateDaemonBotsReadyStatus: " + BotManager.Instance.GetDaemonNotReadyText(requestType), OutputHelper.Verbosity.Debug);
-                    controlPanel.DisableStartSessionButton();
+                    controlPanel.DisableButtons();
                     //DialogManager.Instance.UpdateMessage(GetDaemonNotReadyText(requestType), DialogManager.Instance.WarningMessage);
                 }
                 else
@@ -907,11 +868,7 @@ namespace ControlPanel
                     OutputHelper.OutputLog($"All Daemons ready: [Capture:{captureGroupState}][Calib:{calibGroupState}][BG:{bgcapGroupState}]", OutputHelper.Verbosity.Debug);
                     if (allDaemonBotsReadyToBeLaunched_Capture && allDaemonBotsReadyToBeLaunched_BGCap && allDaemonBotsReadyToBeLaunched_Calib)
                     {
-                        controlPanel.EnableStartSessionButton();
-                    }
-                    else 
-                    {
-                        controlPanel.DisableStartSessionButton();
+                        controlPanel.EnableButtons();
                     }
                     //DialogManager.Instance.UpdateMessage($"All Daemons ready: [Capture:{captureGroupState}][Calib:{calibGroupState}][BG:{bgcapGroupState}]", DialogManager.Instance.NormalMessage);
                 }
@@ -1078,7 +1035,7 @@ namespace ControlPanel
                     FPS = 0,
                     FrameNum = 0,
                     ErrState = CPC_ERROR.NONE,
-                    Status = Status.Stopped,    
+                    Status = Status.Stopped,
                     IP = hostNameOrIP,
                     Subscribe = true,
                     //   CanLaunch = canLaunch // NOT used in this setup
@@ -1114,6 +1071,7 @@ namespace ControlPanel
 
         public bool CreateCalibrationSoftwareStatusBot()
         {
+            CalibrationComplete = false;
             if (calibrationSoftwareStatusBot != null)
             {
                 calibrationSoftwareStatusBot.Stop();
@@ -1134,7 +1092,7 @@ namespace ControlPanel
                 FPS = 0,
                 FrameNum = 0,
                 ErrState = CPC_ERROR.NONE,
-                Status = Status.Stopped,    
+                Status = Status.Stopped,
                 //If a specific IP address is not set for the CalibrationSoftware machine, it is usually located in the same machine as Fusion
                 IP = SettingsManager.Instance.GetValueWithDefault("Network", "CalibrationSoftwareIPAddress", fusionIPaddress, true),
                 Subscribe = true,
@@ -1145,13 +1103,91 @@ namespace ControlPanel
             {
                 UpdateVersionData(calibrationSoftwareStatusBot, update);
             });
+            calibrationSoftwareStatusBot.RegisterUpdateFunction(CPC_STATUS.CALIBRATION_SOFTWARE_PROCESSING,
+                delegate (byte[] update)
+                {
+                    CalibrationComplete = false;
+                    // Rebroadcast so every other subscriber knows it is processing
+                    BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CALIBRATION_SOFTWARE_PROCESSING, update);
+                    if (update.Length > cUpdateOffset)
+                    {
+                        String progress_msg = System.Text.Encoding.UTF8.GetString(update, cUpdateOffset, update.Length - cUpdateOffset);
+                        controlPanel.UpdateCalibrationStatusTextbox(progress_msg);
+                    }
+                    OutputHelper.OutputLog($"Forwarding a calibration software processing event.", OutputHelper.Verbosity.Debug);
+                });
+            calibrationSoftwareStatusBot.RegisterUpdateFunction(CPC_STATUS.CALIBRATION_SOFTWARE_RESULT,
+                delegate (byte[] update)
+                {
+                    OutputHelper.OutputLog("CalibrationSoftware provided result");
+                    Newtonsoft.Json.Linq.JObject json = new Newtonsoft.Json.Linq.JObject();
+
+                    int calibJsonLength = 0;
+                    bool success = false;
+                    // Upon success, we expect the size of the calibration Json file to be returned. However, such size may
+                    // also be 0 if an error occurred and we need to take care of that case.
+                    if (update.Length >= cUpdateOffset + sizeof(int))
+                    {
+                        calibJsonLength = BitConverter.ToInt32(update, cUpdateOffset);
+
+                        OutputHelper.OutputLog($"CalibrationSoftware Json payload size {calibJsonLength}");
+
+                        if (calibJsonLength > 0)
+                        {
+                            // Creating payload array for calibration Json
+                            byte[] jsonPacketBytes = new byte[calibJsonLength + sizeof(int)];
+
+
+                            // Copying Json ([length][Json data]) from update into the new payload array. The idea is to remove the
+                            // first "cUpdateOffset" bytes from "update", since they represent the CPC_STATUS.CALIBRATION_SOFTWARE_RESULT status
+                            Buffer.BlockCopy(BitConverter.GetBytes(calibJsonLength), 0, jsonPacketBytes, 0, sizeof(int));
+                            Buffer.BlockCopy(update, cUpdateOffset + sizeof(int), jsonPacketBytes, sizeof(int), calibJsonLength);
+
+                            // Decoding Json
+                            CameraCalibrationHelper.BytePacketToJSON(update, out json);
+
+                            //Re-broadcasting the calibration software result to Fusion, Render, and the PODs with sanitized Json payload
+                            BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CALIBRATION_SOFTWARE_RESULT, jsonPacketBytes);
+                            success = true;
+                        }
+                    }
+
+                    // Calibration failed and we should let the user know and stop calibration
+                    if (!success)
+                    {
+                        OutputHelper.OutputLog($"Error: CalibrationSoftware failed! Calibration Json with length 0 returned after processing.", OutputHelper.Verbosity.Debug);
+                        controlPanel.UpdateCalibrationStatusTextbox("Calibration Failed.  Please re-try calibration.");
+
+                        // Returning empty Json string to indicate a failed calibration to Fusion, Render, and the PODs
+                        BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CALIBRATION_SOFTWARE_RESULT, new byte[0]);
+
+                        // Shut down the session if we failed.
+                        controlPanel.StopCalibration();
+                    }
+                    else
+                    {
+                        float ReprojectionError = json["calibrationSession"]["metrics"]["ReprojectionError"].ToObject<float>();
+                        float DepthError = json["calibrationSession"]["metrics"]["DepthError"].ToObject<float>();
+                        float MultiViewMisalignment = json["calibrationSession"]["metrics"]["MultiViewMisalignment"].ToObject<float>();
+                        String metric_msg = $"Successful Calibration. Reprojection error {ReprojectionError:F3} pixels. Depth error {DepthError:F3}mm. MultiViewMisalignment {MultiViewMisalignment:F3}mm";
+                        if (MultiViewMisalignment > 2.0)
+                        {
+                            metric_msg = $"Calibration succeeded, but the MultiViewMisalignment is greater than 2.0.  Quality of the output may be degraded with this calibration.  You may way to recalibrate. Reprojection error {ReprojectionError:F3} pixels. Depth error {DepthError:F3}mm. MultiViewMisalignment {MultiViewMisalignment:F3}mm";
+                        }
+
+                        controlPanel.UpdateCalibrationStatusTextbox(metric_msg);
+                        OutputHelper.OutputLog(metric_msg);
+                        OutputHelper.OutputLog($"Distributing 3DTM calibration files");
+
+                        controlPanel.UpdateCalibrationStatusTextbox("Distributing 3DTM calibration files");
+                    }
+                    CalibrationComplete = true;  // This will let the control panel thread move to the next stage
+                });
 
             SetVersionDataFromMap(calibrationSoftwareStatusBot);
 
-            //CreateVersionTextObject(calibrationSoftwareStatusBot.UnitName, calibrationSoftwareStatusBot.GetVersionData(), calibrationSoftwareStatusBot.componentStatusContainer);
-
+            calibrationSoftwareStatusBot.Start();
             return true;
-
         }
 
         /// <summary>
@@ -1163,7 +1199,7 @@ namespace ControlPanel
             CreateDepthStatusBots();
 
             //Fusion
-            if(fusionStatusBot != null)
+            if (fusionStatusBot != null)
             {
                 fusionStatusBot.Stop();
             }
@@ -1193,7 +1229,7 @@ namespace ControlPanel
 
             //CreateVersionTextObject(fusionStatusBot.UnitName, fusionStatusBot.GetVersionData(), fusionStatusBot.componentStatusContainer);
             //Renderer
-            if(renderStatusBot != null)
+            if (renderStatusBot != null)
             {
                 renderStatusBot.Stop();
             }
@@ -1441,7 +1477,7 @@ namespace ControlPanel
             while (stillCleaning)
             {
                 stillCleaning = AreMachinesStillCleaning(false, true);
-                
+
                 yield return WaitForSecondsAsync(0.2);
             }
 
@@ -1507,13 +1543,13 @@ namespace ControlPanel
             BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, dataArray);
         }
 
-        public void BroadcastStopUntilAllDGStop(SOFTWARE startType)
+        public void BroadcastStopUntilAllDGStop(SOFTWARE softwareToStop)
         {
             StopBroadcastThread();
             broadcastThread = new Thread(() =>
             {
                 OutputHelper.OutputLog("Broadcast stop thread is starting");
-                int runningDGBots = GetBotsWithCaptureRunning() + GetBotsSendingFPS();
+                int runningDGBots = GetBotsWithSoftwareRunning(softwareToStop) + GetBotsSendingFPS();
                 OutputHelper.OutputLog($"Broadcast stop Thread started.  Running DGs: {runningDGBots}/{depthGenStatusBots.Length}");
                 byte[] dataArray =
                 [
@@ -1525,7 +1561,7 @@ namespace ControlPanel
                     BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_STOP_REQUESTED, dataArray);
                     OutputHelper.OutputLog(String.Format("Broadcasting {0} for DGs: {1}/{2}", CONTROL_PANEL_EVENT.CONTROL_PANEL_STOP_REQUESTED, runningDGBots, BotManager.Instance.depthGenStatusBots.Length), OutputHelper.Verbosity.Warning);
                     Thread.Sleep(3000);
-                    runningDGBots = GetBotsWithCaptureRunning();
+                    runningDGBots = GetBotsWithSoftwareRunning(softwareToStop);
                 }
             }
             );
@@ -1556,16 +1592,27 @@ namespace ControlPanel
             runBroadcastThread = true;
             broadcastThread.Start();
         }
-        public void BroadcastSoftwareStartUntilAllDGStart()
+        public void BroadcastSoftwareStartUntilAllDGStart(SOFTWARE softwareToStart, byte[] eventData = null)
         {
             StopBroadcastThread();
             broadcastThread = new Thread(() =>
             {
+                byte[] dataArray = null;
                 OutputHelper.OutputLog("Broadcast thread is starting");
-                byte[] dataArray = new byte[1];
-                // Copying startType into dataArray
-                dataArray[0] = (byte)SOFTWARE.CAPTURE;
-                int runningDGBots = GetBotsWithCaptureRunning();
+                if (softwareToStart != SOFTWARE.SYSTEM_START)
+                {
+                    if (eventData != null)
+                    {
+                        dataArray = new byte[eventData.Length + 1];
+                        dataArray[0] = (byte)softwareToStart;
+                        eventData.CopyTo(dataArray, 1);
+                    }
+                    else
+                    {
+                        dataArray = new byte[1] { (byte)softwareToStart };
+                    }
+                }
+                int runningDGBots = GetBotsWithSoftwareRunning(softwareToStart);
                 OutputHelper.OutputLog($"Broadcast Thread started.  Running DGs: {runningDGBots}/{depthGenStatusBots.Length}");
                 while (runBroadcastThread && runningDGBots < depthGenStatusBots.Length)
                 {
@@ -1573,15 +1620,15 @@ namespace ControlPanel
                     OutputHelper.OutputLog(String.Format("Broadcasting {0}-{1} for DGs: {2}/{3}", CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, SOFTWARE.CAPTURE,
                         runningDGBots, BotManager.Instance.depthGenStatusBots.Length), OutputHelper.Verbosity.Warning);
                     Thread.Sleep(3000);
-                    runningDGBots = GetBotsWithCaptureRunning();
-                } 
+                    runningDGBots = GetBotsWithSoftwareRunning(softwareToStart);
+                }
             }
             );
             runBroadcastThread = true;
             broadcastThread.Start();
         }
 
-        public int GetBotsWithCaptureRunning()
+        public int GetBotsWithSoftwareRunning(SOFTWARE softwareToCheck)
         {
             // Iterate over the depthGenStatusBots and count how many have componentStatus.Status == Status.Running
             int runningDGBots = 0;
@@ -1592,14 +1639,15 @@ namespace ControlPanel
                     if (depthGenStatusBots[i].componentStatus.Status == Status.Ready)
                     {
                         // do a double check to make sure the daemon says the actual process is still running, it could have crashed
-                        if (depthGenDaemonBots[i].softwareStates[(int)SOFTWARE.CAPTURE] == SOFTWARE_STATE.RUNNING)
+                        if (depthGenDaemonBots[i].softwareStates[(int)softwareToCheck] == SOFTWARE_STATE.RUNNING)
                         {
                             runningDGBots++;
                         }
                         else
                         {
-                            OutputHelper.OutputLog($"The status bot for {depthGenStatusBots[i].UnitName} says it is running, but AKLD does not see an active process!", OutputHelper.Verbosity.Error);
-                        }    
+                            //OutputHelper.OutputLog($"The status bot for {depthGenStatusBots[i].UnitName} says it is running, but AKLD does not see an active process!", OutputHelper.Verbosity.Error);
+                            // Most likely means the status bot has been started, but the software isn't started up yet, just wait
+                        }
                     }
                 }
             }
@@ -1675,11 +1723,11 @@ namespace ControlPanel
             DaemonPublisher?.Stop();
             runDaemonStatusThread = false;
             runBroadcastThread = false;
-            if(resetDaemonStatusThread != null && resetDaemonStatusThread.ThreadState != ThreadState.Unstarted)
+            if (resetDaemonStatusThread != null && resetDaemonStatusThread.ThreadState != ThreadState.Unstarted)
             {
                 resetDaemonStatusThread.Join();
-            }   
-            if(broadcastThread != null && broadcastThread.ThreadState != ThreadState.Unstarted)
+            }
+            if (broadcastThread != null && broadcastThread.ThreadState != ThreadState.Unstarted)
             {
                 broadcastThread.Join();
             }
@@ -1801,7 +1849,7 @@ namespace ControlPanel
             if (versionMap.ContainsKey(unitName))
             {
                 VersionContent vc = versionMap[unitName];
-                vc.SetUpdateButtonText(text);
+                vc.UpdateButtonText = text;
                 vc.EnableUpdateButton(enable);
             }
         }
@@ -1818,7 +1866,7 @@ namespace ControlPanel
                 vc.versionData = currBot.VersionData;
                 versionMap[currBot.UnitName] = vc;
                 // Update the UI text box if it's been created
-                vc.SetVersionStringText(vc.versionData.Description);
+                vc.UpdateButtonText = "";
             }
             else
             {
@@ -1826,9 +1874,12 @@ namespace ControlPanel
                 vc.unitName = currBot.UnitName;
                 vc.versionData = currBot.VersionData;
                 versionMap.TryAdd(currBot.UnitName, vc);
+                vc.UpdateButtonText = "";
 
                 OutputHelper.OutputLog($"{currBot.UnitName} not found in the version map.  Creating entry", OutputHelper.Verbosity.Trace);
             }
+
+            controlPanel.RefreshVersionUI();
         }
         public void SaveVersionInformationToDisk()
         {
@@ -1871,8 +1922,17 @@ namespace ControlPanel
                         vd.Description = "Unknown Version";
                         vc.versionData = vd;
                     }
-
-                    //CreateVersionTextObject(vc.unitName, vc.versionData);
+                    vc.UpdateButtonText = "";
+                    if (versionMap.ContainsKey(vc.unitName))
+                    {
+                        // game object is null, attach
+                        VersionContent thisVC = versionMap[vc.unitName];
+                        versionMap[vc.unitName] = thisVC;
+                    }
+                    else
+                    {
+                        versionMap.TryAdd(vc.unitName, vc);
+                    }
                 }
                 OutputHelper.OutputLog($"Read version data from {path}", OutputHelper.Verbosity.Info);
             }
@@ -1895,6 +1955,54 @@ namespace ControlPanel
                 for (int i = 0; i < depthGenStatusBots.Length; ++i)
                 {
                     if (depthGenStatusBots[i].componentStatus.FPS > 0)
+                    {
+                        runningDGBots++;
+                    }
+                }
+            }
+            return runningDGBots;
+        }
+
+        internal int GetBotsRecordingVideo()
+        {
+            int runningDGBots = 0;
+            if (depthGenStatusBots != null)
+            {
+                for (int i = 0; i < depthGenStatusBots.Length; ++i)
+                {
+                    if (depthGenStatusBots[i].componentStatus.VideoRecordingStarted)
+                    {
+                        runningDGBots++;
+                    }
+                }
+            }
+            return runningDGBots;
+        }
+
+        internal int GetBotsWithVideoTransferRunning()
+        {
+            int runningDGBots = 0;
+            if (depthGenStatusBots != null)
+            {
+                for (int i = 0; i < depthGenStatusBots.Length; ++i)
+                {
+                    if (depthGenStatusBots[i].componentStatus.VideoTransferStarted && depthGenStatusBots[i].componentStatus.VideoTransferFinished)
+                    {
+                        runningDGBots++;
+                    }
+                }
+            }
+            return runningDGBots;
+        }
+
+        internal int GetBotsWithVideoTransferComplete()
+        {
+            int runningDGBots = 0;
+            if (depthGenStatusBots != null)
+            {
+                for (int i = 0; i < depthGenStatusBots.Length; ++i)
+                {
+                    if (depthGenStatusBots[i].componentStatus.VideoTransferFinished)
                     {
                         runningDGBots++;
                     }

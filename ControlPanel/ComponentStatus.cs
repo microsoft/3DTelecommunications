@@ -21,7 +21,10 @@ namespace ControlPanel
         private double _temperature;
         private Status _status;
         private bool _newDataReceived;
-
+        private bool _videoRecordingStarted;
+        private bool _videoTransferStarted;
+        private bool _videoTransferFinished;
+        private int _frameNum;
         public int ID { get; set; }
         public string Name { get; set; }
         public string IP { get; set; }        
@@ -42,7 +45,15 @@ namespace ControlPanel
         public double FPS_min { get; set; }
         public double FPS_max { get; set; }
         public CPC_ERROR ErrState { get; set; }
-        public int FrameNum { get; set; }
+        public int FrameNum 
+        { 
+            get => _frameNum; 
+            set 
+            { 
+                _frameNum = value; 
+                OnPropertyChanged(nameof(FrameNum)); 
+            } 
+        }
         public bool NewDataReceived 
         { 
             get => _newDataReceived;
@@ -81,11 +92,48 @@ namespace ControlPanel
             }
         }
 
+        public bool VideoRecordingStarted
+        {
+            get => _videoRecordingStarted;
+            set
+            {
+                if (_videoRecordingStarted != value)
+                {
+                    _videoRecordingStarted = value;
+                    OnPropertyChanged(nameof(VideoRecordingStarted));
+                }
+            }
+        }
+        public bool VideoTransferStarted
+        {
+            get => _videoTransferStarted;
+            set
+            {
+                if (_videoTransferStarted != value)
+                {
+                    _videoTransferStarted = value;
+                    OnPropertyChanged(nameof(VideoTransferStarted));
+                }
+            }
+        }
+        public bool VideoTransferFinished
+        {
+            get => _videoTransferFinished;
+            set
+            {
+                if (_videoTransferFinished != value)
+                {
+                    _videoTransferFinished = value;
+                    OnPropertyChanged(nameof(VideoTransferFinished));
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
