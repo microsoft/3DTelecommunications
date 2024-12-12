@@ -33,6 +33,8 @@ namespace ControlPanel
     public delegate void StatusResponseDelegate(byte[] update);
     public class StatusBot : SocketBot, INotifyPropertyChanged
     {
+        private System.Threading.Timer _updateTimer;
+        private bool _updatePending;
         private SOFTWARE_STATE[] _softwareStates;
         
         public SOFTWARE_STATE[] softwareStates { get => _softwareStates; protected set
@@ -66,9 +68,11 @@ namespace ControlPanel
         public string ComponentStatus => componentStatus.Status.ToString();
         public string CameraName => "Camera " + (DepthGenID + 1).ToString();
 
+        public string Frames => componentStatus.FrameNum.ToString();
+
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void OnPropertyChanged(string propertyName)
+        public void OnPropertyChanged(string propertyName)
         {
             if(_controlPanel.InvokeRequired)
             {
@@ -77,6 +81,16 @@ namespace ControlPanel
             else
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                if (!_updatePending)
+                {
+                    if (propertyName == "FusionStatus" || propertyName == "RenderStatus")
+                    {
+                        //_controlPanel.Refresh();
+                    }
+                    _updatePending = true;
+                    _updateTimer.Change(100, Timeout.Infinite);
+                    //_controlPanel.Refresh();
+                }
             }
         }
 
@@ -93,7 +107,7 @@ namespace ControlPanel
         protected bool heartBeatRunning;
         private Thread HeartbeatThread;
 
-        private Dictionary<CPC_STATUS, StatusResponseDelegate> statusResponseTable;
+        private Dictionary<CPC_STATUS, StatusResponseDelegate[]> statusResponseTable;
 
         private string receivedLogDestinationPath = Path.GetTempPath();
 
@@ -112,10 +126,11 @@ namespace ControlPanel
             this._controlPanel = controlPanel;
             this.DepthGenID = -1;
             this.depthGenMachineID = -1;
+            _updateTimer = new System.Threading.Timer(UpdateUI, null, Timeout.Infinite, Timeout.Infinite);
             ResetHBTime();
             ResetKnownStatus();
 
-            statusResponseTable = new Dictionary<CPC_STATUS, StatusResponseDelegate>();
+            statusResponseTable = new Dictionary<CPC_STATUS, StatusResponseDelegate[]>();
 
             if(overrideTCPPort.Length > 0)
             {
@@ -125,8 +140,21 @@ namespace ControlPanel
             {
                 StatusEPGMPort = overrideEPGMPORT;
             }
+
         }
 
+        private void UpdateUI(object state)
+        {
+            if (_controlPanel.InvokeRequired)
+            {
+                _controlPanel.Invoke(new Action(() => UpdateUI(state)));
+                return;
+            }
+
+            // Perform the UI update
+            _controlPanel.Refresh();
+            _updatePending = false;
+        }
         // create a destructor
         ~StatusBot()
         {
@@ -202,7 +230,7 @@ namespace ControlPanel
                     controlPanelEventPoller.RunAsync();
                 }
             }
-
+            componentStatus.Status = Status.Ready;
         }
 
         public override void Stop()
@@ -238,6 +266,18 @@ namespace ControlPanel
             for (int i = 0; i < (int)SOFTWARE.COUNT; i++)
             {
                 softwareStates[i] = SOFTWARE_STATE.UNKNOWN;
+            }
+            if (componentStatus != null)
+            {
+                componentStatus.FPS = 0.0;
+                componentStatus.FPS_max = 0.0;
+                componentStatus.FPS_min = 0.0;
+                componentStatus.FrameNum = 0;
+                componentStatus.NewDataReceived = false;
+                componentStatus.Temperature = 0.0;
+                componentStatus.VideoRecordingStarted = false;
+                componentStatus.VideoTransferFinished = false;
+                componentStatus.VideoTransferStarted = false;
             }
         }
         public void SetLogCollectionPath(string path)
@@ -277,12 +317,16 @@ namespace ControlPanel
             if (statusResponseTable.ContainsKey(eventType))
             {
                 OutputHelper.OutputLog($"{UnitName} is registering an ADDITIONAL response for {eventType.ToString()}", OutputHelper.Verbosity.Trace);
-                statusResponseTable[eventType] += responseFunction;
+                var existingFunctions = statusResponseTable[eventType];
+                var newFunctions = new StatusResponseDelegate[existingFunctions.Length + 1];
+                Array.Copy(existingFunctions, newFunctions, existingFunctions.Length);
+                newFunctions[existingFunctions.Length] = responseFunction;
+                statusResponseTable[eventType] = newFunctions;
             }
             else
             {
                 OutputHelper.OutputLog($"{UnitName} is registering a NEW response for {eventType.ToString()}", OutputHelper.Verbosity.Trace);
-                statusResponseTable.Add(eventType, responseFunction);
+                statusResponseTable.Add(eventType, [responseFunction]);
             }
         }
 
@@ -337,12 +381,13 @@ namespace ControlPanel
                 if (timeSinceLastHB > TimeSpan.FromSeconds(MAX_HB_TIMEOUT_SEC))
                 {
                     OutputHelper.OutputLog(String.Format("Havent heard from {0} in > {1} sec. Resetting known state...", this.UnitName, MAX_HB_TIMEOUT_SEC));
-                    componentStatus.Status = Status.TimedOut;
-                    OnPropertyChanged(nameof(ComponentStatus));
+                    baseStatusBotStoppedFunction(new byte[0]);
                 }
                 else if (timeSinceLastHB > TimeSpan.FromSeconds(WRN_HB_TIMEOUT_SEC))
                 {
                     OutputHelper.OutputLog(String.Format("Havent heard from {0} in {1} sec", this.UnitName, timeSinceLastHB.TotalSeconds));
+                    componentStatus.Status = Status.TimedOut;
+                    OnPropertyChanged(nameof(ComponentStatus));
                 }
             }
         }
@@ -351,6 +396,8 @@ namespace ControlPanel
         public void UpdateTimeLastHBReceived()
         {
             LastHBReceived = DateTime.UtcNow;
+            componentStatus.Status = Status.Running;
+            OnPropertyChanged(nameof(ComponentStatus));
         }
 
         // Inside the StatusBot class, replace the method UpdateSoftwareState with the following:
@@ -420,104 +467,136 @@ namespace ControlPanel
         {
             // Clear the table (prevents adding the same calls twice if this is called more than once)
             statusResponseTable.Clear();
-            RegisterUpdateFunction(CPC_STATUS.READY,
-                delegate (byte[] update)
-                {
-                    UpdateTimeLastHBReceived();
-                    componentStatus.Status = Status.Ready;
-                    OnPropertyChanged(ComponentStatus);
-                });
-            RegisterUpdateFunction( CPC_STATUS.BUILD_VERSION,
-                delegate ( byte [] update )
-                {
-                    OutputHelper.OutputLog($"{UnitName} default updater calling only SaveVersionData");
-                    SaveVersionData(update);
-                    OnPropertyChanged(VersionString);
-                });
-
-            RegisterUpdateFunction(CPC_STATUS.RECEIVED_NEW_DATA, 
-                delegate (byte[] update)
-            {
-                OutputHelper.OutputLog($"{UnitName} received valid calibration data.");
-                componentStatus.NewDataReceived = true;
-                OnPropertyChanged(ComponentStatus);
-            });
-
-            RegisterUpdateFunction( CPC_STATUS.RUNNING,
-               delegate (byte[] update)
-               {
-                   componentStatus.Status = Status.Running;
-                   OnPropertyChanged(ComponentStatus);
-                   heartBeatRunning = true;
-               });
-
-            RegisterUpdateFunction(CPC_STATUS.STOPPED,
-               delegate (byte[] update)
-               {
-                   componentStatus.Status = Status.Stopped;
-                   if (setupFPS)//don't update if we dont have fpsSETUp
-                   {
-                       componentStatus.FPS = 0.0f;
-                       componentStatus.Temperature = 0.0f;
-                   }
-                   OnPropertyChanged(ComponentStatus);
-                   heartBeatRunning = false; // no need to detect heartbeat if we know it stopped correctly
-               });
-            RegisterUpdateFunction(CPC_STATUS.IS_ALIVE, (byte[] update) =>
-            {
-                OutputHelper.OutputLog($"{UnitName} Daemon isAlive. (Base Update Function)", OutputHelper.Verbosity.Trace);
-                UpdateTimeLastHBReceived();
-            });
-           
+            RegisterUpdateFunction(CPC_STATUS.READY, baseStatusBotReadyFunction);
+            RegisterUpdateFunction(CPC_STATUS.BUILD_VERSION, baseStatusBotBuildVersionFunction);
+            RegisterUpdateFunction(CPC_STATUS.RECEIVED_NEW_DATA, baseStatusBotReceivedNewDataFunction);
+            RegisterUpdateFunction(CPC_STATUS.RUNNING, baseStatusBotRunningFunction);
+            RegisterUpdateFunction(CPC_STATUS.STOPPED, baseStatusBotStoppedFunction);
+            RegisterUpdateFunction(CPC_STATUS.IS_ALIVE, baseStatusBotIsAliveFunction);
+            RegisterUpdateFunction(CPC_STATUS.CALIBRATION_SOFTWARE_CAPTURING_VIDEO_STARTED, baseStatusBotCalibrationSoftwareCapturingVideoStartedFunction);
+            RegisterUpdateFunction(CPC_STATUS.CALIBRATION_SOFTWARE_TRANSFERRING_VIDEO, baseStatusBotCalibrationSoftwareTransferringVideoFunction);
+            RegisterUpdateFunction(CPC_STATUS.CALIBRATION_SOFTWARE_VIDEO_TRANSFER_DONE, baseStatusBotCalibrationSoftwareVideoTransferDoneFunction);
             //FPS related 
             if (setupFPS)
             {
-                RegisterUpdateFunction(CPC_STATUS.FPS,
-                delegate (byte[] update)
-                {
-                    UpdateTimeLastHBReceived();
-                  
-                    if(update.Length < sizeof(double)+sizeof(byte))
-                    {
-                        int expectedSize = sizeof(double)+sizeof(byte);
-                        OutputHelper.OutputLog($"FPS packetsize ({expectedSize} expected): " + update.Length);
-                        return;
-                    }
-                    double fps = BitConverter.ToDouble(update, sizeof(byte));
-                    double temperature = 0.0;
-                    if (update.Length > sizeof(double)+sizeof(byte))
-                    {
-                        temperature = BitConverter.ToDouble(update, sizeof(byte) + sizeof(double));
-                    }
-                    if(fps > componentStatus.FPS_max)
-                    {
-                        componentStatus.FPS_max = fps;
-                    }
-                    if(fps < componentStatus.FPS_min)
-                    {
-                        componentStatus.FPS_min = fps;
-                    }
-                    OutputHelper.OutputLog($"Got FPS Packet for {UnitName}. FPS: {fps} Temperature: {temperature}");
-                    //this.Form.OutputLog("Fusion FPS: " + fps.ToString());
-                    componentStatus.FPS = fps;
-                    componentStatus.Temperature = temperature;
-                    componentStatus.Status = Status.Running;
-                    heartBeatRunning = true;
-
-                    // Determining if the number of acquired frames was also sent as payload.
-                    // This typically occurs during video-based calibration and allows the user
-                    // to easily determining when video recording started.
-                    if(update.Length >= 1+sizeof(double)+sizeof(int))
-                    {
-                        int frameNumber = (int)System.BitConverter.ToInt32(update, 1+sizeof(double));
-                        componentStatus.FrameNum = frameNumber;
-                    }
-                    OnPropertyChanged(nameof(FPS));
-                    OnPropertyChanged(nameof(Temp));
-                    OnPropertyChanged(nameof(ComponentStatus));
-                    // Don't update status here, FPS status is just used for sending data back to the control panel
-                });
+                RegisterUpdateFunction(CPC_STATUS.FPS, baseStatusBotFPSFunction);
             }                 
+        }
+
+        private void baseStatusBotCalibrationSoftwareVideoTransferDoneFunction(byte[] update)
+        {
+            componentStatus.VideoTransferStarted = false;
+            componentStatus.VideoTransferFinished = true;
+            OnPropertyChanged(nameof(ComponentStatus));
+        }
+
+        private void baseStatusBotCalibrationSoftwareTransferringVideoFunction(byte[] update)
+        {
+            componentStatus.VideoRecordingStarted = false;
+            componentStatus.VideoTransferStarted = true;
+            componentStatus.VideoTransferFinished = false;
+            OnPropertyChanged(nameof(ComponentStatus));
+        }
+
+        private void baseStatusBotCalibrationSoftwareCapturingVideoStartedFunction(byte[] update)
+        {
+            componentStatus.VideoRecordingStarted = true;
+            componentStatus.VideoTransferStarted = false;
+            componentStatus.VideoTransferFinished = false;
+            OnPropertyChanged(nameof(ComponentStatus));
+        }
+
+        private void baseStatusBotIsAliveFunction(byte[] update)
+        {
+            OutputHelper.OutputLog($"{UnitName} Daemon isAlive. (Base Update Function)", OutputHelper.Verbosity.Trace);
+            UpdateTimeLastHBReceived();
+            componentStatus.Status = Status.Running;
+            OnPropertyChanged(nameof(ComponentStatus));
+        }
+
+        private void baseStatusBotReadyFunction(byte[] update)
+        {
+            UpdateTimeLastHBReceived();
+            componentStatus.Status = Status.Ready;
+            OnPropertyChanged(nameof(ComponentStatus));
+        }
+
+        private void baseStatusBotBuildVersionFunction(byte[] update)
+        {
+            OutputHelper.OutputLog($"{UnitName} default updater calling only SaveVersionData");
+            SaveVersionData(update);
+            OnPropertyChanged(nameof(VersionString));
+        }
+
+        private void baseStatusBotReceivedNewDataFunction(byte[] update)
+        {
+            OutputHelper.OutputLog($"{UnitName} received valid calibration data.");
+            componentStatus.NewDataReceived = true;
+            OnPropertyChanged(nameof(ComponentStatus));
+        }
+
+        private void baseStatusBotStoppedFunction(byte[] update)
+        {
+            ResetKnownStatus();
+            componentStatus.VideoRecordingStarted = false;
+            componentStatus.Status = Status.Stopped;
+            OnPropertyChanged(nameof(ComponentStatus));
+            heartBeatRunning = false; // no need to detect heartbeat if we know it stopped correctly
+        }
+
+        private void baseStatusBotFPSFunction(byte[] update)
+        {
+            UpdateTimeLastHBReceived();
+
+            if (update.Length < sizeof(double) + sizeof(byte))
+            {
+                int expectedSize = sizeof(double) + sizeof(byte);
+                OutputHelper.OutputLog($"FPS packetsize ({expectedSize} expected): " + update.Length);
+                return;
+            }
+            if (update.Length > sizeof(double))
+            {
+                double fps = BitConverter.ToDouble(update, sizeof(byte));
+                if (fps > componentStatus.FPS_max)
+                {
+                    componentStatus.FPS_max = fps;
+                }
+                if (fps < componentStatus.FPS_min)
+                {
+                    componentStatus.FPS_min = fps;
+                }
+                //this.Form.OutputLog("Fusion FPS: " + fps.ToString());
+                componentStatus.FPS = fps;
+
+                if (update.Length > sizeof(double) * 2)
+                {
+                    double temperature = 0.0;
+                    temperature = BitConverter.ToDouble(update, sizeof(byte) + sizeof(double));
+                    componentStatus.Temperature = temperature;
+                }
+                // Determining if the number of acquired frames was also sent as payload.
+                // This typically occurs during video-based calibration and allows the user
+                // to easily determining when video recording started.
+                if (update.Length > sizeof(double) + sizeof(int))
+                {
+                    int frameNumber = (int)System.BitConverter.ToInt32(update, 1 + sizeof(double));
+                    componentStatus.FrameNum = frameNumber;
+                    componentStatus.VideoRecordingStarted = true;
+                }
+            }
+            componentStatus.Status = Status.Running;
+            heartBeatRunning = true;
+            OnPropertyChanged(nameof(FPS));
+            OnPropertyChanged(nameof(Temp));
+            OnPropertyChanged(nameof(ComponentStatus));
+            // Don't update status here, FPS status is just used for sending data back to the control panel
+        }
+
+        public void baseStatusBotRunningFunction(byte[] update)
+        {
+            componentStatus.Status = Status.Running;
+            OnPropertyChanged(nameof(ComponentStatus));
+            heartBeatRunning = true;
         }
 
         public void SaveVersionData(byte[] update)
@@ -550,7 +629,10 @@ namespace ControlPanel
                         OutputHelper.OutputLog($"{UnitName} got a status update.  Type {StatusType.ToString()}: packet size: {update.Length}", OutputHelper.Verbosity.Trace);
                         if (statusResponseTable.ContainsKey(StatusType))
                         {
-                            statusResponseTable[StatusType](update);
+                            for(int i = 0; i < statusResponseTable[StatusType].Length; i++)
+                            {
+                                statusResponseTable[StatusType][i](update);
+                            }
                         }
                         else
                         {
