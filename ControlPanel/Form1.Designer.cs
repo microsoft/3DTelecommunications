@@ -94,7 +94,17 @@ namespace ControlPanel
             tabPage_config = new TabPage();
             dataGridView_config = new DataGridView();
             tabPage_debug = new TabPage();
+            tableLayoutPanel2 = new TableLayoutPanel();
+            tableLayoutPanel4 = new TableLayoutPanel();
+            button_debug_RequestVersions = new Button();
+            button_debug_CollectLogs = new Button();
+            button_debug_TransmitConfig = new Button();
+            button_debug_StopRender = new Button();
+            button_debug_StartRender = new Button();
+            button_debug_StopFusion = new Button();
+            button_debug_StartFusion = new Button();
             tabPage_updates = new TabPage();
+            tableLayoutPanel6 = new TableLayoutPanel();
             dataGridView_software_version_list = new DataGridView();
             tabControl_application_selection.SuspendLayout();
             tabPage_broadcast.SuspendLayout();
@@ -123,7 +133,11 @@ namespace ControlPanel
             tabPage_main.SuspendLayout();
             tabPage_config.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView_config).BeginInit();
+            tabPage_debug.SuspendLayout();
+            tableLayoutPanel2.SuspendLayout();
+            tableLayoutPanel4.SuspendLayout();
             tabPage_updates.SuspendLayout();
+            tableLayoutPanel6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView_software_version_list).BeginInit();
             SuspendLayout();
             // 
@@ -874,6 +888,7 @@ namespace ControlPanel
             // 
             // tabPage_debug
             // 
+            tabPage_debug.Controls.Add(tableLayoutPanel2);
             tabPage_debug.Location = new Point(4, 24);
             tabPage_debug.Margin = new Padding(2);
             tabPage_debug.Name = "tabPage_debug";
@@ -883,9 +898,126 @@ namespace ControlPanel
             tabPage_debug.Text = "Debug";
             tabPage_debug.UseVisualStyleBackColor = true;
             // 
+            // tableLayoutPanel2
+            // 
+            tableLayoutPanel2.ColumnCount = 2;
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel2.Controls.Add(tableLayoutPanel4, 0, 0);
+            tableLayoutPanel2.Dock = DockStyle.Fill;
+            tableLayoutPanel2.Location = new Point(2, 2);
+            tableLayoutPanel2.Name = "tableLayoutPanel2";
+            tableLayoutPanel2.RowCount = 2;
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel2.Size = new Size(1592, 575);
+            tableLayoutPanel2.TabIndex = 0;
+            // 
+            // tableLayoutPanel4
+            // 
+            tableLayoutPanel4.ColumnCount = 2;
+            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle());
+            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle());
+            tableLayoutPanel4.Controls.Add(button_debug_RequestVersions, 1, 1);
+            tableLayoutPanel4.Controls.Add(button_debug_CollectLogs, 1, 0);
+            tableLayoutPanel4.Controls.Add(button_debug_TransmitConfig, 0, 4);
+            tableLayoutPanel4.Controls.Add(button_debug_StopRender, 0, 3);
+            tableLayoutPanel4.Controls.Add(button_debug_StartRender, 0, 2);
+            tableLayoutPanel4.Controls.Add(button_debug_StopFusion, 0, 1);
+            tableLayoutPanel4.Controls.Add(button_debug_StartFusion, 0, 0);
+            tableLayoutPanel4.Dock = DockStyle.Fill;
+            tableLayoutPanel4.Location = new Point(3, 3);
+            tableLayoutPanel4.Name = "tableLayoutPanel4";
+            tableLayoutPanel4.RowCount = 6;
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6666679F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6666679F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6666679F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6666679F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6666679F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6666679F));
+            tableLayoutPanel4.Size = new Size(790, 281);
+            tableLayoutPanel4.TabIndex = 0;
+            // 
+            // button_debug_RequestVersions
+            // 
+            button_debug_RequestVersions.Font = new Font("Segoe UI", 14F);
+            button_debug_RequestVersions.Location = new Point(177, 49);
+            button_debug_RequestVersions.Name = "button_debug_RequestVersions";
+            button_debug_RequestVersions.Size = new Size(168, 40);
+            button_debug_RequestVersions.TabIndex = 6;
+            button_debug_RequestVersions.Text = "Request Versions";
+            button_debug_RequestVersions.UseVisualStyleBackColor = true;
+            button_debug_RequestVersions.Click += button_debug_RequestVersions_Click;
+            // 
+            // button_debug_CollectLogs
+            // 
+            button_debug_CollectLogs.Font = new Font("Segoe UI", 14F);
+            button_debug_CollectLogs.Location = new Point(177, 3);
+            button_debug_CollectLogs.Name = "button_debug_CollectLogs";
+            button_debug_CollectLogs.Size = new Size(168, 40);
+            button_debug_CollectLogs.TabIndex = 5;
+            button_debug_CollectLogs.Text = "Collect Logs";
+            button_debug_CollectLogs.UseVisualStyleBackColor = true;
+            button_debug_CollectLogs.Click += button_debug_CollectLogs_Click;
+            // 
+            // button_debug_TransmitConfig
+            // 
+            button_debug_TransmitConfig.Font = new Font("Segoe UI", 14F);
+            button_debug_TransmitConfig.Location = new Point(3, 187);
+            button_debug_TransmitConfig.Name = "button_debug_TransmitConfig";
+            button_debug_TransmitConfig.Size = new Size(168, 40);
+            button_debug_TransmitConfig.TabIndex = 4;
+            button_debug_TransmitConfig.Text = "Transmit Config";
+            button_debug_TransmitConfig.UseVisualStyleBackColor = true;
+            button_debug_TransmitConfig.Click += button_debug_TransmitConfig_Click;
+            // 
+            // button_debug_StopRender
+            // 
+            button_debug_StopRender.Font = new Font("Segoe UI", 14F);
+            button_debug_StopRender.Location = new Point(3, 141);
+            button_debug_StopRender.Name = "button_debug_StopRender";
+            button_debug_StopRender.Size = new Size(168, 40);
+            button_debug_StopRender.TabIndex = 3;
+            button_debug_StopRender.Text = "Stop Render";
+            button_debug_StopRender.UseVisualStyleBackColor = true;
+            button_debug_StopRender.Click += button_debug_StopRender_Click;
+            // 
+            // button_debug_StartRender
+            // 
+            button_debug_StartRender.Font = new Font("Segoe UI", 14F);
+            button_debug_StartRender.Location = new Point(3, 95);
+            button_debug_StartRender.Name = "button_debug_StartRender";
+            button_debug_StartRender.Size = new Size(168, 40);
+            button_debug_StartRender.TabIndex = 2;
+            button_debug_StartRender.Text = "Start Render";
+            button_debug_StartRender.UseVisualStyleBackColor = true;
+            button_debug_StartRender.Click += button_debug_StartRender_Click;
+            // 
+            // button_debug_StopFusion
+            // 
+            button_debug_StopFusion.Font = new Font("Segoe UI", 14F);
+            button_debug_StopFusion.Location = new Point(3, 49);
+            button_debug_StopFusion.Name = "button_debug_StopFusion";
+            button_debug_StopFusion.Size = new Size(168, 40);
+            button_debug_StopFusion.TabIndex = 1;
+            button_debug_StopFusion.Text = "Stop Fusion";
+            button_debug_StopFusion.UseVisualStyleBackColor = true;
+            button_debug_StopFusion.Click += button_debug_StopFusion_Click;
+            // 
+            // button_debug_StartFusion
+            // 
+            button_debug_StartFusion.Font = new Font("Segoe UI", 14F);
+            button_debug_StartFusion.Location = new Point(3, 3);
+            button_debug_StartFusion.Name = "button_debug_StartFusion";
+            button_debug_StartFusion.Size = new Size(168, 40);
+            button_debug_StartFusion.TabIndex = 0;
+            button_debug_StartFusion.Text = "Start Fusion";
+            button_debug_StartFusion.UseVisualStyleBackColor = true;
+            button_debug_StartFusion.Click += button_debug_StartFusion_Click;
+            // 
             // tabPage_updates
             // 
-            tabPage_updates.Controls.Add(dataGridView_software_version_list);
+            tabPage_updates.Controls.Add(tableLayoutPanel6);
             tabPage_updates.Location = new Point(4, 24);
             tabPage_updates.Margin = new Padding(2);
             tabPage_updates.Name = "tabPage_updates";
@@ -894,15 +1026,29 @@ namespace ControlPanel
             tabPage_updates.Text = "Updates";
             tabPage_updates.UseVisualStyleBackColor = true;
             // 
+            // tableLayoutPanel6
+            // 
+            tableLayoutPanel6.ColumnCount = 2;
+            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle());
+            tableLayoutPanel6.Controls.Add(dataGridView_software_version_list, 0, 0);
+            tableLayoutPanel6.Dock = DockStyle.Fill;
+            tableLayoutPanel6.Location = new Point(0, 0);
+            tableLayoutPanel6.Name = "tableLayoutPanel6";
+            tableLayoutPanel6.RowCount = 1;
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel6.Size = new Size(1596, 579);
+            tableLayoutPanel6.TabIndex = 1;
+            // 
             // dataGridView_software_version_list
             // 
             dataGridView_software_version_list.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView_software_version_list.Dock = DockStyle.Fill;
-            dataGridView_software_version_list.Location = new Point(0, 0);
+            dataGridView_software_version_list.Location = new Point(2, 2);
             dataGridView_software_version_list.Margin = new Padding(2);
             dataGridView_software_version_list.Name = "dataGridView_software_version_list";
             dataGridView_software_version_list.RowHeadersWidth = 62;
-            dataGridView_software_version_list.Size = new Size(1596, 579);
+            dataGridView_software_version_list.Size = new Size(1592, 575);
             dataGridView_software_version_list.TabIndex = 0;
             // 
             // ControlPanel
@@ -952,7 +1098,11 @@ namespace ControlPanel
             tabPage_main.ResumeLayout(false);
             tabPage_config.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridView_config).EndInit();
+            tabPage_debug.ResumeLayout(false);
+            tableLayoutPanel2.ResumeLayout(false);
+            tableLayoutPanel4.ResumeLayout(false);
             tabPage_updates.ResumeLayout(false);
+            tableLayoutPanel6.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridView_software_version_list).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -1022,5 +1172,15 @@ namespace ControlPanel
         private DataGridView dataGridView_calibration_camera_status;
         private TextBox textBox_calibration_software_status;
         private DataGridView dataGridView_config;
+        private TableLayoutPanel tableLayoutPanel2;
+        private TableLayoutPanel tableLayoutPanel4;
+        private Button button_debug_TransmitConfig;
+        private Button button_debug_StopRender;
+        private Button button_debug_StartRender;
+        private Button button_debug_StopFusion;
+        private Button button_debug_StartFusion;
+        private Button button_debug_CollectLogs;
+        private Button button_debug_RequestVersions;
+        private TableLayoutPanel tableLayoutPanel6;
     }
 }

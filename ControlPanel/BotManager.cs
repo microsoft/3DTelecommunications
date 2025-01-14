@@ -1511,6 +1511,7 @@ namespace ControlPanel
                 InitializePublisherAndStart();
             }
             DaemonPublisher.PublishEvent(eventType);
+            OutputHelper.OutputLog(String.Format("Broadcast Once {0}", eventType), OutputHelper.Verbosity.Debug);
         }
 
         public void BroadcastEventOnce(CONTROL_PANEL_EVENT eventType, byte[] eventData)
@@ -1559,11 +1560,17 @@ namespace ControlPanel
                     // Coying startType into dataArray
                     //(byte)startType,
                 ];
+                int loopCounter = 0;
                 while (runBroadcastThread && runningDGBots > 0)
                 {
-                    BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_STOP_REQUESTED, dataArray);
-                    OutputHelper.OutputLog(String.Format("Broadcasting {0} for DGs: {1}/{2}", CONTROL_PANEL_EVENT.CONTROL_PANEL_STOP_REQUESTED, runningDGBots, BotManager.Instance.depthGenStatusBots.Length), OutputHelper.Verbosity.Warning);
-                    Thread.Sleep(3000);
+                    // Only re-broadcast every 3 seconds, but check every 300ms so the UI is more responsive
+                    if (loopCounter == 0)
+                    {
+                        BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_STOP_REQUESTED, dataArray);
+                        OutputHelper.OutputLog(String.Format("BroadcastingUntilAllStop {0} for DGs: {1}/{2}", CONTROL_PANEL_EVENT.CONTROL_PANEL_STOP_REQUESTED, runningDGBots, BotManager.Instance.depthGenStatusBots.Length), OutputHelper.Verbosity.Warning);
+                    }
+                    Thread.Sleep(300);
+                    loopCounter = loopCounter == 10 ? 0 : loopCounter++;
                     runningDGBots = GetBotsWithSoftwareRunning(softwareToStop);
                 }
             }
@@ -1582,12 +1589,17 @@ namespace ControlPanel
                 dataArray[0] = (byte)SOFTWARE.CAPTURE;
                 int runningDGBots = GetBotsSendingFPS();
                 OutputHelper.OutputLog($"Broadcast Thread started.  Running DGs: {runningDGBots}/{depthGenStatusBots.Length}");
+                int loopCounter = 0;
                 while (runBroadcastThread && runningDGBots < depthGenStatusBots.Length)
                 {
-                    BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, new byte[0]);
-                    OutputHelper.OutputLog(String.Format("Broadcasting {0}-{1} for DGs: {2}/{3}", CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, SOFTWARE.SYSTEM_START,
-                        runningDGBots, BotManager.Instance.depthGenStatusBots.Length), OutputHelper.Verbosity.Warning);
-                    Thread.Sleep(3000);
+                    if (loopCounter == 0)
+                    {
+                        BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, new byte[0]);
+                        OutputHelper.OutputLog(String.Format("BroadcastingUntilAllStart {0}-{1} for DGs: {2}/{3}", CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, SOFTWARE.SYSTEM_START,
+                            runningDGBots, BotManager.Instance.depthGenStatusBots.Length), OutputHelper.Verbosity.Warning);
+                    }
+                    Thread.Sleep(300);
+                    loopCounter = loopCounter == 10 ? 0 : loopCounter++;
                     runningDGBots = GetBotsSendingFPS();
                 }
             }
@@ -1617,12 +1629,17 @@ namespace ControlPanel
                 }
                 int runningDGBots = GetBotsWithSoftwareRunning(softwareToStart);
                 OutputHelper.OutputLog($"Broadcast Thread started.  Running DGs: {runningDGBots}/{depthGenStatusBots.Length}");
+                int loopCounter = 0;
                 while (runBroadcastThread && runningDGBots < depthGenStatusBots.Length)
                 {
-                    BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, dataArray);
-                    OutputHelper.OutputLog(String.Format("Broadcasting {0}-{1} for DGs: {2}/{3}", CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, SOFTWARE.CAPTURE,
-                        runningDGBots, BotManager.Instance.depthGenStatusBots.Length), OutputHelper.Verbosity.Warning);
-                    Thread.Sleep(3000);
+                    if (loopCounter == 0)
+                    {
+                        BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, dataArray);
+                        OutputHelper.OutputLog(String.Format("BroadcastingUntilAllStart {0}-{1} for DGs: {2}/{3}", CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, SOFTWARE.CAPTURE,
+                            runningDGBots, BotManager.Instance.depthGenStatusBots.Length), OutputHelper.Verbosity.Warning);
+                    }
+                    Thread.Sleep(300);
+                    loopCounter = loopCounter == 10 ? 0 : loopCounter++;
                     runningDGBots = GetBotsWithSoftwareRunning(softwareToStart);
                 }
             }

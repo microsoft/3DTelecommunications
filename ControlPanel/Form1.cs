@@ -5,6 +5,8 @@ using NLog;
 using PeabodyNetworkingLibrary;
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Net;
+using System.Text;
 using static ControlPanel.BotManager;
 
 namespace ControlPanel
@@ -16,6 +18,8 @@ namespace ControlPanel
         bool CalibrationSessionRunning = false;
         Thread SessionStartupThread;
         private TimeSpan BotResponseTimeout = TimeSpan.FromSeconds(10);
+        private List<BotManager.VersionContent> versionContentsToCheck;
+
         public ControlPanel()
         {
             // Required to get NetMQ to work correctly
@@ -35,6 +39,7 @@ namespace ControlPanel
             {
                 return;
             }
+            SetStartButtonClosing();
             _isClosing = true;
             // Make sure we close everything else first
             e.Cancel = true;
@@ -46,6 +51,7 @@ namespace ControlPanel
             // Now finish closing
             this.Close();
         }
+
 
         private void ControlPanel_Loaded(object? sender, EventArgs e)
         {
@@ -167,6 +173,7 @@ namespace ControlPanel
                 HeaderText = "Update"
             });
             // Refresh the DataGridView
+            
             dataGridView_software_version_list.Refresh();
         }
 
@@ -381,7 +388,7 @@ namespace ControlPanel
                 return;
             }
             dataGridView_broadcast_camera_daemons.Refresh();
-            if(tabControl_application_selection.SelectedTab == tabPage_calibration)
+            if (tabControl_application_selection.SelectedTab == tabPage_calibration)
             {
                 dataGridView_calibration_camera_status.Refresh();
             }
@@ -505,8 +512,12 @@ namespace ControlPanel
                 });
                 SessionStartupThread.Start();
             }
-            else
+            else // any other case, send a stop session request
             {
+                if (button_start_session.Text == "Stop Session")
+                {
+                    button_start_session.Text = "Stopping...";
+                }
                 TelemedSessionRunning = false;
                 BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_STOP_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.RENDER));
                 BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_STOP_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.FUSION));
@@ -524,13 +535,21 @@ namespace ControlPanel
             if (!TelemedSessionRunning && !CalibrationSessionRunning)
             {
                 button_start_session.BackColor = Color.LightGreen;
-                button_start_session.Enabled = true;
                 button_start_session.Text = "Start Session";
 
                 button_start_calibration.BackColor = Color.LightGreen;
                 button_start_calibration.Enabled = true;
                 button_start_calibration.Text = "Start Calibration";
             }
+        }
+        private void SetStartButtonClosing()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(SetStartButtonClosing));
+                return;
+            }
+            button_start_session.Text = "Closing...";
         }
 
         internal void StartingStartSessionButton()
@@ -541,7 +560,6 @@ namespace ControlPanel
                 return;
             }
             button_start_session.BackColor = Color.Yellow;
-            button_start_session.Enabled = false;
             button_start_session.Text = "Starting";
         }
         internal void DisableButtons()
@@ -554,11 +572,10 @@ namespace ControlPanel
             if (TelemedSessionRunning || !BotManager.Instance.AllDaemonBotsReadyToBeLaunched_Capture)
             {
                 button_start_session.BackColor = Color.Red;
-                button_start_session.Enabled = true;
                 button_start_session.Text = "Stop Session";
             }
-            if ( (CalibrationSessionRunning && button_start_calibration.Text == "Start Calibration")  //add any other button states where we might want "cancel" to be available
-                || (!CalibrationSessionRunning && !BotManager.Instance.AllDaemonBotsReadyToBeLaunched_Calib) )
+            if ((CalibrationSessionRunning && button_start_calibration.Text == "Start Calibration")  //add any other button states where we might want "cancel" to be available
+                || (!CalibrationSessionRunning && !BotManager.Instance.AllDaemonBotsReadyToBeLaunched_Calib))
             {
                 button_start_calibration.BackColor = Color.Red;
                 button_start_calibration.Enabled = true;
@@ -644,7 +661,7 @@ namespace ControlPanel
                     }
                     OutputHelper.OutputLog("All cameras are now recording.");
                     CalibrationStopRecordingButton();
-                    while(CalibrationSessionRunning && BotManager.Instance.GetBotsRecordingVideo() > 0)
+                    while (CalibrationSessionRunning && BotManager.Instance.GetBotsRecordingVideo() > 0)
                     {
                         // I really shouldn't have to do this, but I can't get the UI to update the frame count reliably
                         Refresh();
@@ -661,10 +678,10 @@ namespace ControlPanel
                 SessionStartupThread = new Thread(() =>
                 {
                     int dgNum = SettingsManager.Instance.GetValueWithDefault("DepthGeneration", "DepthCameraCount", 0, true);
-                    while (CalibrationSessionRunning && 
+                    while (CalibrationSessionRunning &&
                         (BotManager.Instance.GetBotsWithSoftwareRunning(SOFTWARE.CALIBRATION) > 0 ||
                         BotManager.Instance.GetBotsWithVideoTransferRunning() > 0 ||
-                        BotManager.Instance.GetBotsWithVideoTransferComplete() < dgNum) )
+                        BotManager.Instance.GetBotsWithVideoTransferComplete() < dgNum))
                     {
                         OutputHelper.OutputLog($"Waiting for all cameras to finish transferring video.  " +
                             $"Bots Running: {BotManager.Instance.GetBotsWithSoftwareRunning(SOFTWARE.CALIBRATION)}/{dgNum} " +
@@ -681,7 +698,7 @@ namespace ControlPanel
                 });
                 SessionStartupThread.Start();
             }
-            else if(button_start_calibration.Text == "Calculate Calibration")
+            else if (button_start_calibration.Text == "Calculate Calibration")
             {
                 CancelCalibrationButton();
                 CalibrationSessionRunning = true;
@@ -858,6 +875,109 @@ namespace ControlPanel
             return configItems;
 
         }
-    }
 
+        private void button_debug_StartFusion_Click(object sender, EventArgs e)
+        {
+            BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.FUSION));
+        }
+
+        private void button_debug_StopFusion_Click(object sender, EventArgs e)
+        {
+            BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_STOP_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.FUSION));
+        }
+
+        private void button_debug_StartRender_Click(object sender, EventArgs e)
+        {
+            BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.RENDER));
+        }
+
+        private void button_debug_StopRender_Click(object sender, EventArgs e)
+        {
+            BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_STOP_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.RENDER));
+        }
+
+        private void button_debug_TransmitConfig_Click(object sender, EventArgs e)
+        {
+            string configurationFileContents = SettingsManager.Instance.config.StringRepresentation;
+            byte[] packet = new byte[configurationFileContents.Length + sizeof(int)];
+            byte[] lengthInBytes = BitConverter.GetBytes(configurationFileContents.Length);
+            Buffer.BlockCopy(lengthInBytes, 0, packet, 0, sizeof(int));
+            Buffer.BlockCopy(Encoding.Default.GetBytes(configurationFileContents), 0, packet, sizeof(int), configurationFileContents.Length);
+            BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.SYSTEM_CONFIGURATION_UPDATE, packet);
+        }
+
+        private void button_debug_CollectLogs_Click(object sender, EventArgs e)
+        {
+            string logCollectionFolderBase = SettingsManager.Instance.GetValueWithDefault("Debug", "LogCollectionFolder", Path.GetTempPath());
+            string logCollectionFolder = "\\" + DateTime.Now.ToString("yyyy-MM-dd_H-mm-ss");
+            // Create a new log collection folder
+            // Check if the log collection folder in the config file exists
+            if (!Directory.Exists(logCollectionFolderBase))
+            {
+                logCollectionFolder = Path.GetTempPath() + logCollectionFolder;
+            }
+            else
+            {
+                logCollectionFolder = logCollectionFolderBase + logCollectionFolder;
+            }
+            OutputHelper.OutputLog($"Requesting logs and collecting in {logCollectionFolder}");
+            try
+            {
+                Directory.CreateDirectory(logCollectionFolder);
+            }
+            catch (Exception ex)
+            {
+                OutputHelper.OutputLog($"Couldn't create the directory {logCollectionFolder}: {ex.Message}.  Aborting log collection.");
+                return;
+            }
+            // Update the bots with the new directory
+            BotManager.Instance.fusionDaemonBot.SetLogCollectionPath(logCollectionFolder);
+            BotManager.Instance.renderDaemonBot.SetLogCollectionPath(logCollectionFolder);
+            foreach (StatusBot bot in BotManager.Instance.depthGenDaemonBots)
+            {
+                bot.SetLogCollectionPath(logCollectionFolder);
+            }
+            // Request logs from everyone
+            BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.LOG_COLLECTION_REQUESTED);
+            // Copy control panel logs there as well
+            Directory.CreateDirectory(logCollectionFolder + "/ControlPanel");
+            string logFilename = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\..\\LocalLow\\" + Application.CompanyName + "\\" + Application.ProductName + "\\Player.log";
+            try
+            {
+                File.Copy(logFilename, logCollectionFolder + "/ControlPanel/Player.log");
+            }
+            catch (FileNotFoundException) { }
+
+            logFilename = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\..\\LocalLow\\" + Application.CompanyName + "\\" + Application.ProductName + "\\Player-prev.log";
+
+            try
+            {
+                File.Copy(logFilename, logCollectionFolder + "/ControlPanel/Player-prev.log");
+            }
+            catch (FileNotFoundException) { }
+
+            // Copy any calibration logs as well
+            string logPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + SettingsManager.Instance.GetValueWithDefault("Calibration", "LogRelativePath", "\\..\\LocalLow\\Microsoft Research\\CalibrationLogs");
+            if (Directory.Exists(logPath))
+            {
+                foreach (string file in Directory.GetFiles(logPath))
+                {
+                    try
+                    {
+                        File.Copy(file, logCollectionFolder + "/" + Path.GetFileName(file));
+                    }
+                    catch (Exception ex)
+                    {
+                        OutputHelper.OutputLog($"Couldn't copy {file} to {logCollectionFolder}/{file}.  Error: {ex.Message}");
+                    }
+                }
+            }
+        }
+
+        private void button_debug_RequestVersions_Click(object sender, EventArgs e)
+        {
+            BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.BUILD_VERSION_REQUESTED);
+        }
+
+    }
 }
