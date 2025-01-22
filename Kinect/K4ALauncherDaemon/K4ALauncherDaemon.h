@@ -27,7 +27,7 @@
 using namespace ControlPanelConnector;
 
 #define SOFTWARE_STATES	3  //how many states are we tracking?
-
+#define TRANSMIT_VOLTAGE_INTERVAL_MSEC 10000
 class K4ALauncherDaemon :
 	public ControlPanelConnector
 {
@@ -42,6 +42,7 @@ public:
 	long EventReceived(CONTROL_PANEL_EVENT eventType, void* eventData = NULL, int dataSize = 0);
 	static void StateMonitor(K4ALauncherDaemon* daemon);
 	static void ApplicationThread(K4ALauncherDaemon* daemon);
+	static void ReadVoltageThread(K4ALauncherDaemon* daemon);
 	void PrintStates();
 	void SetState(int idx, SOFTWARE_STATE state);
 	SOFTWARE_STATE GetState(int idx);
@@ -54,6 +55,7 @@ public:
 	void SetConfig(CConfig* config);
 	void SendLogFile(std::string filename);
 	void SendInstallationResult(SOFTWARE software, bool success, std::string errorMessage);
+	void SendVoltagePacket();
 	void Cleanup(int signal);
 	int Verbosity;
 	std::string serialPortFilename;
@@ -65,6 +67,11 @@ protected:
 	std::mutex stateMutex;
 
 	std::thread applicationThread;
+	std::thread voltageMonitoringThread;
+	std::mutex voltageMutex;
+
+	double voltage;
+	double temp;
 	
 	bool runThread;
 	void PrintState(SOFTWARE_STATE state);
@@ -76,6 +83,6 @@ protected:
 	std::string kinectSerialNumber;
 	void GetKinectSerialNumber();
 	bool calibrationSoftwarePart2Running;
-	bool SetStateIfSerialNumberMatches(void* eventData, int dataSize, std::string stateString);
+	bool SetStateIfSerialNumberMatches(void* eventData, int dataSize, std::string stateString);	
 };
 
