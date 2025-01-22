@@ -400,6 +400,7 @@ namespace ControlPanel
                 depthGenDaemonBots[i].DepthGenMachineID = i;
                 DefaultStatusForwarderSetup(depthGenDaemonBots[i]);
                 depthGenDaemonBots[i].DefaultStatusUpdateSetup(false);
+                depthGenDaemonBots[i].RegisterUpdateFunction(CPC_STATUS.FPS, depthGenDaemonBots[i].daemonStatusBotFPSFunction);
                 SetupSocket(depthGenDaemonBots[i], hostNameOrIP);
 
                 depthGenDaemonBots[i].componentStatus = new ComponentStatus
@@ -407,6 +408,8 @@ namespace ControlPanel
                     ID = i,
                     Name = dgName,
                     FPS = 0,
+                    FPS_max = 0.0,
+                    FPS_min = 100.0,
                     FrameNum = 0,
                     ErrState = CPC_ERROR.NONE,
                     Status = Status.Stopped,

@@ -139,6 +139,7 @@ K4ALauncherDaemon::K4ALauncherDaemon(std::string controlPanelIP,
 	}
 	stateMonitoringThread = std::thread(StateMonitor, this);
 	applicationThread = std::thread(ApplicationThread, this);
+	voltageMonitoringThread = std::thread(ReadVoltageThread, this);
 	Verbosity = 0;
 	calibrationSoftwarePart2Running = false;
 }
@@ -200,6 +201,47 @@ void K4ALauncherDaemon::ApplicationThread(K4ALauncherDaemon* daemon)
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
 	LOGGER()->info("Application thread terminating.");
+}
+
+void K4ALauncherDaemon::ReadVoltageThread(K4ALauncherDaemon* daemon)
+{
+	LOGGER()->info("K4ALauncherDaemon ReadVoltageThread is starting.");
+	while(daemon->runThread)
+	{
+		// Read the voltage from /sys/bus/i2c/drivers/ina3221x/6-0040/iio:device0/in_voltage0_input, this is POM_5V_IN
+		std::ifstream file("/sys/bus/i2c/drivers/ina3221x/6-0040/iio:device0/in_voltage0_input");
+		if (file.is_open())
+		{
+			std::string line;
+			std::getline(file, line);
+			file.close();
+			daemon->voltage = std::stod(line) / 1000.0;
+			LOGGER()->info("Voltage is %f", daemon->voltage);
+		}
+		else
+		{
+			LOGGER()->error("ReadVoltageThread", "Failed to open voltage file");
+		}
+		// Read the temperature from /sys/devices/virtual/thermal/thermal_zone0/temp
+		std::ifstream tempFile("/sys/devices/virtual/thermal/thermal_zone0/temp");
+		if (tempFile.is_open())
+		{
+			std::string line;
+			std::getline(tempFile, line);
+			tempFile.close();
+			daemon->temp = std::stod(line) / 1000.0;
+			LOGGER()->info("Temperature is %f", daemon->temp);
+		}
+		else
+		{
+			LOGGER()->error("ReadVoltageThread", "Failed to open temperature file");
+		}
+		// Send the voltage and temperature to the control panel
+		daemon->SendVoltagePacket();
+		// Sleep for 1 second
+		std::this_thread::sleep_for(std::chrono::milliseconds(TRANSMIT_VOLTAGE_INTERVAL_MSEC));
+	}
+	LOGGER()->info("Voltage monitoring thread terminating.");
 }
 
 void K4ALauncherDaemon::SetConfig(CConfig* new_config)
@@ -348,6 +390,10 @@ K4ALauncherDaemon::~K4ALauncherDaemon()
 	if(applicationThread.joinable())
 	{
 		applicationThread.join();
+	}
+	if(voltageMonitoringThread.joinable())
+	{
+		voltageMonitoringThread.join();
 	}
 }
 
@@ -745,6 +791,17 @@ void K4ALauncherDaemon::SendInstallationResult(SOFTWARE software, bool success, 
 	memcpy(data+index, (char*)&messagelength, sizeof(int)); index += sizeof(int);
 	memcpy(data+index, errorMessage.c_str(), messagelength); index += messagelength;
 	SendStatusUpdate(CPC_STATUS::SOFTWARE_INSTALLATION_RESULT, data, packetSize, Logger::Verbosity::Trace);
+	delete[] data;
+}
+
+void K4ALauncherDaemon::SendVoltagePacket()
+{
+	int index = 0;
+	int packetSize = sizeof(double)*2;
+	char* data = new char[packetSize];
+	memcpy(data+index, (char*)&voltage, sizeof(double)); index += sizeof(double);
+	memcpy(data+index, (char*)&temp, sizeof(double)); index += sizeof(double);
+	SendStatusUpdate(CPC_STATUS::FPS, data, packetSize, Logger::Verbosity::Trace);
 	delete[] data;
 }
 

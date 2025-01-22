@@ -68,6 +68,10 @@ namespace ControlPanel
         public string RenderStatus => softwareStates[(int)SOFTWARE.RENDER].ToString();
         public string VersionString => VersionData.Description;
         public string FPS => componentStatus.FPS.ToString();
+        public string MaxFPS => componentStatus.FPS_max.ToString();
+        public string MinFPS => componentStatus.FPS_min.ToString();
+        public string MinVoltage => componentStatus.Voltage_min.ToString();
+        public string MaxVoltage => componentStatus.Voltage_max.ToString();
         public string Temp => componentStatus.Temperature.ToString();
 
         public string ComponentStatus => componentStatus.Status.ToString();
@@ -97,12 +101,20 @@ namespace ControlPanel
 
         protected const int MAX_HB_TIMEOUT_SEC = 15;
         protected const int WRN_HB_TIMEOUT_SEC = 10;
+        protected const double MAX_HEART_RATE = 2.0;
         public const int C3DTM_KILL_TIMEOUT_SEC = 8;
         protected const int MAX_FRAMES_PER_RECEIVE_CALL = 100;
 
         public int DepthGenID { get; protected set; } // if this is a depth gen bot, we set this to correspond to its index in the array of depth gen bots, threads, and GUI controls
         protected int depthGenMachineID;
         protected DateTime LastHBReceived;
+        public double HeartRate
+        {
+            get
+            {
+                return 1.0 / TimeSinceLastHB().TotalSeconds;
+            }
+        }
 
         protected bool heartBeatRunning;
         private Thread HeartbeatThread;
@@ -271,7 +283,7 @@ namespace ControlPanel
             {
                 componentStatus.FPS = 0.0;
                 componentStatus.FPS_max = 0.0;
-                componentStatus.FPS_min = 0.0;
+                componentStatus.FPS_min = 100.0;
                 componentStatus.FrameNum = 0;
                 componentStatus.NewDataReceived = false;
                 componentStatus.Temperature = 0.0;
@@ -395,14 +407,16 @@ namespace ControlPanel
             }
         }
 
-
         public void UpdateTimeLastHBReceived()
         {
             LastHBReceived = DateTime.UtcNow;
             if(componentStatus.Status != Status.Running)
             {
-                componentStatus.Status = Status.Running;
-                OnPropertyChanged(nameof(ComponentStatus));
+                if(componentStatus.Status != Status.Running)
+                {
+                    componentStatus.Status = Status.Running;
+                    OnPropertyChanged(nameof(ComponentStatus));
+                }
             }
         }
 
@@ -561,8 +575,13 @@ namespace ControlPanel
 
         private void baseStatusBotFPSFunction(byte[] update)
         {
+            if (HeartRate > MAX_HEART_RATE)
+            {
+                //OutputHelper.OutputLog($"Bot {UnitName} is running too fast.  Heart rate: {HeartRate}", OutputHelper.Verbosity.Warning);
+                // Ignore, running too often
+                return;
+            }
             UpdateTimeLastHBReceived();
-
             if (update.Length < sizeof(double) + sizeof(byte))
             {
                 int expectedSize = sizeof(double) + sizeof(byte);
@@ -572,15 +591,6 @@ namespace ControlPanel
             if (update.Length > sizeof(double))
             {
                 double fps = BitConverter.ToDouble(update, sizeof(byte));
-                if (fps > componentStatus.FPS_max)
-                {
-                    componentStatus.FPS_max = fps;
-                }
-                if (fps < componentStatus.FPS_min)
-                {
-                    componentStatus.FPS_min = fps;
-                }
-                //this.Form.OutputLog("Fusion FPS: " + fps.ToString());
                 componentStatus.FPS = fps;
 
                 if (update.Length > sizeof(double) * 2)
@@ -601,8 +611,39 @@ namespace ControlPanel
             }
             heartBeatRunning = true;
             OnPropertyChanged(nameof(FPS));
+            OnPropertyChanged(nameof(MinFPS));
+            OnPropertyChanged(nameof(MaxFPS));
             OnPropertyChanged(nameof(Temp));
             // Don't update status here, FPS status is just used for sending data back to the control panel
+        }
+        // Daemon bots don't actually read FPS, we're piggybacking on the packet
+        // to transmit voltage and temperature from the Nanos
+        public void daemonStatusBotFPSFunction(byte[] update)
+        {
+            UpdateTimeLastHBReceived();
+            if (update.Length < sizeof(double) + sizeof(byte))
+            {
+                int expectedSize = sizeof(double) + sizeof(byte);
+                OutputHelper.OutputLog($"FPS packetsize ({expectedSize} expected): " + update.Length);
+                return;
+            }
+            if (update.Length > sizeof(double))
+            {
+                double voltage = BitConverter.ToDouble(update, sizeof(byte));
+                //this.Form.OutputLog("Fusion FPS: " + fps.ToString());
+                componentStatus.Voltage = voltage;
+
+                if (update.Length > sizeof(double) * 2)
+                {
+                    double temperature = 0.0;
+                    temperature = BitConverter.ToDouble(update, sizeof(byte) + sizeof(double));
+                    componentStatus.Temperature = temperature;
+                    OnPropertyChanged(nameof(Temp));
+                }
+                OnPropertyChanged(nameof(MinVoltage));
+                OnPropertyChanged(nameof(MaxVoltage));
+            }
+            heartBeatRunning = true;
         }
 
         public void baseStatusBotRunningFunction(byte[] update)

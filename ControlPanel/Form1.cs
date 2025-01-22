@@ -52,7 +52,6 @@ namespace ControlPanel
             this.Close();
         }
 
-
         private void ControlPanel_Loaded(object? sender, EventArgs e)
         {
             UpdateStatusText("Initializing Bot Manager...");
@@ -67,7 +66,7 @@ namespace ControlPanel
             BindFusionStatusBotToUI();
             BindRenderStatusBotToUI();
             dataGridView_broadcast_camera_applications.CellFormatting += DataGridView_broadcast_camera_applications_CellFormatting;
-
+            dataGridView_broadcast_camera_daemons.CellFormatting += DataGridView_broadcast_camera_daemons_CellFormatting;
             BindVersionMapToUI();
             BindConfigToUI();
         }
@@ -129,7 +128,6 @@ namespace ControlPanel
             SettingsManager.Instance.SaveConfigToDisk(config);
         }
 
-
         private void BindVersionMapToUI()
         {
             if (InvokeRequired)
@@ -176,7 +174,59 @@ namespace ControlPanel
             
             dataGridView_software_version_list.Refresh();
         }
-
+        private void DataGridView_broadcast_camera_daemons_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (dataGridView_broadcast_camera_daemons.Columns[e.ColumnIndex].HeaderText == "Min Voltage" || dataGridView_broadcast_camera_daemons.Columns[e.ColumnIndex].HeaderText == "Max Voltage")
+            {
+                if (e.Value != null && !string.IsNullOrEmpty(e.Value.ToString()))
+                {
+                    if (double.TryParse(e.Value.ToString(), out double voltage))
+                    {
+                        if (voltage <= 4.5 && voltage != 0)
+                        {
+                            e.CellStyle.BackColor = Color.Yellow;
+                        }
+                        else if (voltage > 4.5)
+                        {
+                            e.CellStyle.BackColor = Color.LightGreen;
+                        }
+                        else
+                        {
+                            e.CellStyle.BackColor = Color.White;
+                        }
+                    }
+                }
+                else
+                {
+                    e.CellStyle.BackColor = Color.White;
+                }
+            }
+            if (dataGridView_broadcast_camera_daemons.Columns[e.ColumnIndex].HeaderText == "Temp")
+            {
+                if (e.Value != null && !string.IsNullOrEmpty(e.Value.ToString()))
+                {
+                    if (double.TryParse(e.Value.ToString(), out double temp))
+                    {
+                        if (temp >= 50)
+                        {
+                            e.CellStyle.BackColor = Color.Yellow;
+                        }
+                        else if (temp < 50 && temp != 0)
+                        {
+                            e.CellStyle.BackColor = Color.LightGreen;
+                        }
+                        else
+                        {
+                            e.CellStyle.BackColor = Color.White;
+                        }
+                    }
+                }
+                else
+                {
+                    e.CellStyle.BackColor = Color.White;
+                }
+            }
+        }
         private void DataGridView_broadcast_camera_applications_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             // Check if the column is the "FPS" column
@@ -209,8 +259,32 @@ namespace ControlPanel
                     e.CellStyle.BackColor = Color.White;
                 }
             }
+            if (dataGridView_broadcast_camera_applications.Columns[e.ColumnIndex].HeaderText == "Temp")
+            {
+                if (e.Value != null && !string.IsNullOrEmpty(e.Value.ToString()))
+                {
+                    if (double.TryParse(e.Value.ToString(), out double temp))
+                    {
+                        if (temp >= 50)
+                        {
+                            e.CellStyle.BackColor = Color.Yellow;
+                        }
+                        else if (temp < 50 && temp != 0)
+                        {
+                            e.CellStyle.BackColor = Color.LightGreen;
+                        }
+                        else
+                        {
+                            e.CellStyle.BackColor = Color.White;
+                        }
+                    }
+                }
+                else
+                {
+                    e.CellStyle.BackColor = Color.White;
+                }
+            }
         }
-
         private void BindRenderDaemonBotToUI()
         {
             if (InvokeRequired)
@@ -324,6 +398,21 @@ namespace ControlPanel
                 DataPropertyName = "CalibrationStatus",
                 HeaderText = "Calibration Software"
             });
+            dataGridView_broadcast_camera_daemons.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "MinVoltage",
+                HeaderText = "Min Voltage"
+            });
+            dataGridView_broadcast_camera_daemons.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "MaxVoltage",
+                HeaderText = "Max Voltage"
+            });
+            dataGridView_broadcast_camera_daemons.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Temp",
+                HeaderText = "Temp"
+            });
             //dataGridView_broadcast_camera_daemons.Columns.Add(new DataGridViewTextBoxColumn
             //{
             //    DataPropertyName = "VersionString",
@@ -353,6 +442,16 @@ namespace ControlPanel
             {
                 DataPropertyName = "FPS",
                 HeaderText = "FPS"
+            });
+            dataGridView_broadcast_camera_applications.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "MaxFPS",
+                HeaderText = "Max FPS"
+            });
+            dataGridView_broadcast_camera_applications.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "MinFPS",
+                HeaderText = "Min FPS"
             });
             dataGridView_calibration_camera_status.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -498,16 +597,16 @@ namespace ControlPanel
                     if (!TelemedSessionRunning)
                         return;
                     // Start fusion
-                    BotManager.Instance.fusionStatusBot.Start();
-                    BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.FUSION));
+                    //BotManager.Instance.fusionStatusBot.Start();
+                    //BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.FUSION));
 
-                    while (TelemedSessionRunning && BotManager.Instance.fusionStatusBot.componentStatus.Status != Status.Running)
-                    {
-                        Thread.Sleep(250);
-                    }
+                    //while (TelemedSessionRunning && BotManager.Instance.fusionStatusBot.componentStatus.Status != Status.Running)
+                    //{
+                    //    Thread.Sleep(250);
+                    //}
 
-                    BotManager.Instance.renderStatusBot.Start();
-                    BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.RENDER));
+                    //BotManager.Instance.renderStatusBot.Start();
+                    //BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.RENDER));
 
                 });
                 SessionStartupThread.Start();
