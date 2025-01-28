@@ -191,71 +191,6 @@ namespace ControlPanel
         }
         public ConcurrentDictionary<string, VersionContent> versionMap = new ConcurrentDictionary<string, VersionContent>();
 
-        //public void CreateVersionTextObject(string unitName, PeabodyNetworkingLibrary.VersionData versionData, ComponentStatusContainer container = null)
-        //{
-        //    Text[] texts;
-        //    GameObject versionGameObject;
-        //    if (versionMap.ContainsKey(unitName) && versionMap[unitName].gameObject != null)
-        //    {
-        //        // already created, probably ready from disk
-        //        versionGameObject = versionMap[unitName].gameObject;
-        //    }
-        //    else
-        //    {
-        //        // Create the version info in the version list
-        //        versionGameObject = Instantiate(VersionGameObject);
-        //    }
-        //    texts = versionGameObject.GetComponentsInChildren<Text>();
-        //    texts[0].text = $"{unitName}: {versionData.Description}";
-        //    if (container != null)
-        //    {
-        //        OutputHelper.OutputLog($"CVTO called {unitName}.  Container is valid.  Setting texts.", OutputHelper.Verbosity.Trace);
-        //        container.versionText = texts[0];
-        //        container.cloudText = texts[1];
-        //    }
-        //    else
-        //    {
-        //        OutputHelper.OutputLog($"CVTO called {unitName}.  Container is NULL.", OutputHelper.Verbosity.Trace);
-        //    }
-        //    Button updateButton = versionGameObject.GetComponentInChildren<Button>();
-        //    updateButton.onClick.AddListener(delegate { OnButton_UpdateComponent(versionMap[unitName]); });
-        //    updateButton.enabled = false;
-        //    Text buttonText = updateButton.GetComponentInChildren<Text>();
-        //    buttonText.text = " No Update Available ";
-        //    versionGameObject.transform.SetParent(VersionListCanvas.gameObject.transform);
-        //    // don't know if I need any of this, just trying to make the text visible
-        //    versionGameObject.transform.Translate(new Vector3(0, 0, 0));
-        //    foreach (Text t in texts)
-        //    {
-        //        t.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        //        t.fontStyle = FontStyle.Normal;
-        //    }
-
-        //    if (versionMap.ContainsKey(unitName))
-        //    {
-        //        // game object is null, attach
-        //        VersionContent thisVC = versionMap[unitName];
-        //        thisVC.gameObject = versionGameObject;
-        //        versionMap[unitName] = thisVC;
-        //    }
-        //    else
-        //    {
-        //        // creating a new object
-        //        VersionContent vc = new VersionContent();
-        //        vc.gameObject = versionGameObject;
-        //        vc.unitName = unitName;
-        //        vc.versionData = versionData;
-        //        versionMap.TryAdd(unitName, vc);
-        //    }
-        //    // Sort alphabetically
-        //    var sortedMap = versionMap.OrderBy(x => x.Value.unitName);
-        //    int siblingIndex = 0;
-        //    foreach (var item in sortedMap)
-        //    {
-        //        item.Value.gameObject.transform.SetSiblingIndex(siblingIndex++);
-        //    }
-        //}
-
         public void OnButton_UpdateComponent(VersionContent versionContent)
         {
             versionContent.EnableUpdateButton(false);
@@ -422,18 +357,6 @@ namespace ControlPanel
                 int currBotID = i;
                 SetVersionDataFromMap(currBot);
 
-                //currBot.componentStatusContainer.onTimedOutCallback_permanent += () =>
-                //{
-                //    //timed out, so no longer running
-                //    currBot.UpdateStateAndUI(SOFTWARE.CAPTURE, SOFTWARE_STATE.TIMEDOUT);
-                //    currBot.UpdateStateAndUI(SOFTWARE.CALIBRATION, SOFTWARE_STATE.TIMEDOUT);
-                //    currBot.UpdateStateAndUI(SOFTWARE.LINUX_DAEMON, SOFTWARE_STATE.TIMEDOUT);
-                //    OutputHelper.OutputLog($"[{DateTime.UtcNow}] Daemon {currBot.UnitName} timed out. calling callback!", OutputHelper.Verbosity.Warning);
-
-                //    //status updated
-                //    RespondToDaemonUpdate();
-                //};
-
                 currBot.RegisterUpdateFunction(CPC_STATUS.RUNNING, (byte[] update) =>
                 {
                     SOFTWARE_STATE[] states = ProcessDaemonStateUpdate(update);
@@ -571,7 +494,6 @@ namespace ControlPanel
                     OutputHelper.OutputLog($"Daemon {currBot.UnitName} received an is alive update", OutputHelper.Verbosity.Debug);
                     currBot.UpdateSoftwareState(SOFTWARE.LINUX_DAEMON, SOFTWARE_STATE.RUNNING);
                 });
-                //CreateVersionTextObject(currBot.UnitName, currBot.GetVersionData(), currBot.componentStatusContainer);
                 currBot.Start();
             }
 
@@ -595,9 +517,6 @@ namespace ControlPanel
             };
             SetVersionDataFromMap(fusionDaemonBot);
 
-            //CreateVersionTextObject(fusionDaemonBot.UnitName, fusionDaemonBot.GetVersionData(), fusionDaemonBot.componentStatusContainer);
-
-
             //Renderer
             daemonPort = SettingsManager.Instance.GetValueWithDefault("Ports/Renderer", "DaemonPort", SettingsManager.Instance.GetValueWithDefault("Ports", "DaemonPort", "14511", true));
             renderDaemonBot = new StatusBot(null, "3DTMLauncherService_Render", controlPanel, daemonPort);
@@ -617,8 +536,6 @@ namespace ControlPanel
             };
 
             SetVersionDataFromMap(renderDaemonBot);
-
-            //CreateVersionTextObject(renderDaemonBot.UnitName, renderDaemonBot.GetVersionData(), renderDaemonBot.componentStatusContainer);
 
             StatusBot[] windowsDaemonBots = { fusionDaemonBot, renderDaemonBot };
 
@@ -668,13 +585,6 @@ namespace ControlPanel
                     HandleInstallationResult(currBot, update);
                 });
 
-
-                //currBot.componentStatusContainer.onTimedOutCallback_permanent += () =>
-                //{
-                //    //timed out, so no longer running
-                //    currBot.UpdateStateAndUI(SOFTWARE.WINDOWS_SERVICE, SOFTWARE_STATE.TIMEDOUT);
-                //    OutputHelper.OutputLog($"[{DateTime.UtcNow}] Daemon {currBot.UnitName} timed out. calling callback!", OutputHelper.Verbosity.Warning);
-                //};
                 currBot.Start();
             }
 
@@ -1659,7 +1569,7 @@ namespace ControlPanel
             {
                 for (int i = 0; i < depthGenStatusBots.Length; ++i)
                 {
-                    if (depthGenStatusBots[i].componentStatus.Status == Status.Ready)
+                    if (depthGenStatusBots[i].componentStatus.Status == Status.Ready || depthGenStatusBots[i].componentStatus.Status == Status.Running)
                     {
                         // do a double check to make sure the daemon says the actual process is still running, it could have crashed
                         if (depthGenDaemonBots[i].softwareStates[(int)softwareToCheck] == SOFTWARE_STATE.RUNNING)
@@ -2025,7 +1935,7 @@ namespace ControlPanel
             {
                 for (int i = 0; i < depthGenStatusBots.Length; ++i)
                 {
-                    if (depthGenStatusBots[i].componentStatus.VideoTransferFinished)
+                    if (depthGenStatusBots[i].componentStatus.VideoTransferFinished || depthGenDaemonBots[i].softwareStates[(int)SOFTWARE.CALIBRATION] == SOFTWARE_STATE.NOT_RUNNING)
                     {
                         runningDGBots++;
                     }
