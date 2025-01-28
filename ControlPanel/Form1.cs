@@ -207,9 +207,13 @@ namespace ControlPanel
                 {
                     if (double.TryParse(e.Value.ToString(), out double temp))
                     {
-                        if (temp >= 50)
+                        if (temp >= 50 && temp < 70)
                         {
                             e.CellStyle.BackColor = Color.Yellow;
+                        }
+                        else if (temp >= 70)
+                        {
+                            e.CellStyle.BackColor = Color.Red;
                         }
                         else if (temp < 50 && temp != 0)
                         {
@@ -230,20 +234,24 @@ namespace ControlPanel
         private void DataGridView_broadcast_camera_applications_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             // Check if the column is the "FPS" column
-            if (dataGridView_broadcast_camera_applications.Columns[e.ColumnIndex].HeaderText == "FPS")
+            if (dataGridView_broadcast_camera_applications.Columns[e.ColumnIndex].HeaderText == "FPS" ||
+                dataGridView_broadcast_camera_applications.Columns[e.ColumnIndex].HeaderText == "Min FPS" ||
+                dataGridView_broadcast_camera_applications.Columns[e.ColumnIndex].HeaderText == "Max FPS")
             {
                 // Check if the cell value is not null or empty
                 if (e.Value != null && !string.IsNullOrEmpty(e.Value.ToString()))
                 {
+                    int expectedFPSIdx = SettingsManager.Instance.GetValueWithDefault("PodGlobalConfig", "CameraFPS", 1);
+                    double expectedFPS = expectedFPSIdx == 0 ? 5 : (expectedFPSIdx == 1 ? 15 : 30);
                     // Try to parse the cell value as a double
                     if (double.TryParse(e.Value.ToString(), out double fps))
                     {
                         // Change the background color based on the value of FPS
-                        if (fps > 0 && fps < 14.5)
+                        if (fps > 0 && fps != 100 && (fps < expectedFPS-0.5 || fps > expectedFPS+0.5)) 
                         {
                             e.CellStyle.BackColor = Color.Yellow;
                         }
-                        else if (fps >= 14.5)
+                        else if (fps > 0)
                         {
                             e.CellStyle.BackColor = Color.LightGreen;
                         }
@@ -265,9 +273,13 @@ namespace ControlPanel
                 {
                     if (double.TryParse(e.Value.ToString(), out double temp))
                     {
-                        if (temp >= 50)
+                        if (temp >= 50 && temp < 70)
                         {
                             e.CellStyle.BackColor = Color.Yellow;
+                        }
+                        else if (temp >= 70)
+                        {
+                            e.CellStyle.BackColor = Color.Red;
                         }
                         else if (temp < 50 && temp != 0)
                         {
@@ -914,7 +926,7 @@ namespace ControlPanel
                 return;
             }
             button_start_calibration.BackColor = Color.CornflowerBlue;
-            button_start_calibration.Enabled = false;
+            button_start_calibration.Enabled = true;
             button_start_calibration.Text = "Recording Starting...";
             UpdateCalibrationStatusTextbox("Telling the cameras to start recording.  Please wait.");
         }
