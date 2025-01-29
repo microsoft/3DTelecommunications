@@ -609,16 +609,16 @@ namespace ControlPanel
                     if (!TelemedSessionRunning)
                         return;
                     // Start fusion
-                    //BotManager.Instance.fusionStatusBot.Start();
-                    //BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.FUSION));
+                    BotManager.Instance.fusionStatusBot.Start();
+                    BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.FUSION));
 
-                    //while (TelemedSessionRunning && BotManager.Instance.fusionStatusBot.componentStatus.Status != Status.Running)
-                    //{
-                    //    Thread.Sleep(250);
-                    //}
+                    while (TelemedSessionRunning && BotManager.Instance.fusionStatusBot.componentStatus.Status != Status.Running)
+                    {
+                        Thread.Sleep(250);
+                    }
 
-                    //BotManager.Instance.renderStatusBot.Start();
-                    //BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.RENDER));
+                    BotManager.Instance.renderStatusBot.Start();
+                    BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.RENDER));
 
                 });
                 SessionStartupThread.Start();
