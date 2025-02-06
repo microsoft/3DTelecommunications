@@ -451,8 +451,7 @@ const Calibration& K4ACaptureSource::GetDepthCalibration()
 
 const k4a_imu_sample_t K4ACaptureSource::GetIMUReading()
 {
-    k4a_imu_sample_t sample;
-    k4a_wait_result_t result = k4a_device_get_imu_sample(m_device.deviceHandle, &sample, 100);
+    k4a_wait_result_t result = k4a_device_get_imu_sample(m_device.deviceHandle, &m_imuReading, 100);
     if(result != K4A_WAIT_RESULT_SUCCEEDED)
     {
         if(result == K4A_WAIT_RESULT_TIMEOUT)
@@ -464,7 +463,7 @@ const k4a_imu_sample_t K4ACaptureSource::GetIMUReading()
             std::cout << "ERROR waiting for IMU sample." << std::endl;
         }
     }
-    return sample;
+    return m_imuReading;
 }
 
 

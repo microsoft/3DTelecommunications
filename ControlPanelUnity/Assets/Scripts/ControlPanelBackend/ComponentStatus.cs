@@ -22,5 +22,6 @@ namespace ControlPanel
         public bool CanLaunch { get; set; }
         public int FrameNum { get; set; }
         public bool NewDataReceived { get; set; }
+        public double Temperature { get; set; }
     }
 }

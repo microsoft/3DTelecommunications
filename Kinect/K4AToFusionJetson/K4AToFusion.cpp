@@ -82,6 +82,8 @@ uint64_t timestampForNextCapture = 0;
 bool gShouldPublishTimeStamp = false;
 
 static K4AControlPanelConnector* K4ACPC = nullptr;
+k4a_imu_sample_t gIMUSample;
+std::mutex gIMUSampleMutex;
 
 uint g_verbosity;
 //bool g_CalibDetectCheckerboard = true;
@@ -586,58 +588,6 @@ void ProcessFramesFn(K4AFusionStream* stream, SharedSettings shrdSettings)
             else
                 outBuffer = processedDepthBuffer;
         }
-   //     if(IS_CALIB_CAPTURE() && g_CalibDetectCheckerboard)
-   //     {
-   //         if(g_verbosity > 2)
-   //         {
-   //             std::cout << "Detecting checkerboard in image...";
-   //         }
-   //         // get a grayscale image
-   //         // in calibration mode I've forced my output to be BRGA, not MJPEG
-   //         if (g_profile)
-   //             profStart = std::chrono::high_resolution_clock::now();
-   //         cv::Mat colorImage(colorInfo.outHeight, colorInfo.outWidth, CV_8UC4, colorBuffer.get());            
-   //         cv::Mat grayImage;
-   //         cv::cuda::GpuMat colorImageGPU;
-   //         cv::cuda::GpuMat grayImageGPU(colorImage.size(), CV_8UC1, cv::Scalar(0));
-   //         colorImageGPU.upload(colorImage);
-   //         cv::cuda::cvtColor(colorImageGPU, grayImageGPU, cv::COLOR_BGRA2GRAY);
-   //         grayImageGPU.download(grayImage);
-   //         if (g_profile)
-   //         {
-   //             profEnd = std::chrono::high_resolution_clock::now();
-   //             elapsed_seconds = profEnd - profStart;
-   //             std::cout << "[PROC][CALIB-CUDAConvert][" << elapsed_seconds.count() << "]" << std::endl;
-   //             profStart = std::chrono::high_resolution_clock::now();
-   //         }
-   //         // Run a checkerboard detector and send packets indicating how many corners I've detected in this image
-   //         bool success = checkerboardDetector.Detect(&grayImage, minCheckerboardSize, maxCheckerboardSize, undistortBorderPixels);
-   //         if (g_profile)
-   //         {
-   //             profEnd = std::chrono::high_resolution_clock::now();
-   //             elapsed_seconds = profEnd - profStart;
-   //             std::cout << "[PROC][CALIB-Checkerboard Detect][" << elapsed_seconds.count() << "]" << std::endl;
-   //         }
-   //         CheckerBoardPose pose;
-   //         checkerboardDetector.GetCurrCBPose(&pose);
-			//int num = pose.GetNumFound();
-   //         if(success && num > maxPointsToDetectInACheckerboard/2) // we'll send this packet if we see parts of the checkerboard too.  That way we can indicate that the image is _almost_ good enough
-   //         {
-   //             if(g_verbosity > 1)
-   //             {
-   //                 std::cout << "I can see a valid checkerboard!" << std::endl;
-   //             }
-   //             K4ACPC->SendStatusUpdate(CPC_STATUS::CALIBRATION_I_SEE_CHECKERBOARD, &num, sizeof(num));
-   //             // send the number of corners, because this could be an "I see _some_ corners situation, and we need to tell the tech to move slightly"
-   //         }
-   //         else
-   //         {
-   //             if(g_verbosity > 2)
-   //             {
-   //                 std::cout << "I can NOT see a valid checkerboard.  Pts: " << num << std::endl;
-   //             }
-   //         }
-   //     }
 
         // don't preprocess calibration or offline frames
         if (IS_STREAM_CAPTURE())
@@ -901,12 +851,15 @@ void ProcessFramesFn(K4AFusionStream* stream, SharedSettings shrdSettings)
             {
                 Trinket::SetState(Trinket::Broadcast_Running);
             }
-            auto end = std::chrono::high_resolution_clock::now();
+            auto end = std::chrono::high_resolution_clock::now();            
             std::chrono::duration<double> elapsed_seconds = end - start;
-            double frameRate = (double)frameCounter/elapsed_seconds.count();
+            gIMUSampleMutex.lock();
+            double frameRate[2] = {(double)frameCounter/elapsed_seconds.count(), gIMUSample.temperature}; 
+            gIMUSampleMutex.unlock();
             if(g_verbosity > 0)
             {
-                printf("[PROCFR: %.2f]\r\n", frameRate);;
+                printf("[PROCFR: %.2f]\r\n", frameRate[0]);
+                printf("IMU Reading: %.2f C\r\n", frameRate[1]);
             }
             frameCounter = 0;
             start = std::chrono::high_resolution_clock::now();
@@ -1109,6 +1062,9 @@ void CaptureFramesFn(K4AFusionStream* stream, SharedSettings shrdSettings)
             printf("[CAPTFR: %.2f]\r\n", frameRate);
             frameCounter = 0;
             start = std::chrono::high_resolution_clock::now();
+            gIMUSampleMutex.lock();
+            gIMUSample = stream->source->GetIMUReading();
+            gIMUSampleMutex.unlock();
         }
     }
     K4ACPC->SendStatusUpdate(CPC_STATUS::STOPPED);
