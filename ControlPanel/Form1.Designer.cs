@@ -34,6 +34,12 @@ namespace ControlPanel
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle10 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle11 = new DataGridViewCellStyle();
             tabControl_application_selection = new TabControl();
             tabPage_broadcast = new TabPage();
             tableLayoutPanel_broadcast_status = new TableLayoutPanel();
@@ -106,6 +112,8 @@ namespace ControlPanel
             tabPage_updates = new TabPage();
             tableLayoutPanel6 = new TableLayoutPanel();
             dataGridView_software_version_list = new DataGridView();
+            tableLayoutPanel7 = new TableLayoutPanel();
+            button_start_bg_capture = new Button();
             tabControl_application_selection.SuspendLayout();
             tabPage_broadcast.SuspendLayout();
             tableLayoutPanel_broadcast_status.SuspendLayout();
@@ -139,6 +147,7 @@ namespace ControlPanel
             tabPage_updates.SuspendLayout();
             tableLayoutPanel6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView_software_version_list).BeginInit();
+            tableLayoutPanel7.SuspendLayout();
             SuspendLayout();
             // 
             // tabControl_application_selection
@@ -150,7 +159,7 @@ namespace ControlPanel
             tabControl_application_selection.Margin = new Padding(2);
             tabControl_application_selection.Name = "tabControl_application_selection";
             tabControl_application_selection.SelectedIndex = 0;
-            tabControl_application_selection.Size = new Size(1588, 330);
+            tabControl_application_selection.Size = new Size(1588, 387);
             tabControl_application_selection.TabIndex = 0;
             // 
             // tabPage_broadcast
@@ -403,7 +412,7 @@ namespace ControlPanel
             tabPage_calibration.Margin = new Padding(2);
             tabPage_calibration.Name = "tabPage_calibration";
             tabPage_calibration.Padding = new Padding(2);
-            tabPage_calibration.Size = new Size(1580, 302);
+            tabPage_calibration.Size = new Size(1580, 359);
             tabPage_calibration.TabIndex = 1;
             tabPage_calibration.Text = "Calibration";
             tabPage_calibration.UseVisualStyleBackColor = true;
@@ -424,27 +433,27 @@ namespace ControlPanel
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle());
-            tableLayoutPanel1.Size = new Size(1576, 298);
+            tableLayoutPanel1.Size = new Size(1576, 355);
             tableLayoutPanel1.TabIndex = 2;
             // 
             // panel2
             // 
             tableLayoutPanel1.SetColumnSpan(panel2, 2);
-            panel2.Controls.Add(button_start_calibration);
+            panel2.Controls.Add(tableLayoutPanel7);
             panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(2, 258);
+            panel2.Location = new Point(2, 308);
             panel2.Margin = new Padding(2);
             panel2.Name = "panel2";
-            panel2.Size = new Size(1572, 38);
+            panel2.Size = new Size(1572, 45);
             panel2.TabIndex = 7;
             // 
             // button_start_calibration
             // 
             button_start_calibration.Font = new Font("Segoe UI", 18F);
-            button_start_calibration.Location = new Point(527, 3);
+            button_start_calibration.Location = new Point(2, 2);
             button_start_calibration.Margin = new Padding(2);
             button_start_calibration.Name = "button_start_calibration";
-            button_start_calibration.Size = new Size(256, 32);
+            button_start_calibration.Size = new Size(256, 40);
             button_start_calibration.TabIndex = 6;
             button_start_calibration.Text = "Start Calibration";
             button_start_calibration.UseVisualStyleBackColor = true;
@@ -464,7 +473,7 @@ namespace ControlPanel
             tableLayoutPanel1.SetRowSpan(tableLayoutPanel5, 2);
             tableLayoutPanel5.RowStyles.Add(new RowStyle());
             tableLayoutPanel5.RowStyles.Add(new RowStyle());
-            tableLayoutPanel5.Size = new Size(784, 252);
+            tableLayoutPanel5.Size = new Size(784, 302);
             tableLayoutPanel5.TabIndex = 8;
             // 
             // textBox_calibration_software_status_title
@@ -491,14 +500,22 @@ namespace ControlPanel
             dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
             dataGridView_calibration_camera_status.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dataGridView_calibration_camera_status.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Window;
+            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle3.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
+            dataGridView_calibration_camera_status.DefaultCellStyle = dataGridViewCellStyle3;
             dataGridView_calibration_camera_status.Dock = DockStyle.Fill;
             dataGridView_calibration_camera_status.Location = new Point(2, 35);
             dataGridView_calibration_camera_status.Margin = new Padding(2);
             dataGridView_calibration_camera_status.Name = "dataGridView_calibration_camera_status";
             dataGridView_calibration_camera_status.RowHeadersWidth = 62;
-            dataGridViewCellStyle3.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dataGridView_calibration_camera_status.RowsDefaultCellStyle = dataGridViewCellStyle3;
-            dataGridView_calibration_camera_status.Size = new Size(780, 241);
+            dataGridViewCellStyle4.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dataGridView_calibration_camera_status.RowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridView_calibration_camera_status.Size = new Size(780, 265);
             dataGridView_calibration_camera_status.TabIndex = 2;
             // 
             // textBox_calibration_software_status
@@ -508,14 +525,14 @@ namespace ControlPanel
             textBox_calibration_software_status.Multiline = true;
             textBox_calibration_software_status.Name = "textBox_calibration_software_status";
             tableLayoutPanel1.SetRowSpan(textBox_calibration_software_status, 2);
-            textBox_calibration_software_status.Size = new Size(782, 250);
+            textBox_calibration_software_status.Size = new Size(782, 300);
             textBox_calibration_software_status.TabIndex = 9;
             // 
             // statusStrip
             // 
             statusStrip.ImageScalingSize = new Size(24, 24);
             statusStrip.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel_versionText, toolStripStatusLabel_updateText });
-            statusStrip.Location = new Point(0, 607);
+            statusStrip.Location = new Point(0, 682);
             statusStrip.Name = "statusStrip";
             statusStrip.Padding = new Padding(1, 0, 10, 0);
             statusStrip.Size = new Size(1604, 22);
@@ -703,23 +720,31 @@ namespace ControlPanel
             // 
             dataGridView_broadcast_camera_daemons.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView_broadcast_camera_daemons.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = SystemColors.Control;
-            dataGridViewCellStyle4.Font = new Font("Segoe UI", 18F);
-            dataGridViewCellStyle4.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.True;
-            dataGridView_broadcast_camera_daemons.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = SystemColors.Control;
+            dataGridViewCellStyle5.Font = new Font("Segoe UI", 18F);
+            dataGridViewCellStyle5.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.True;
+            dataGridView_broadcast_camera_daemons.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             dataGridView_broadcast_camera_daemons.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = SystemColors.Window;
+            dataGridViewCellStyle6.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle6.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle6.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.False;
+            dataGridView_broadcast_camera_daemons.DefaultCellStyle = dataGridViewCellStyle6;
             dataGridView_broadcast_camera_daemons.Dock = DockStyle.Fill;
             dataGridView_broadcast_camera_daemons.Location = new Point(2, 35);
             dataGridView_broadcast_camera_daemons.Margin = new Padding(2);
             dataGridView_broadcast_camera_daemons.MinimumSize = new Size(800, 240);
             dataGridView_broadcast_camera_daemons.Name = "dataGridView_broadcast_camera_daemons";
             dataGridView_broadcast_camera_daemons.RowHeadersWidth = 62;
-            dataGridViewCellStyle5.Font = new Font("Segoe UI", 10F);
-            dataGridView_broadcast_camera_daemons.RowsDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle7.Font = new Font("Segoe UI", 10F);
+            dataGridView_broadcast_camera_daemons.RowsDefaultCellStyle = dataGridViewCellStyle7;
             dataGridView_broadcast_camera_daemons.Size = new Size(1146, 240);
             dataGridView_broadcast_camera_daemons.TabIndex = 1;
             dataGridView_broadcast_camera_daemons.CellClick += DataGridView_broadcast_camera_daemons_CellClick;
@@ -836,7 +861,7 @@ namespace ControlPanel
             tableLayoutPanel_application_panel.RowCount = 2;
             tableLayoutPanel_application_panel.RowStyles.Add(new RowStyle());
             tableLayoutPanel_application_panel.RowStyles.Add(new RowStyle());
-            tableLayoutPanel_application_panel.Size = new Size(1592, 575);
+            tableLayoutPanel_application_panel.Size = new Size(1592, 650);
             tableLayoutPanel_application_panel.TabIndex = 1;
             // 
             // tabControl_main_menu
@@ -851,7 +876,7 @@ namespace ControlPanel
             tabControl_main_menu.Margin = new Padding(2);
             tabControl_main_menu.Name = "tabControl_main_menu";
             tabControl_main_menu.SelectedIndex = 0;
-            tabControl_main_menu.Size = new Size(1604, 607);
+            tabControl_main_menu.Size = new Size(1604, 682);
             tabControl_main_menu.TabIndex = 2;
             // 
             // tabPage_main
@@ -861,7 +886,7 @@ namespace ControlPanel
             tabPage_main.Margin = new Padding(2);
             tabPage_main.Name = "tabPage_main";
             tabPage_main.Padding = new Padding(2);
-            tabPage_main.Size = new Size(1596, 579);
+            tabPage_main.Size = new Size(1596, 654);
             tabPage_main.TabIndex = 0;
             tabPage_main.Text = "3D Telemedicine";
             tabPage_main.UseVisualStyleBackColor = true;
@@ -879,7 +904,23 @@ namespace ControlPanel
             // 
             // dataGridView_config
             // 
+            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle8.BackColor = SystemColors.Control;
+            dataGridViewCellStyle8.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle8.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle8.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = DataGridViewTriState.True;
+            dataGridView_config.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle8;
             dataGridView_config.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle9.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle9.BackColor = SystemColors.Window;
+            dataGridViewCellStyle9.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle9.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle9.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle9.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle9.WrapMode = DataGridViewTriState.False;
+            dataGridView_config.DefaultCellStyle = dataGridViewCellStyle9;
             dataGridView_config.Dock = DockStyle.Fill;
             dataGridView_config.Location = new Point(0, 0);
             dataGridView_config.Name = "dataGridView_config";
@@ -1042,7 +1083,23 @@ namespace ControlPanel
             // 
             // dataGridView_software_version_list
             // 
+            dataGridViewCellStyle10.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle10.BackColor = SystemColors.Control;
+            dataGridViewCellStyle10.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle10.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle10.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle10.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle10.WrapMode = DataGridViewTriState.True;
+            dataGridView_software_version_list.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
             dataGridView_software_version_list.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle11.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle11.BackColor = SystemColors.Window;
+            dataGridViewCellStyle11.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle11.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle11.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle11.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle11.WrapMode = DataGridViewTriState.False;
+            dataGridView_software_version_list.DefaultCellStyle = dataGridViewCellStyle11;
             dataGridView_software_version_list.Dock = DockStyle.Fill;
             dataGridView_software_version_list.Location = new Point(2, 2);
             dataGridView_software_version_list.Margin = new Padding(2);
@@ -1051,11 +1108,39 @@ namespace ControlPanel
             dataGridView_software_version_list.Size = new Size(1592, 575);
             dataGridView_software_version_list.TabIndex = 0;
             // 
+            // tableLayoutPanel7
+            // 
+            tableLayoutPanel7.ColumnCount = 2;
+            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel7.Controls.Add(button_start_bg_capture, 1, 0);
+            tableLayoutPanel7.Controls.Add(button_start_calibration, 0, 0);
+            tableLayoutPanel7.Dock = DockStyle.Fill;
+            tableLayoutPanel7.Location = new Point(0, 0);
+            tableLayoutPanel7.Name = "tableLayoutPanel7";
+            tableLayoutPanel7.RowCount = 1;
+            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel7.Size = new Size(1572, 45);
+            tableLayoutPanel7.TabIndex = 7;
+            // 
+            // button_start_bg_capture
+            // 
+            button_start_bg_capture.Font = new Font("Segoe UI", 18F);
+            button_start_bg_capture.Location = new Point(788, 2);
+            button_start_bg_capture.Margin = new Padding(2);
+            button_start_bg_capture.Name = "button_start_bg_capture";
+            button_start_bg_capture.Size = new Size(256, 40);
+            button_start_bg_capture.TabIndex = 7;
+            button_start_bg_capture.Text = "Capture Background";
+            button_start_bg_capture.UseVisualStyleBackColor = true;
+            button_start_bg_capture.Click += button_start_bg_capture_Click;
+            // 
             // ControlPanel
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1604, 629);
+            ClientSize = new Size(1604, 704);
             Controls.Add(tabControl_main_menu);
             Controls.Add(statusStrip);
             Margin = new Padding(2);
@@ -1104,6 +1189,7 @@ namespace ControlPanel
             tabPage_updates.ResumeLayout(false);
             tableLayoutPanel6.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridView_software_version_list).EndInit();
+            tableLayoutPanel7.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -1182,5 +1268,7 @@ namespace ControlPanel
         private Button button_debug_CollectLogs;
         private Button button_debug_RequestVersions;
         private TableLayoutPanel tableLayoutPanel6;
+        private TableLayoutPanel tableLayoutPanel7;
+        private Button button_start_bg_capture;
     }
 }
