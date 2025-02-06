@@ -75,7 +75,7 @@ public class ComponentStatusContainer
         componentStatus.IsReady = false;
         if (updateImgClrEvent != null && uiImageIcon != null)
             updateImgClrEvent.Raise(uiImageIcon, ControlPanelMain.Instance.mStoppedColor);
-        SetFPSText(0.0);
+        SetFPSText(new double[] { 0.0, 1.1 });
     }
 
     public void SetToTimedOut()
@@ -95,9 +95,16 @@ public class ComponentStatusContainer
         }
     }
 
-    public void SetFPSText(double fps)
+    public void SetFPSText(double[] fpsData)
     {
+        double fps = fpsData[0];
         componentStatus.FPS = fps;
+        // if fpsData has at least 2 elements
+        if (fpsData.Length > 1)
+        {
+            componentStatus.Temperature = fpsData[1];
+            OutputHelper.OutputLog($"[WARNING] {componentStatus.Name} FPS: {fps}  Max: {componentStatus.FPS_max} Min: {componentStatus.FPS_min} Temp: {componentStatus.Temperature}", OutputHelper.Verbosity.Warning);
+        }
         if (uiFPSText != null)
         {
             updateTextEvent.Raise(uiFPSText, fps.ToString("0.00"));
