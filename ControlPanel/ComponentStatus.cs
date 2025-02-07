@@ -29,6 +29,7 @@ namespace ControlPanel
         private bool _videoRecordingStarted;
         private bool _videoTransferStarted;
         private bool _videoTransferFinished;
+        private bool _bgCaptureFinished;
         private int _frameNum;
         public int ID { get; set; }
         public string Name { get; set; }
@@ -213,6 +214,18 @@ namespace ControlPanel
                 {
                     _videoTransferFinished = value;
                     //OnPropertyChanged(nameof(VideoTransferFinished));
+                }
+            }
+        }
+        public bool BGCaptureFinished
+        {
+            get => _bgCaptureFinished;
+            set
+            {
+                if (_bgCaptureFinished != value)
+                {
+                    _bgCaptureFinished = value;
+                    //OnPropertyChanged(nameof(BGCaptureFinished));
                 }
             }
         }
