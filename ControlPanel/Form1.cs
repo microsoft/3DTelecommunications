@@ -412,6 +412,11 @@ namespace ControlPanel
             });
             dataGridView_broadcast_camera_daemons.Columns.Add(new DataGridViewTextBoxColumn
             {
+                DataPropertyName = "BackgroundCaptureStatus",
+                HeaderText = "Background Capture Software"
+            });
+            dataGridView_broadcast_camera_daemons.Columns.Add(new DataGridViewTextBoxColumn
+            {
                 DataPropertyName = "MinVoltage",
                 HeaderText = "Min Voltage"
             });
@@ -916,17 +921,24 @@ namespace ControlPanel
                     }
                     if (!CalibrationSessionRunning)
                     {
-                        StopCalibration();
+                        UpdateCalibrationStatusTextbox("Background capture stopped.");
+                        StopBGCapture();
+                        return;
                     }
+                    BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED);
                     BGRunningButton();       
-                    while (CalibrationSessionRunning && BotManager.Instance.GetBotsWithSoftwareRunning(SOFTWARE.BACKGROUND_CAPTURE) > 0)
+                    while (CalibrationSessionRunning && BotManager.Instance.GetBotsWithBGCaptureComplete() < dgNum)
                     {
                         Thread.Sleep(250);
                     }
                     UpdateCalibrationStatusTextbox("Background capture complete.");
-                    StopCalibration();
+                    StopBGCapture();
                 });
                 SessionStartupThread.Start();
+            }
+            else
+            {
+                StopBGCapture();
             }
         }
         private void BGRunningButton()
@@ -941,6 +953,12 @@ namespace ControlPanel
             UpdateCalibrationStatusTextbox("Background capture software is running.  It will stop automatically when each pod has captured 200 frames.");
         }
 
+        public void StopBGCapture()
+        {
+            BotManager.Instance.BroadcastStopUntilAllDGStop(SOFTWARE.BACKGROUND_CAPTURE);  //this should work for BG capture as well, because the software automatically stops after capturing 200 frames
+            CalibrationSessionRunning = false;
+            EnableButtons();
+        }
         public void StopCalibration()
         {
             BotManager.Instance.BroadcastStopUntilAllDGStop(SOFTWARE.CALIBRATION);  //this should work for BG capture as well, because the software automatically stops after capturing 200 frames

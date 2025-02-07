@@ -155,11 +155,11 @@ namespace ControlPanel
             tabControl_application_selection.Controls.Add(tabPage_broadcast);
             tabControl_application_selection.Controls.Add(tabPage_calibration);
             tabControl_application_selection.Dock = DockStyle.Fill;
-            tabControl_application_selection.Location = new Point(2, 261);
+            tabControl_application_selection.Location = new Point(2, 327);
             tabControl_application_selection.Margin = new Padding(2);
             tabControl_application_selection.Name = "tabControl_application_selection";
             tabControl_application_selection.SelectedIndex = 0;
-            tabControl_application_selection.Size = new Size(1588, 387);
+            tabControl_application_selection.Size = new Size(1588, 321);
             tabControl_application_selection.TabIndex = 0;
             // 
             // tabPage_broadcast
@@ -171,7 +171,7 @@ namespace ControlPanel
             tabPage_broadcast.Margin = new Padding(2);
             tabPage_broadcast.Name = "tabPage_broadcast";
             tabPage_broadcast.Padding = new Padding(2);
-            tabPage_broadcast.Size = new Size(1580, 359);
+            tabPage_broadcast.Size = new Size(1580, 293);
             tabPage_broadcast.TabIndex = 0;
             tabPage_broadcast.Text = "Broadcast";
             tabPage_broadcast.UseVisualStyleBackColor = true;
@@ -193,7 +193,7 @@ namespace ControlPanel
             tableLayoutPanel_broadcast_status.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutPanel_broadcast_status.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutPanel_broadcast_status.RowStyles.Add(new RowStyle());
-            tableLayoutPanel_broadcast_status.Size = new Size(1576, 355);
+            tableLayoutPanel_broadcast_status.Size = new Size(1576, 289);
             tableLayoutPanel_broadcast_status.TabIndex = 1;
             // 
             // tableLayoutPanel_render_application_status
@@ -207,14 +207,14 @@ namespace ControlPanel
             tableLayoutPanel_render_application_status.Controls.Add(textBox14, 0, 2);
             tableLayoutPanel_render_application_status.Controls.Add(textBox_broadcastTab_render_application_status, 1, 1);
             tableLayoutPanel_render_application_status.Controls.Add(textBox_render_fps, 1, 2);
-            tableLayoutPanel_render_application_status.Location = new Point(1148, 158);
+            tableLayoutPanel_render_application_status.Location = new Point(1148, 125);
             tableLayoutPanel_render_application_status.Margin = new Padding(2);
             tableLayoutPanel_render_application_status.Name = "tableLayoutPanel_render_application_status";
             tableLayoutPanel_render_application_status.RowCount = 3;
             tableLayoutPanel_render_application_status.RowStyles.Add(new RowStyle());
             tableLayoutPanel_render_application_status.RowStyles.Add(new RowStyle());
             tableLayoutPanel_render_application_status.RowStyles.Add(new RowStyle(SizeType.Absolute, 12F));
-            tableLayoutPanel_render_application_status.Size = new Size(426, 124);
+            tableLayoutPanel_render_application_status.Size = new Size(426, 119);
             tableLayoutPanel_render_application_status.TabIndex = 10;
             // 
             // textBox11
@@ -343,7 +343,7 @@ namespace ControlPanel
             tableLayoutPanel_broadcast_status.SetColumnSpan(panel1, 2);
             panel1.Controls.Add(button_start_session);
             panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(2, 314);
+            panel1.Location = new Point(2, 248);
             panel1.Margin = new Padding(2);
             panel1.Name = "panel1";
             panel1.Size = new Size(1572, 39);
@@ -373,8 +373,8 @@ namespace ControlPanel
             tableLayoutPanel_broadcast_status_pod_status.RowCount = 2;
             tableLayoutPanel_broadcast_status.SetRowSpan(tableLayoutPanel_broadcast_status_pod_status, 2);
             tableLayoutPanel_broadcast_status_pod_status.RowStyles.Add(new RowStyle());
-            tableLayoutPanel_broadcast_status_pod_status.RowStyles.Add(new RowStyle());
-            tableLayoutPanel_broadcast_status_pod_status.Size = new Size(1142, 308);
+            tableLayoutPanel_broadcast_status_pod_status.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel_broadcast_status_pod_status.Size = new Size(1142, 242);
             tableLayoutPanel_broadcast_status_pod_status.TabIndex = 8;
             // 
             // textBox_kinect_nano_to_fusion_title
@@ -401,7 +401,7 @@ namespace ControlPanel
             dataGridView_broadcast_camera_applications.RowHeadersWidth = 62;
             dataGridViewCellStyle1.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
             dataGridView_broadcast_camera_applications.RowsDefaultCellStyle = dataGridViewCellStyle1;
-            dataGridView_broadcast_camera_applications.Size = new Size(1138, 271);
+            dataGridView_broadcast_camera_applications.Size = new Size(1138, 205);
             dataGridView_broadcast_camera_applications.TabIndex = 2;
             dataGridView_broadcast_camera_applications.ColumnHeaderMouseClick += DataGridView_broadcast_camera_applications_ColumnHeaderMouseClick;
             // 
@@ -412,7 +412,7 @@ namespace ControlPanel
             tabPage_calibration.Margin = new Padding(2);
             tabPage_calibration.Name = "tabPage_calibration";
             tabPage_calibration.Padding = new Padding(2);
-            tabPage_calibration.Size = new Size(1580, 359);
+            tabPage_calibration.Size = new Size(1580, 293);
             tabPage_calibration.TabIndex = 1;
             tabPage_calibration.Text = "Calibration";
             tabPage_calibration.UseVisualStyleBackColor = true;
@@ -433,7 +433,7 @@ namespace ControlPanel
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle());
-            tableLayoutPanel1.Size = new Size(1576, 355);
+            tableLayoutPanel1.Size = new Size(1576, 289);
             tableLayoutPanel1.TabIndex = 2;
             // 
             // panel2
@@ -441,7 +441,7 @@ namespace ControlPanel
             tableLayoutPanel1.SetColumnSpan(panel2, 2);
             panel2.Controls.Add(tableLayoutPanel7);
             panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(2, 308);
+            panel2.Location = new Point(2, 242);
             panel2.Margin = new Padding(2);
             panel2.Name = "panel2";
             panel2.Size = new Size(1572, 45);
@@ -501,7 +501,7 @@ namespace ControlPanel
             tableLayoutPanel1.SetRowSpan(tableLayoutPanel5, 2);
             tableLayoutPanel5.RowStyles.Add(new RowStyle());
             tableLayoutPanel5.RowStyles.Add(new RowStyle());
-            tableLayoutPanel5.Size = new Size(784, 302);
+            tableLayoutPanel5.Size = new Size(784, 236);
             tableLayoutPanel5.TabIndex = 8;
             // 
             // textBox_calibration_software_status_title
@@ -553,7 +553,7 @@ namespace ControlPanel
             textBox_calibration_software_status.Multiline = true;
             textBox_calibration_software_status.Name = "textBox_calibration_software_status";
             tableLayoutPanel1.SetRowSpan(textBox_calibration_software_status, 2);
-            textBox_calibration_software_status.Size = new Size(782, 300);
+            textBox_calibration_software_status.Size = new Size(782, 234);
             textBox_calibration_software_status.TabIndex = 9;
             // 
             // statusStrip
@@ -615,7 +615,7 @@ namespace ControlPanel
             tableLayoutPanel_daemon_status.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel_daemon_status.RowStyles.Add(new RowStyle());
             tableLayoutPanel_daemon_status.RowStyles.Add(new RowStyle(SizeType.Absolute, 12F));
-            tableLayoutPanel_daemon_status.Size = new Size(1588, 255);
+            tableLayoutPanel_daemon_status.Size = new Size(1588, 321);
             tableLayoutPanel_daemon_status.TabIndex = 2;
             // 
             // panel_podStatus
@@ -625,11 +625,12 @@ namespace ControlPanel
             panel_podStatus.Location = new Point(2, 2);
             panel_podStatus.Margin = new Padding(2);
             panel_podStatus.Name = "panel_podStatus";
-            panel_podStatus.Size = new Size(1584, 251);
+            panel_podStatus.Size = new Size(1584, 317);
             panel_podStatus.TabIndex = 2;
             // 
             // tableLayoutPanel3
             // 
+            tableLayoutPanel3.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             tableLayoutPanel3.ColumnCount = 2;
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle());
@@ -641,9 +642,9 @@ namespace ControlPanel
             tableLayoutPanel3.Margin = new Padding(2);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
             tableLayoutPanel3.RowCount = 2;
-            tableLayoutPanel3.RowStyles.Add(new RowStyle());
-            tableLayoutPanel3.RowStyles.Add(new RowStyle());
-            tableLayoutPanel3.Size = new Size(1584, 251);
+            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel3.Size = new Size(1584, 317);
             tableLayoutPanel3.TabIndex = 2;
             // 
             // tableLayoutPanel_fusion_daemon_status
@@ -730,8 +731,8 @@ namespace ControlPanel
             tableLayoutPanel_daemon_status_pod_status.RowCount = 2;
             tableLayoutPanel3.SetRowSpan(tableLayoutPanel_daemon_status_pod_status, 2);
             tableLayoutPanel_daemon_status_pod_status.RowStyles.Add(new RowStyle());
-            tableLayoutPanel_daemon_status_pod_status.RowStyles.Add(new RowStyle());
-            tableLayoutPanel_daemon_status_pod_status.Size = new Size(1150, 247);
+            tableLayoutPanel_daemon_status_pod_status.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel_daemon_status_pod_status.Size = new Size(1150, 313);
             tableLayoutPanel_daemon_status_pod_status.TabIndex = 4;
             // 
             // textBox_podStatusTitle
@@ -750,7 +751,7 @@ namespace ControlPanel
             dataGridView_broadcast_camera_daemons.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle5.BackColor = SystemColors.Control;
-            dataGridViewCellStyle5.Font = new Font("Segoe UI", 18F);
+            dataGridViewCellStyle5.Font = new Font("Segoe UI", 15F);
             dataGridViewCellStyle5.ForeColor = SystemColors.WindowText;
             dataGridViewCellStyle5.SelectionBackColor = SystemColors.Highlight;
             dataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText;
@@ -766,14 +767,14 @@ namespace ControlPanel
             dataGridViewCellStyle6.WrapMode = DataGridViewTriState.False;
             dataGridView_broadcast_camera_daemons.DefaultCellStyle = dataGridViewCellStyle6;
             dataGridView_broadcast_camera_daemons.Dock = DockStyle.Fill;
-            dataGridView_broadcast_camera_daemons.Location = new Point(2, 35);
-            dataGridView_broadcast_camera_daemons.Margin = new Padding(2);
+            dataGridView_broadcast_camera_daemons.Location = new Point(0, 33);
+            dataGridView_broadcast_camera_daemons.Margin = new Padding(0);
             dataGridView_broadcast_camera_daemons.MinimumSize = new Size(800, 240);
             dataGridView_broadcast_camera_daemons.Name = "dataGridView_broadcast_camera_daemons";
             dataGridView_broadcast_camera_daemons.RowHeadersWidth = 62;
             dataGridViewCellStyle7.Font = new Font("Segoe UI", 10F);
             dataGridView_broadcast_camera_daemons.RowsDefaultCellStyle = dataGridViewCellStyle7;
-            dataGridView_broadcast_camera_daemons.Size = new Size(1146, 240);
+            dataGridView_broadcast_camera_daemons.Size = new Size(1150, 280);
             dataGridView_broadcast_camera_daemons.TabIndex = 1;
             dataGridView_broadcast_camera_daemons.CellClick += DataGridView_broadcast_camera_daemons_CellClick;
             dataGridView_broadcast_camera_daemons.ColumnHeaderMouseClick += DataGridView_broadcast_camera_daemons_ColumnHeaderMouseClick;
@@ -789,7 +790,7 @@ namespace ControlPanel
             tableLayoutPanel_render_daemon_status.Controls.Add(textBox_render_application_status_title, 0, 2);
             tableLayoutPanel_render_daemon_status.Controls.Add(textBox_render_daemon_status, 1, 1);
             tableLayoutPanel_render_daemon_status.Controls.Add(textBox_render_application_status, 1, 2);
-            tableLayoutPanel_render_daemon_status.Location = new Point(1156, 119);
+            tableLayoutPanel_render_daemon_status.Location = new Point(1156, 160);
             tableLayoutPanel_render_daemon_status.Margin = new Padding(2);
             tableLayoutPanel_render_daemon_status.Name = "tableLayoutPanel_render_daemon_status";
             tableLayoutPanel_render_daemon_status.RowCount = 3;
@@ -878,6 +879,7 @@ namespace ControlPanel
             // 
             // tableLayoutPanel_application_panel
             // 
+            tableLayoutPanel_application_panel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             tableLayoutPanel_application_panel.ColumnCount = 1;
             tableLayoutPanel_application_panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel_application_panel.Controls.Add(tableLayoutPanel_daemon_status, 0, 0);
@@ -887,8 +889,8 @@ namespace ControlPanel
             tableLayoutPanel_application_panel.Margin = new Padding(2);
             tableLayoutPanel_application_panel.Name = "tableLayoutPanel_application_panel";
             tableLayoutPanel_application_panel.RowCount = 2;
-            tableLayoutPanel_application_panel.RowStyles.Add(new RowStyle());
-            tableLayoutPanel_application_panel.RowStyles.Add(new RowStyle());
+            tableLayoutPanel_application_panel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel_application_panel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutPanel_application_panel.Size = new Size(1592, 650);
             tableLayoutPanel_application_panel.TabIndex = 1;
             // 

@@ -1960,5 +1960,21 @@ namespace ControlPanel
             }
             return runningDGBots;
         }
+
+        internal int GetBotsWithBGCaptureComplete()
+        {
+            int runningDGBots = 0;
+            if (depthGenStatusBots != null)
+            {
+                for (int i = 0; i < depthGenStatusBots.Length; ++i)
+                {
+                    if (depthGenStatusBots[i].componentStatus.BGCaptureFinished)
+                    {
+                        runningDGBots++;
+                    }
+                }
+            }
+            return runningDGBots;
+        }
     }
 }
