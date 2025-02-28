@@ -1879,6 +1879,23 @@ namespace ControlPanel
             }
         }
 
+        internal int GetBotsSendingFrameCounts()
+        {
+            int runningDGBots = 0;
+            if (depthGenStatusBots != null)
+            {
+                for (int i = 0; i < depthGenStatusBots.Length; ++i)
+                {
+                    if (depthGenStatusBots[i].componentStatus.FrameNum > 0)
+                    {
+                        runningDGBots++;
+                    }
+
+                }
+            }
+            return runningDGBots;
+        }
+
         internal int GetBotsSendingFPS()
         {
             // Iterate over the depthGenDaemonBots and count how many have softwareStates[(int)SOFTWARE.CAPTURE] == SOFTWARE_STATE.RUNNING
@@ -1936,6 +1953,22 @@ namespace ControlPanel
                 for (int i = 0; i < depthGenStatusBots.Length; ++i)
                 {
                     if (depthGenStatusBots[i].componentStatus.VideoTransferFinished || depthGenDaemonBots[i].softwareStates[(int)SOFTWARE.CALIBRATION] == SOFTWARE_STATE.NOT_RUNNING)
+                    {
+                        runningDGBots++;
+                    }
+                }
+            }
+            return runningDGBots;
+        }
+
+        internal int GetBotsWithBGCaptureComplete()
+        {
+            int runningDGBots = 0;
+            if (depthGenStatusBots != null)
+            {
+                for (int i = 0; i < depthGenStatusBots.Length; ++i)
+                {
+                    if (depthGenStatusBots[i].componentStatus.BGCaptureFinished)
                     {
                         runningDGBots++;
                     }
