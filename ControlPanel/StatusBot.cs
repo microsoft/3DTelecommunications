@@ -65,6 +65,7 @@ namespace ControlPanel
 
         public string FusionStatus => softwareStates[(int)SOFTWARE.FUSION].ToString();
         public string CalibrationSoftwareStatus => softwareStates[(int)SOFTWARE.CALIBRATION].ToString();
+        public string BackgroundCaptureStatus => softwareStates[(int)SOFTWARE.BACKGROUND_CAPTURE].ToString();
         public string RenderStatus => softwareStates[(int)SOFTWARE.RENDER].ToString();
         public string VersionString => VersionData.Description;
         public string FPS => componentStatus.FPS.ToString();
@@ -497,6 +498,8 @@ namespace ControlPanel
             RegisterUpdateFunction(CPC_STATUS.CALIBRATION_SOFTWARE_CAPTURING_VIDEO_STARTED, baseStatusBotCalibrationSoftwareCapturingVideoStartedFunction);
             RegisterUpdateFunction(CPC_STATUS.CALIBRATION_SOFTWARE_TRANSFERRING_VIDEO, baseStatusBotCalibrationSoftwareTransferringVideoFunction);
             RegisterUpdateFunction(CPC_STATUS.CALIBRATION_SOFTWARE_VIDEO_TRANSFER_DONE, baseStatusBotCalibrationSoftwareVideoTransferDoneFunction);
+            RegisterUpdateFunction(CPC_STATUS.CALIBRATION_PROGRESS, baseStatusBotCalibrationProgressFunction);
+            RegisterUpdateFunction(CPC_STATUS.CALIBRATION_DONE, baseStatusBotCalibrationDoneFunction);
             //FPS related 
             if (setupFPS)
             {
@@ -607,6 +610,7 @@ namespace ControlPanel
                     int frameNumber = (int)System.BitConverter.ToInt32(update, 1 + sizeof(double));
                     componentStatus.FrameNum = frameNumber;
                     componentStatus.VideoRecordingStarted = true;
+                    OnPropertyChanged(nameof(Frames));
                 }
             }
             heartBeatRunning = true;
@@ -615,6 +619,18 @@ namespace ControlPanel
             OnPropertyChanged(nameof(MaxFPS));
             OnPropertyChanged(nameof(Temp));
             // Don't update status here, FPS status is just used for sending data back to the control panel
+        }
+
+        private void baseStatusBotCalibrationProgressFunction(byte[] update)
+        {
+            int BGframeNumber = (int)System.BitConverter.ToUInt32(update, 1);
+            componentStatus.FrameNum = BGframeNumber;
+            OnPropertyChanged(nameof(Frames));
+        }
+
+        private void baseStatusBotCalibrationDoneFunction(byte[] update)
+        {
+            componentStatus.BGCaptureFinished = true;
         }
         // Daemon bots don't actually read FPS, we're piggybacking on the packet
         // to transmit voltage and temperature from the Nanos

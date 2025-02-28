@@ -171,7 +171,7 @@ namespace ControlPanel
                 HeaderText = "Update"
             });
             // Refresh the DataGridView
-            
+
             dataGridView_software_version_list.Refresh();
         }
         private void DataGridView_broadcast_camera_daemons_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
@@ -247,7 +247,7 @@ namespace ControlPanel
                     if (double.TryParse(e.Value.ToString(), out double fps))
                     {
                         // Change the background color based on the value of FPS
-                        if (fps > 0 && fps != 100 && (fps < expectedFPS-0.5 || fps > expectedFPS+0.5)) 
+                        if (fps > 0 && fps != 100 && (fps < expectedFPS - 0.5 || fps > expectedFPS + 0.5))
                         {
                             e.CellStyle.BackColor = Color.Yellow;
                         }
@@ -412,6 +412,11 @@ namespace ControlPanel
             });
             dataGridView_broadcast_camera_daemons.Columns.Add(new DataGridViewTextBoxColumn
             {
+                DataPropertyName = "BackgroundCaptureStatus",
+                HeaderText = "Background Capture Software"
+            });
+            dataGridView_broadcast_camera_daemons.Columns.Add(new DataGridViewTextBoxColumn
+            {
                 DataPropertyName = "MinVoltage",
                 HeaderText = "Min Voltage"
             });
@@ -555,6 +560,7 @@ namespace ControlPanel
                 BotManager.Instance.BroadcastEventOnce(PeabodyNetworkingLibrary.CONTROL_PANEL_EVENT.BUILD_VERSION_REQUESTED);
             }
         }
+        /*** SECTION FOR BROADCAST ***/
         private void button_start_session_Click(object sender, EventArgs e)
         {
             if (InvokeRequired)
@@ -651,6 +657,10 @@ namespace ControlPanel
                 button_start_calibration.BackColor = Color.LightGreen;
                 button_start_calibration.Enabled = true;
                 button_start_calibration.Text = "Start Calibration";
+
+                button_start_bg_capture.BackColor = Color.LightGreen;
+                button_start_bg_capture.Enabled = true;
+                button_start_bg_capture.Text = "Capture Background";
             }
         }
         private void SetStartButtonClosing()
@@ -662,7 +672,6 @@ namespace ControlPanel
             }
             button_start_session.Text = "Closing...";
         }
-
         internal void StartingStartSessionButton()
         {
             if (InvokeRequired)
@@ -680,35 +689,42 @@ namespace ControlPanel
                 Invoke(new Action(DisableButtons));
                 return;
             }
-            if (TelemedSessionRunning || !BotManager.Instance.AllDaemonBotsReadyToBeLaunched_Capture)
+            if (TelemedSessionRunning)
             {
                 button_start_session.BackColor = Color.Red;
                 button_start_session.Text = "Stop Session";
             }
-            if ((CalibrationSessionRunning && button_start_calibration.Text == "Start Calibration")  //add any other button states where we might want "cancel" to be available
-                || (!CalibrationSessionRunning && !BotManager.Instance.AllDaemonBotsReadyToBeLaunched_Calib))
+            if (!BotManager.Instance.AllDaemonBotsReadyToBeLaunched_Capture)
             {
-                button_start_calibration.BackColor = Color.Red;
+                button_start_session.BackColor = Color.Red;
+                button_start_session.Text = "Not Ready";
+            }
+            if (CalibrationSessionRunning && button_start_calibration.Text == "Start Calibration")  //add any other button states where we might want "cancel" to be available    
+            {
                 button_start_calibration.Enabled = true;
-                button_start_calibration.Text = "Stop Calibration";
+                button_start_bg_capture.Enabled = false;
+            }
+            if (!CalibrationSessionRunning && !BotManager.Instance.AllDaemonBotsReadyToBeLaunched_Calib)
+            {
+                button_start_calibration.Enabled = true; //leave true, so I can still send the "stop" command
+                button_start_calibration.Text = "System Not Ready";
+                button_start_bg_capture.Text = "System Not Ready";
+                button_start_bg_capture.Enabled = false;
+            }
+            if (CalibrationSessionRunning && button_start_bg_capture.Text == "Capturing...")
+            {
+                button_start_calibration.Enabled = false;
+
+                button_start_bg_capture.Enabled = true;
+            }
+            if (CalibrationSessionRunning && button_start_bg_capture.Text == "Stop Capture")
+            {
+                button_start_calibration.Enabled = false;
+                button_start_bg_capture.Enabled = true;
             }
         }
 
-        public void StopCalibration()
-        {
-            BotManager.Instance.BroadcastStopUntilAllDGStop(SOFTWARE.CALIBRATION);
-            CalibrationSessionRunning = false;
-            EnableButtons();
-        }
-        public void UpdateCalibrationStatusTextbox(string message)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new Action<string>(UpdateCalibrationStatusTextbox), message);
-                return;
-            }
-            textBox_calibration_software_status.Text = message + Environment.NewLine + textBox_calibration_software_status.Text;
-        }
+        /*** SECTION FOR CALIBRATION ***/
 
         private void button_start_calibration_Click(object sender, EventArgs e)
         {
@@ -866,6 +882,98 @@ namespace ControlPanel
                 StopCalibration();
             }
         }
+        private void button_start_bg_capture_Click(object sender, EventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => button_start_bg_capture_Click(sender, e)));
+                return;
+            }
+            BotManager.Instance.StopBroadcastThread();
+
+
+            if (button_start_bg_capture.Text == "Capture Background")
+            {
+                OutputHelper.OutputLog("Background capture start button clicked!");
+                button_start_bg_capture.Text = "Capturing...";
+                UpdateCalibrationStatusTextbox("Background capture button clicked.  Starting background capture on the cameras.");
+                CalibrationSessionRunning = true;
+
+                SessionStartupThread = new Thread(() =>
+                {
+                    // Send the launch command to the daemon bots
+                    int dgNum = SettingsManager.Instance.GetValueWithDefault("DepthGeneration", "DepthCameraCount", 0, true);
+                    //kick off the sequence of tasks
+                    //start the DG's status bots 
+                    for (int i = 0; i < dgNum; ++i)
+                    {
+                        BotManager.Instance.depthGenStatusBots[i].Start();
+                    }
+                    //Tell the DG Daemons to start in Capture mode
+                    OutputHelper.OutputLog($"Start bg capture clicked.  Broadcasting the start bg capture signal.");
+                    BotManager.Instance.BroadcastSoftwareStartUntilAllDGStart(SOFTWARE.BACKGROUND_CAPTURE);
+
+                    // Wait for all DG to be running
+                    while (CalibrationSessionRunning && BotManager.Instance.GetBotsWithSoftwareRunning(SOFTWARE.BACKGROUND_CAPTURE) < dgNum && BotManager.Instance.GetBotsSendingFrameCounts() < dgNum)
+                    {
+                        UpdateStatusText($"Waiting for all bots to report bg capture software running: {BotManager.Instance.GetBotsWithSoftwareRunning(SOFTWARE.BACKGROUND_CAPTURE)}/{dgNum}");
+                        Thread.Sleep(250);
+                    }
+                    if (!CalibrationSessionRunning)
+                    {
+                        UpdateCalibrationStatusTextbox("Background capture stopped.");
+                        StopBGCapture();
+                        return;
+                    }
+                    BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED);
+                    BGRunningButton();       
+                    while (CalibrationSessionRunning && BotManager.Instance.GetBotsWithBGCaptureComplete() < dgNum)
+                    {
+                        Thread.Sleep(250);
+                    }
+                    UpdateCalibrationStatusTextbox("Background capture complete.");
+                    StopBGCapture();
+                });
+                SessionStartupThread.Start();
+            }
+            else
+            {
+                StopBGCapture();
+            }
+        }
+        private void BGRunningButton()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(BGRunningButton));
+                return;
+            }
+            button_start_bg_capture.BackColor = Color.Red;
+            button_start_bg_capture.Text = "Stop Capture";
+            UpdateCalibrationStatusTextbox("Background capture software is running.  It will stop automatically when each pod has captured 200 frames.");
+        }
+
+        public void StopBGCapture()
+        {
+            BotManager.Instance.BroadcastStopUntilAllDGStop(SOFTWARE.BACKGROUND_CAPTURE);  //this should work for BG capture as well, because the software automatically stops after capturing 200 frames
+            CalibrationSessionRunning = false;
+            EnableButtons();
+        }
+        public void StopCalibration()
+        {
+            BotManager.Instance.BroadcastStopUntilAllDGStop(SOFTWARE.CALIBRATION);  //this should work for BG capture as well, because the software automatically stops after capturing 200 frames
+            CalibrationSessionRunning = false;
+            EnableButtons();
+        }
+        public void UpdateCalibrationStatusTextbox(string message)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action<string>(UpdateCalibrationStatusTextbox), message);
+                return;
+            }
+            textBox_calibration_software_status.Text = message + Environment.NewLine + textBox_calibration_software_status.Text;
+        }
 
         private void CancelCalibrationButton()
         {
@@ -956,6 +1064,7 @@ namespace ControlPanel
             button_start_calibration.Text = "Software Starting...";
             UpdateCalibrationStatusTextbox("New calibration start button clicked.  Starting K4ARecorder on the cameras.");
         }
+
         private List<ConfigItem> LoadConfigItems()
         {
             var configItems = new List<ConfigItem>();
@@ -987,6 +1096,7 @@ namespace ControlPanel
 
         }
 
+        /*** SECTION FOR DEBUG BUTTONS ***/
         private void button_debug_StartFusion_Click(object sender, EventArgs e)
         {
             BotManager.Instance.BroadcastEventOnce(CONTROL_PANEL_EVENT.CONTROL_PANEL_START_REQUESTED, BitConverter.GetBytes((char)SOFTWARE.FUSION));
