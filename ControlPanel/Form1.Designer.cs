@@ -465,11 +465,12 @@ namespace ControlPanel
             // 
             // button_start_bg_capture
             // 
+            button_start_bg_capture.AutoSize = true;
             button_start_bg_capture.Font = new Font("Segoe UI", 18F);
             button_start_bg_capture.Location = new Point(788, 2);
             button_start_bg_capture.Margin = new Padding(2);
             button_start_bg_capture.Name = "button_start_bg_capture";
-            button_start_bg_capture.Size = new Size(256, 40);
+            button_start_bg_capture.Size = new Size(256, 41);
             button_start_bg_capture.TabIndex = 7;
             button_start_bg_capture.Text = "Capture Background";
             button_start_bg_capture.UseVisualStyleBackColor = true;
@@ -477,11 +478,12 @@ namespace ControlPanel
             // 
             // button_start_calibration
             // 
+            button_start_calibration.AutoSize = true;
             button_start_calibration.Font = new Font("Segoe UI", 18F);
             button_start_calibration.Location = new Point(2, 2);
             button_start_calibration.Margin = new Padding(2);
             button_start_calibration.Name = "button_start_calibration";
-            button_start_calibration.Size = new Size(256, 40);
+            button_start_calibration.Size = new Size(256, 41);
             button_start_calibration.TabIndex = 6;
             button_start_calibration.Text = "Start Calibration";
             button_start_calibration.UseVisualStyleBackColor = true;
@@ -1164,6 +1166,7 @@ namespace ControlPanel
             tableLayoutPanel1.PerformLayout();
             panel2.ResumeLayout(false);
             tableLayoutPanel7.ResumeLayout(false);
+            tableLayoutPanel7.PerformLayout();
             tableLayoutPanel5.ResumeLayout(false);
             tableLayoutPanel5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView_calibration_camera_status).EndInit();
