@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #include "stdafx.h"
 #include "track_extraction_basic.h"
 using namespace std;

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __VISUAL_FEATURE_MATCHING_H__
 #define __VISUAL_FEATURE_MATCHING_H__
 #include <brl/bseg/bapl/bapl_lowe_keypoint_sptr.h>

@@ -1,29 +1,9 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #include "stdafx.h"
 #include "CCLCuda.h"
 #include <helper_cuda.h>
 
-
-//void CCLCuda::
-//readout_labels(std::vector<vnl_matrix<int>> &mat_labels)
-//{
-//	mat_labels.clear();
-//	mat_labels.resize(view_num_);
-//
-//	cudaMemcpy3DParms paras = { 0 };
-//	paras.srcPos = make_cudaPos(0, 0, 0);
-//	paras.dstPos = make_cudaPos(0, 0, 0);
-//	paras.srcArray = cu_3dArr_labels_;
-//	paras.dstPtr = make_cudaPitchedPtr(NULL, width_ * sizeof(int),width_, height_);
-//	paras.extent = make_cudaExtent(width_, height_, 1);
-//	paras.kind = cudaMemcpyDeviceToHost;
-//	for (int i = 0; i < view_num_; i++)
-//	{
-//		mat_labels[i].set_size(height_, width_);
-//		paras.srcPos = make_cudaPos(0, 0, i);
-//		paras.dstPtr = make_cudaPitchedPtr(mat_labels[i].data_block(), width_ * sizeof(int), width_, height_);
-//		checkCudaErrors(cudaMemcpy3D(&paras));
-//	}
-//}
 
 void CCLCuda::
 readout_labels(std::vector<vnl_matrix<int>> &mat_labels)

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #pragma once
 #ifndef __SURFACE_MISC_HPP__
 #define __SURFACE_MISC_HPP__

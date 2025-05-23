@@ -1,4 +1,6 @@
 #pragma once
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #include "ControlPanelConnector.h"
 using namespace ControlPanelConnector;
 

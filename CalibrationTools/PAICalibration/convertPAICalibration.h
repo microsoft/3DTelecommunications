@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef CONVERT_PAI_CALIBRATION_H
 #define CONVERT_PAI_CALIBRATION_H
 

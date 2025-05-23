@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 // C++17 defines std::byte and it causes numerous compile errors for ambiguous byte types without this flag
 #define _HAS_STD_BYTE 0  
 #include <filesystem>

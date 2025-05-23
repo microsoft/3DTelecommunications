@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __DEFORMGRAPHCUDAIMPL_GPU_CUH__
 #define __DEFORMGRAPHCUDAIMPL_GPU_CUH__
 #include "cuda_vector_fixed.cuh"

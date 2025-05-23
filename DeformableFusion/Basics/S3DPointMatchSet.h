@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __S3DPOINTMATCHSET_H__
 #define __S3DPOINTMATCHSET_H__
 #include <vector>

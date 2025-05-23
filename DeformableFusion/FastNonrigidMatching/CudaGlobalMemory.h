@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __CUDAGLOBALMEMORY_H__
 #define __CUDAGLOBALMEMORY_H__
 #include <cuda_runtime.h>

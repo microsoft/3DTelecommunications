@@ -1,12 +1,5 @@
-/**
-* Code adapted from the main.cpp file of the RunCalibrationApi executable from the PAI Calibration tool.
-* This code modifies the main function to become a callable named RunCalibrationApi that accepts
-* a function callback, which can be used to send progress information to the Control Panel.
-* 
-* Repo: https://microsoft.visualstudio.com/Analog/_git/vision.presence.babylon?path=/Holoportation/Tools/Calibration/RunCalibrationApi
-* Commit: f7e69cc2
-**/
-
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #include "PAI/InputParameters.h"
 #include "PAI/Metrics.h"
 #include "Logger.h"

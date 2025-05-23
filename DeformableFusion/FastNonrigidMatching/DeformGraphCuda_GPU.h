@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __DEFORMGRAPH_CUDA_GPU_H__
 #define __DEFORMGRAPH_CUDA_GPU_H__
 

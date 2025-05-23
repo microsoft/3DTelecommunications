@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __KL_FEATURES_H__
 #define __KL_FEATURES_H__
 #include "UtilMatrix.h"

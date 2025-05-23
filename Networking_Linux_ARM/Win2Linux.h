@@ -1,4 +1,6 @@
 #pragma once
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 //typedef unsigned long DWORD;
 //typedef unsigned long ULONG;
 // in windows, long is 4 bytes, but on Linux ARM is resolves to 8 bytes, so
@@ -99,4 +101,3 @@ typedef struct _WSABUF {
 #include <string.h>
 #define memcpy_s(dest, destSize, src, count) memcpy(dest, src, count)
 #define sscanf_s sscanf
-

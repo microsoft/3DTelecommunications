@@ -1,8 +1,5 @@
-//===============================================
-//			CPointCloud.h
-//			Mingsong Dou (doums@cs.unc.edu)
-//			August, 2010
-//===============================================
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 
 #pragma once
 #include <stdio.h>

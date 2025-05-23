@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __TRACK_EXTRACTION_BASIC_H__
 #define __TRACK_EXTRACTION_BASIC_H__
 #include "UtilMatrix.h"

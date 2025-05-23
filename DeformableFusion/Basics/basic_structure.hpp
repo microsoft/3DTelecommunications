@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #pragma once
 #ifndef __BASIC_STRUCTURE_HPP__
 #define __BASIC_STRUCTURE_HPP__

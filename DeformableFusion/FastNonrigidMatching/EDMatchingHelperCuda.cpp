@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 bool EDMatchingHelperCuda::
 read_out(BlockedHessianMatrix &jtj, vnl_vector<float> &jtf)
 {

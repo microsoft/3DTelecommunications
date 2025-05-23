@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __BLOCKEDHESSIANMATRIX_H__
 #define __BLOCKEDHESSIANMATRIX_H__
 

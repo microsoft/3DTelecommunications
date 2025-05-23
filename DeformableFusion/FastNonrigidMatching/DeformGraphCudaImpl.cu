@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 __device__ int dev_ed_cubes_count = 0;
 surface<void, cudaSurfaceType3D> surf_ndIds; //short
 texture<short, cudaTextureType3D, cudaReadModeElementType> tex_ndIds;

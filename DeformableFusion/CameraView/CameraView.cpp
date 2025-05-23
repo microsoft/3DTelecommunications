@@ -1,9 +1,5 @@
-//===============================================
-//			CameraView.cpp
-//			Mingsong Dou (doums@cs.unc.edu)
-//			Modified from Li Guan's code
-//			August, 2010
-//===============================================
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 
 #include "CameraView.h"
 #include "UtilMatrix.h"

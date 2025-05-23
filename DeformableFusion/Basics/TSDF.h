@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __TSDF_H__
 #define __TSDF_H__
 #include "VoxelMatrix.h"

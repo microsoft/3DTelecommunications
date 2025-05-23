@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __BASIC_STRUCTURE_H__
 #define __BASIC_STRUCTURE_H__
 

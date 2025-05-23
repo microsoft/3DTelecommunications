@@ -1,4 +1,6 @@
-﻿using SharpConfig;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+using SharpConfig;
 using System;
 using System.Collections;
 using System.Collections.Generic;

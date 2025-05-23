@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #include "stdafx.h"
 #include "visual_feature_matching.h"
 

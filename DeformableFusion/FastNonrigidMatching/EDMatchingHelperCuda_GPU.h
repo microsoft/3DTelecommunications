@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __EDMATCHINGHELPERCUDA_GPU_CUH__
 #define __EDMATCHINGHELPERCUDA_GPU_CUH__
 

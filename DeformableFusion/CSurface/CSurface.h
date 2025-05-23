@@ -1,8 +1,5 @@
-//===============================================
-//			CSurface.h
-//			Mingsong Dou (doums@cs.unc.edu)
-//			August, 2010
-//===============================================
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __CSURFACE_H__
 #define __CSURFACE_H__
 

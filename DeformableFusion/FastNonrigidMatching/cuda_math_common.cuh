@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __CUDA_MATH_COMMON_CUL__
 #define __CUDA_MATH_COMMON_CUL__
 #include "cuda_runtime.h"

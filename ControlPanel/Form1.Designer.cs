@@ -1,4 +1,5 @@
-﻿
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 namespace ControlPanel
 {
     partial class ControlPanel
