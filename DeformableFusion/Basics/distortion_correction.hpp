@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __DISTORTION_CORRECTION_HPP__
 #define __DISTORTION_CORRECTION_HPP__
 

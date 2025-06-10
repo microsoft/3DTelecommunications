@@ -1,8 +1,6 @@
 #pragma once
-/// Project Peabody
-///
-/// Copyright (c) Microsoft Corporation. All Rights Reserved
-///
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 
 // Debug Profiling
 

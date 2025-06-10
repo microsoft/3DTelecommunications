@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -91,7 +93,7 @@ namespace ControlPanel
             //boolean variable to hold the status
             bool valid = false;
             //check to make sure an ip address was provided
-            if (addr == "" || addr == null)
+            if (String.IsNullOrEmpty(addr))
             {
                 //no address provided so return false
                 valid = false;

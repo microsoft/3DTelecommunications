@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __VOXEL_DATA_IO_H__
 #define __VOXEL_DATA_IO_H__
 #include "CameraView.h"

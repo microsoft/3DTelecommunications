@@ -1,3 +1,5 @@
+//// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 // From Fusion4D/TED
 
 struct TofinoPacketHeader

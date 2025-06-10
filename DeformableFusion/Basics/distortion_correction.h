@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __DISTORTION_CORRECTION_H__
 #define __DISTORTION_CORRECTION_H__
 //#include "basic_data_structure.h"

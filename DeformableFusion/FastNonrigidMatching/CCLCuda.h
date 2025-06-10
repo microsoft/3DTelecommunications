@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __CCLCUDA_H__
 #define __CCLCUDA_H__
 #include <vector>

@@ -1,14 +1,7 @@
 #ifndef CISOSURFACE_H
 #define CISOSURFACE_H
-// File Name: CIsoSurface.h
-// Last Modified: 5/8/2000
-// Author: Raghavendra Chandrashekara (basesd on source code
-// provided by Paul Bourke and Cory Gene Bloyd)
-// Email: rc99@doc.ic.ac.uk, rchandrashekara@hotmail.com
-//
-// Description: This is the interface file for the CIsoSurface class.
-// CIsoSurface can be used to construct an isosurface from a scalar
-// field.
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 
 /******************************************************************
  * Notice added by Mingsong Dou (doums@cs.unc.edu)

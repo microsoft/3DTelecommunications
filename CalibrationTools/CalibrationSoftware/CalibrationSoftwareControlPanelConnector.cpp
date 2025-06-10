@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #include "CalibrationSoftwareControlPanelConnector.h"
 
 #ifndef WIN32_LEAN_AND_MEAN

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __CCLCUDAImpl_H__
 #define __CCLCUDAImpl_H__
 #include "cuda_runtime.h"
@@ -17,7 +19,6 @@ public:
 			this->width_ = width;
 			this->height_ = height;
 			this->view_num_ = view_num;
-			//allocate_and_bind_cuda_array_labels(width, height, view_num);
 			allocate_labels_linear_memory(width, height, view_num);
 		}
 
@@ -29,9 +30,6 @@ public:
 	void clear_small_components(int thres_pixel_count = 300);
 
 protected:
-	//cudaArray *cu_3dArr_labels_; //bound to both surface and texture memory
-	//cudaTextureObject_t texObj_labels_;
-	//cudaSurfaceObject_t surfObj_labels_;
 	int* dev_labels_all_views_;
 	int height_;
 	int width_;
@@ -40,7 +38,6 @@ protected:
 	short* dev_LUT_new_labels_;
 
 protected:
-	//void allocate_and_bind_cuda_array_labels(int width, int height, int view_num);
 	void allocate_labels_linear_memory(int width, int height, int view_num);
 };
 

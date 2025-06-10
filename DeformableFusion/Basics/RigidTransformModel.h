@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __RIGIDTRANSFORMMODEL_H__
 #define __RIGIDTRANSFORMMODEL_H__
 #include "UtilVnlMatrix.h"

@@ -1,22 +1,9 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #include "CCLCudaImpl.h"
 #include "cuda_runtime.h"
 #include <helper_cuda.h>
 #include "../Common/debug.h"
-
-//__device__ __forceinline__
-//int ccl_find_root(int* equivalence_arr, int addr)
-//{
-//	if (addr >= 0)
-//	{
-//		while (equivalence_arr[addr] != addr)
-//		{
-//			addr = equivalence_arr[addr];
-//			if (addr < 0)
-//				printf("\nError: %d\n", addr);
-//		}
-//	}
-//	return addr;
-//}
 
 __device__ __forceinline__
 int ccl_find_root(int* equivalence_arr, int addr)
@@ -26,8 +13,6 @@ int ccl_find_root(int* equivalence_arr, int addr)
 		int addr_new = equivalence_arr[addr];
 		while (addr_new != addr)
 		{
-			//if (addr_new < 0)
-			//	printf("\nError: label[%d] = %d\n", addr, addr_new);
 			addr = addr_new;
 			addr_new = equivalence_arr[addr];
 		}
@@ -182,7 +167,6 @@ void ccl_kernel_local(cudaTextureObject_t texObj_depths, int *dev_labels,
 	if (x < width && y < height)
 	{
 		int gl_label = ccl_label_local_to_global(label, width);
-		//surf2DLayeredwrite(gl_label, surfObj_labels, x*sizeof(int), y, vId, cudaBoundaryModeClamp);
 		dev_labels[y*width + x] = gl_label;
 	}
 }
@@ -313,11 +297,6 @@ void ccl_kernel_seam(cudaTextureObject_t texObj_depths, int *dev_labels,
 						int label_n = sh_labels_border_br[id + i];
 						if (d_n > 0 && abs(d - d_n) < thres_depth)
 						{
-							//if (label == -1)
-							//	printf("!!!label == -1!, d = %d\n", d);
-							//if (label_n == -1)
-							//	printf("!!!label_n == -1!, d_n = %d\n", d_n);
-
 							if (label < label_n)
 							{
 								atomicMin(&(dev_labels[label_n]), label);
@@ -525,38 +504,6 @@ run_ccl(cudaArray *cu_3dArr_depths, float depth_thres_in_cm, bool bUseTopBitAsSe
 	}
 
 }
-
-
-//void CCLCudaImpl::
-//allocate_and_bind_cuda_array_labels(int width, int height, int view_num)
-//{
-//	this->view_num_ = view_num;
-//	this->height_ = height;
-//	this->width_ = width;
-//
-//	//allocate labels array
-//	cudaChannelFormatDesc channelDesc_tex = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindSigned);
-//	checkCudaErrors(cudaMalloc3DArray(&cu_3dArr_labels_, &channelDesc_tex, make_cudaExtent(width, height, view_num),
-//		cudaArraySurfaceLoadStore | cudaArrayLayered));
-//
-//	//bind label array to texture and surface object
-//	struct cudaResourceDesc resDesc;
-//	memset(&resDesc, 0, sizeof(resDesc));
-//	resDesc.resType = cudaResourceTypeArray; 
-//	resDesc.res.array.array = cu_3dArr_labels_;
-//
-//	struct cudaTextureDesc texDesc;
-//	memset(&texDesc, 0, sizeof(texDesc));
-//	texDesc.addressMode[0] = cudaAddressModeClamp;
-//	texDesc.addressMode[1] = cudaAddressModeClamp;
-//	texDesc.filterMode = cudaFilterModePoint;
-//	texDesc.readMode = cudaReadModeElementType;
-//	texDesc.normalizedCoords = false;
-//
-//	cudaCreateTextureObject(&texObj_labels_, &resDesc, &texDesc, NULL);
-//
-//	cudaCreateSurfaceObject(&surfObj_labels_, &resDesc);
-//}
 
 void CCLCudaImpl::
 allocate_labels_linear_memory(int width, int height, int view_num)

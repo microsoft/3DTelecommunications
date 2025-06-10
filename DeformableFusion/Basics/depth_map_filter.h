@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __DEPTH_MAP_FILTER_H__
 #define __DEPTH_MAP_FILTER_H__
 #include "basic_structure.h"

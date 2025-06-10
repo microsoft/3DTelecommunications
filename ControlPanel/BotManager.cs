@@ -1,4 +1,6 @@
-﻿using ControlPanel;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+using ControlPanel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -1079,9 +1081,12 @@ namespace ControlPanel
                     }
                     else
                     {
-                        float ReprojectionError = json["calibrationSession"]["metrics"]["ReprojectionError"].ToObject<float>();
-                        float DepthError = json["calibrationSession"]["metrics"]["DepthError"].ToObject<float>();
-                        float MultiViewMisalignment = json["calibrationSession"]["metrics"]["MultiViewMisalignment"].ToObject<float>();
+                        float MultiViewMisalignment = 0.0f;
+                        float ReprojectionError = 0.0f;
+                        float DepthError = 0.0f;
+                        ReprojectionError = json["calibrationSession"]["metrics"]["ReprojectionError"].ToObject<float>();
+                        DepthError = json["calibrationSession"]["metrics"]["DepthError"].ToObject<float>();
+                        MultiViewMisalignment = json["calibrationSession"]["metrics"]["MultiViewMisalignment"].ToObject<float>();
                         String metric_msg = $"Successful Calibration. Reprojection error {ReprojectionError:F3} pixels. Depth error {DepthError:F3}mm. MultiViewMisalignment {MultiViewMisalignment:F3}mm";
                         if (MultiViewMisalignment > 2.0)
                         {

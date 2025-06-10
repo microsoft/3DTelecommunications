@@ -1,8 +1,5 @@
-//===============================================
-//			CSurface.hpp
-//			Mingsong Dou (doums@cs.unc.edu)
-//			August, 2010
-//===============================================
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #pragma once
 #ifndef __CSURFACE_HPP__
 #define __CSURFACE_HPP__

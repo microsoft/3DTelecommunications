@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "cuda_math_common.cuh"

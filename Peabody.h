@@ -14,7 +14,7 @@
 // FOR ENCODER
 const int TRANSMITTED_RAW_DEPTH_BYTES_PER_PIXEL = 2;
 
-// FOR FUSION
+// FOR FUSION, still used in CUDA files
 extern int DEPTH_CAMERAS_NUM;
 const int MAX_NUM_DEPTH_CAMERAS = 15;
 const int DEFAULT_PODS_PER_HOST = 1;

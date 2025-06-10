@@ -1,6 +1,6 @@
-# 3D Telemedicine
+# 3D Telecommunications
 
-> This is the open source repository for the 3D Telemedicine system created by Microsoft Research Special Projects Group: https://www.microsoft.com/en-us/research/project/3d-telemedicine/
+> This is the open source repository for the 3D Telecommunications system created by Microsoft Research Special Projects Group and used in the 3D Telemedicine application: https://www.microsoft.com/en-us/research/project/3d-telemedicine/
 [![Watch the video](https://img.youtube.com/vi/ml4Dv5CWC7s/maxresdefault.jpg)](https://youtu.be/ml4Dv5CWC7s)
 
 ## System Requirements
@@ -81,7 +81,7 @@ Viewer subscribes to a given Render stream and presents the textured 3D model to
 It is a C# Unity project, and is known to work with Unity 2019.4.14f1.  It uses Boost ASI for transmitting data. 
 ### Control Panel
 The control panel software orchestrates all of the components of the 3D Telemedicine system.  It provides one interface to start a calibration session, start a broadcast (live) session, modify configuration values, transmit configuration to the various components, monitor status and version of all components in the system, and check for updated components from an Internet-accessible source.
-It is a C# Unity project, and is known to work with Unity 2019.4.14f1. It utilizes the zeroMQ networking library for all communication.
+It is a C# .Net project that utilizes the zeroMQ networking library for all communication.  You will find most other components in the system have a ControlPanelConnector class to handle the communication with the Control Panel.
 ### Calibration Software
 The calibration software will take a number of synchronized input mkv videos from cameras in the system (Azure Kinect) and output a calibration file that provides world coordinates of all cameras in the system.   It is dependent on the PAI calibration system available at this NuGet repository: 
 It is a C++ project.  It uses ZeroMQ for transmitting progress updates to the Control Panel.

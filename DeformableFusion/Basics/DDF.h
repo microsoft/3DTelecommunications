@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __DDF_H__
 #define __DDF_H__
 #include "TSDF.h"

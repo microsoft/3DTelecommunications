@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #pragma once
 #include <cuda_runtime.h>
 #include <helper_cuda.h>

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #pragma once
 #ifndef __CUDA_MATRIX_FIXED_CUH__
 #define __CUDA_MATRIX_FIXED_CUH__

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 void DeformGraphCuda::
 allocate_memory(int vts_num_max, int vt_dim)
 {

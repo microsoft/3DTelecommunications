@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __CUDA_UTILITY_H__
 #define __CUDA_UTILITY_H__
 #include "UtilVnlMatrix.h"

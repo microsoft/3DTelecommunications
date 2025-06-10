@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __FUNC_JACOBIANS_H__
 #define __FUNC_JACOBIANS_H__
 #include "UtilVnlMatrix.h"

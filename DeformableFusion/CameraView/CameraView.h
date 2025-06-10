@@ -1,9 +1,5 @@
-//===============================================
-//			CameraView.h
-//			Mingsong Dou (doums@cs.unc.edu)
-//			Modified from Li Guan's code
-//			August, 2010
-//===============================================
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef _CAMERA_VIEW_H_
 #define _CAMERA_VIEW_H_
 

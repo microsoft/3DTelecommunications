@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #include <iostream>
 #include <string>
 #include <filesystem>
@@ -30,18 +32,18 @@ CConfig* LoadConfigFile(const char* argv[], int argc, std::string& config_filena
 	// if a config wasn't specified on the command line
 	if (config_filename.empty())
 	{
-		std::cout << "No config file specified on command line.  Using 3DTelemedicine_dir environment variable." << std::endl;
+		std::cout << "No config file specified on command line.  Using 3DTelecommunications_dir environment variable." << std::endl;
 		size_t env_var_3dtm_len;
 		char* env_var_3dtm = NULL;
 
-		errno_t err = _dupenv_s(&env_var_3dtm, &env_var_3dtm_len, "3DTelemedicine_dir");
+		errno_t err = _dupenv_s(&env_var_3dtm, &env_var_3dtm_len, "3DTelecommunications_dir");
 
 		// Try the System directory
 		if (env_var_3dtm != NULL)
 		{
 			std::string tmdir = std::string(env_var_3dtm);
 
-			tmdir += "/3DTelemedicine.cfg";
+			tmdir += "/3DTelecommunications.cfg";
 			if (std::filesystem::exists(std::filesystem::path(tmdir)))
 			{
 				std::cout << "Using " << tmdir << std::endl;
@@ -199,10 +201,10 @@ int InvokePAICalibration(CConfig* conf, CalibrationSoftwareControlPanelConnector
 	params["rigType"] = conf->GetValueWithDefault("Calibration", "RigType", "Kinect");
 	params["maximumTimeSeparationOfSubframes"] = conf->GetValueWithDefault("Calibration", "MaximumTimeSeparationOfSubframes", 2000);
 	params["calibration-mode"] = conf->GetValueWithDefault("Calibration", "CalibrationMode", "stage2"); // Default is to compute extrinsics only. Using stage2 gives us that
-	params["mkvsDir"] = conf->GetValueWithDefault("Calibration", "CalibrationWorkingDirectory", "C:\\3DTelemedicine\\DATA\\Calibration");
-	params["outDir"] = conf->GetValueWithDefault("Calibration", "CalibrationWorkingDirectory", "C:\\3DTelemedicine\\DATA\\Calibration");
+	params["mkvsDir"] = conf->GetValueWithDefault("Calibration", "CalibrationWorkingDirectory", "C:\\3DTelecommunications\\DATA\\Calibration");
+	params["outDir"] = conf->GetValueWithDefault("Calibration", "CalibrationWorkingDirectory", "C:\\3DTelecommunications\\DATA\\Calibration");
 	params["objectSize"] = conf->GetValueWithDefault(conf->GetValueWithDefault("Calibration", "CalibrationBoard", "CalibrationBoard-A0"), "ObjectSize", 0.14f);
-	params["clipMetricsFilePath"] = std::string(conf->GetValueWithDefault("Calibration", "CalibrationWorkingDirectory", "C:\\3DTelemedicine\\DATA\\Calibration")) + "\\calibrationMetrics.csv";
+	params["clipMetricsFilePath"] = std::string(conf->GetValueWithDefault("Calibration", "CalibrationWorkingDirectory", "C:\\3DTelecommunications\\DATA\\Calibration")) + "\\calibrationMetrics.csv";
 	params["numOfDevices"] = conf->GetValueWithDefault("DepthGeneration", "DepthCameraCount", 10);
 	
 	if (conf->HasKey("Calibration", "DevicesCalibrationJson")) {
@@ -312,7 +314,7 @@ std::string slurp(const char* filename)
 std::string FetchCalibrationResultAsJsonString(CConfig* conf) {
 	std::string json_string;
 
-	std::string calib_filename = std::string(conf->GetValueWithDefault("Calibration", "CalibrationWorkingDirectory", "C:\\3DTelemedicine\\DATA\\Calibration")) + "\\calibCameras3DTM.json";
+	std::string calib_filename = std::string(conf->GetValueWithDefault("Calibration", "CalibrationWorkingDirectory", "C:\\3DTelecommunications\\DATA\\Calibration")) + "\\calibCameras3DTM.json";
 	LOGGER()->info("Fetching calibration file %s", calib_filename.c_str());
 	json_string = slurp(calib_filename.c_str());
 

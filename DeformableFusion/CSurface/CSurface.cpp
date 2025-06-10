@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #include "CSurface.h"
 #include <stdio.h>
 #include <fstream>

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __CUDA_VECTOR_FIXED_CUH__
 #define __CUDA_VECTOR_FIXED_CUH__
 #include "cuda_runtime.h"

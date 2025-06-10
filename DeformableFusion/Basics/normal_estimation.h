@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 #ifndef __NORMAL_ESTIMATION_H__
 #define __NORMAL_ESTIMATION_H__
 #include "basic_geometry.h"

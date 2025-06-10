@@ -1,8 +1,5 @@
-/**
-* File copied from the RunCalibrationApi executable source code of the PAI Calibration tool.
-* Repo: https://microsoft.visualstudio.com/Analog/_git/vision.presence.babylon?path=/Holoportation/Tools/Calibration/RunCalibrationApi
-* Commit: f7e69cc2
-**/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 
 #pragma once
 
